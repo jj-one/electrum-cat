@@ -1069,9 +1069,9 @@ class Transaction:
             return False
         return True
 
-    def is_final(self) -> bool:
-        """Whether RBF is disabled."""
-        return not any([txin.nsequence < 0xffffffff - 1 for txin in self.inputs()])
+    def is_rbf_enabled(self) -> bool:
+        """Whether the tx explicitly signals BIP-0125 replace-by-fee."""
+        return any([txin.nsequence < 0xffffffff - 1 for txin in self.inputs()])
 
     def estimated_size(self):
         """Return an estimated virtual tx size in vbytes.
@@ -1858,6 +1858,7 @@ class PartialTransaction(Transaction):
 
     @classmethod
     def from_tx(cls, tx: Transaction) -> 'PartialTransaction':
+        assert tx
         res = cls()
         res._inputs = [PartialTxInput.from_txin(txin, strip_witness=True)
                        for txin in tx.inputs()]

@@ -834,8 +834,13 @@ class Abstract_Wallet(ABC, Logger, EventListener):
     def is_lightning_funding_tx(self, txid: Optional[str]) -> bool:
         if not self.lnworker or txid is None:
             return False
-        return any([chan.funding_outpoint.txid == txid
-                    for chan in self.lnworker.channels.values()])
+        if any([chan.funding_outpoint.txid == txid
+                for chan in self.lnworker.channels.values()]):
+            return True
+        if any([chan.funding_outpoint.txid == txid
+                for chan in self.lnworker.channel_backups.values()]):
+            return True
+        return False
 
     def get_swap_by_claim_tx(self, tx: Transaction) -> bool:
         return self.lnworker.swap_manager.get_swap_by_claim_tx(tx) if self.lnworker else None
@@ -922,8 +927,8 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                         size = tx.estimated_size()
                         fee_per_byte = fee / size
                         exp_n = self.config.fee_to_depth(fee_per_byte)
-                    can_bump = (is_any_input_ismine or is_swap) and not tx.is_final()
-                    can_dscancel = (is_any_input_ismine and not tx.is_final()
+                    can_bump = (is_any_input_ismine or is_swap) and tx.is_rbf_enabled()
+                    can_dscancel = (is_any_input_ismine and tx.is_rbf_enabled()
                                     and not all([self.is_mine(txout.address) for txout in tx.outputs()]))
                     try:
                         self.cpfp(tx, 0)
@@ -937,7 +942,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                         num_blocks_remainining = max(0, num_blocks_remainining)
                         status = _('Local (future: {})').format(_('in {} blocks').format(num_blocks_remainining))
                     can_broadcast = self.network is not None
-                    can_bump = (is_any_input_ismine or is_swap) and not tx.is_final()
+                    can_bump = (is_any_input_ismine or is_swap) and tx.is_rbf_enabled()
             else:
                 status = _("Signed")
                 can_broadcast = self.network is not None
@@ -1238,7 +1243,9 @@ class Abstract_Wallet(ABC, Logger, EventListener):
     def export_invoices(self, path):
         write_json_file(path, list(self._invoices.values()))
 
-    def get_relevant_invoices_for_tx(self, tx_hash) -> Sequence[Invoice]:
+    def get_relevant_invoices_for_tx(self, tx_hash: Optional[str]) -> Sequence[Invoice]:
+        if not tx_hash:
+            return []
         invoice_keys = self._invoices_from_txid_map.get(tx_hash, set())
         invoices = [self.get_invoice(key) for key in invoice_keys]
         invoices = [inv for inv in invoices if inv]  # filter out None
@@ -1650,7 +1657,6 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             tx = self.db.get_transaction(tx_hash)
             if not tx:
                 return 2, _("unknown")
-            is_final = tx and tx.is_final()
             fee = self.adb.get_tx_fee(tx_hash)
             if fee is not None:
                 size = tx.estimated_size()
@@ -1713,7 +1719,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             if self.is_lightning_funding_tx(txid):
                 continue
             # tx must have opted-in for RBF (even if local, for consistency)
-            if tx.is_final():
+            if not tx.is_rbf_enabled():
                 continue
             # reject merge if we need to spend outputs from the base tx
             remaining_amount = sum(c.value_sats() for c in coins if c.prevout.txid.hex() != tx.txid())
@@ -2038,15 +2044,11 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         self,
         *,
         tx: Transaction,
-        txid: str = None,
     ) -> Tuple[Sequence[BumpFeeStrategy], int]:
         """Returns tuple(list of available strategies, idx of recommended option among those)."""
-        txid = txid or tx.txid()
-        assert txid
-        assert tx.txid() in (None, txid)
         all_strats = BumpFeeStrategy.all()
         # are we paying max?
-        invoices = self.get_relevant_invoices_for_tx(txid)
+        invoices = self.get_relevant_invoices_for_tx(tx.txid())
         if len(invoices) == 1 and len(invoices[0].outputs) == 1:
             if invoices[0].outputs[0].value == '!':
                 return all_strats, all_strats.index(BumpFeeStrategy.DECREASE_PAYMENT)
@@ -2060,7 +2062,6 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             self,
             *,
             tx: Transaction,
-            txid: str = None,
             new_fee_rate: Union[int, float, Decimal],
             coins: Sequence[PartialTxInput] = None,
             strategy: BumpFeeStrategy = BumpFeeStrategy.PRESERVE_PAYMENT,
@@ -2072,14 +2073,12 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         note: it is the caller's responsibility to have already called tx.add_info_from_network().
               Without that, all txins must be ismine.
         """
-        txid = txid or tx.txid()
-        assert txid
-        assert tx.txid() in (None, txid)
+        assert tx
         if not isinstance(tx, PartialTransaction):
             tx = PartialTransaction.from_tx(tx)
         assert isinstance(tx, PartialTransaction)
         tx.remove_signatures()
-        if tx.is_final():
+        if not tx.is_rbf_enabled():
             raise CannotBumpFee(_('Transaction is final'))
         new_fee_rate = quantize_feerate(new_fee_rate)  # strip excess precision
         tx.add_info_from_wallet(self)
@@ -2098,7 +2097,6 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             try:
                 tx_new = self._bump_fee_through_coinchooser(
                     tx=tx,
-                    txid=txid,
                     new_fee_rate=new_fee_rate,
                     coins=coins,
                 )
@@ -2127,7 +2125,6 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             self,
             *,
             tx: PartialTransaction,
-            txid: str,
             new_fee_rate: Union[int, Decimal],
             coins: Sequence[PartialTxInput] = None,
     ) -> PartialTransaction:
@@ -2137,7 +2134,6 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         - keeps all not is_mine outputs,
         - allows adding new inputs
         """
-        assert txid
         tx = copy.deepcopy(tx)
         tx.add_info_from_wallet(self)
         assert tx.get_fee() is not None
@@ -2166,7 +2162,8 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         if coins is None:
             coins = self.get_spendable_coins(None)
         # make sure we don't try to spend output from the tx-to-be-replaced:
-        coins = [c for c in coins if c.prevout.txid.hex() != txid]
+        coins = [c for c in coins
+                 if c.prevout.txid.hex() not in self.adb.get_conflicting_transactions(tx, include_self=True)]
         for item in coins:
             self.add_input_info(item)
         def fee_estimator(size):
@@ -2304,6 +2301,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         return True
 
     def cpfp(self, tx: Transaction, fee: int) -> Optional[PartialTransaction]:
+        assert tx
         txid = tx.txid()
         for i, o in enumerate(tx.outputs()):
             address, value = o.address, o.value
@@ -2339,12 +2337,13 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         note: it is the caller's responsibility to have already called tx.add_info_from_network().
               Without that, all txins must be ismine.
         """
+        assert tx
         if not isinstance(tx, PartialTransaction):
             tx = PartialTransaction.from_tx(tx)
         assert isinstance(tx, PartialTransaction)
         tx.remove_signatures()
 
-        if tx.is_final():
+        if not tx.is_rbf_enabled():
             raise CannotDoubleSpendTx(_('Transaction is final'))
         new_fee_rate = quantize_feerate(new_fee_rate)  # strip excess precision
         tx.add_info_from_wallet(self)
