@@ -3,7 +3,7 @@ import threading
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal, pyqtSlot, QSize
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal, pyqtSlot, QSize, QMetaObject
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (QDialog, QPushButton, QWidget, QLabel, QVBoxLayout, QScrollArea,
                              QHBoxLayout, QLayout)
@@ -110,8 +110,18 @@ class QEAbstractWizard(QDialog, MessageBoxMixin):
         self.show()
         self.raise_()
 
-        QTimer.singleShot(40, self.strt)
+        QMetaObject.invokeMethod(self, 'strt', Qt.QueuedConnection)  # call strt after subclass constructor(s)
 
+    def sizeHint(self) -> QSize:
+        return QSize(600, 400)
+
+    @pyqtSlot()
+    def strt(self):
+        if self.start_viewstate is not None:
+            viewstate = self._current = self.start_viewstate
+        else:
+            viewstate = self.start_wizard()
+        self.load_next_component(viewstate.view, viewstate.wizard_data, viewstate.params)
         # TODO: re-test if needed on macOS
         self.refresh_gui()  # Need for QT on MacOSX.  Lame.
 
@@ -119,16 +129,6 @@ class QEAbstractWizard(QDialog, MessageBoxMixin):
         # For some reason, to refresh the GUI this needs to be called twice
         self.app.processEvents()
         self.app.processEvents()
-
-    def sizeHint(self) -> QSize:
-        return QSize(600, 400)
-
-    def strt(self):
-        if self.start_viewstate is not None:
-            viewstate = self._current = self.start_viewstate
-        else:
-            viewstate = self.start_wizard()
-        self.load_next_component(viewstate.view, viewstate.wizard_data, viewstate.params)
 
     def load_next_component(self, view, wdata=None, params=None):
         if wdata is None:
