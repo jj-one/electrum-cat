@@ -56,7 +56,7 @@ from electrum_grs.plugin import run_hook, BasePlugin
 from electrum_grs.i18n import _
 from electrum_grs.util import (format_time, UserCancelled, profiler, bfh, InvalidPassword,
                            UserFacingException, get_new_wallet_name, send_exception_to_crash_reporter,
-                           AddTransactionException, os_chmod)
+                           AddTransactionException, os_chmod, UI_UNIT_NAME_TXSIZE_VBYTES)
 from electrum_grs.bip21 import BITCOIN_BIP21_URI_SCHEME
 from electrum_grs.payment_identifier import PaymentIdentifier
 from electrum_grs.invoices import PR_PAID, Invoice
@@ -2366,12 +2366,13 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         d.setMinimumSize(600, 300)
         vbox = QVBoxLayout(d)
         hbox_top = QHBoxLayout()
-        hbox_top.addWidget(QLabel(_("Enter private keys:")))
+        hbox_top.addWidget(QLabel(_("Enter private keys to sweep coins from:")))
         hbox_top.addWidget(InfoButton(WIF_HELP_TEXT), alignment=Qt.AlignRight)
         vbox.addLayout(hbox_top)
         keys_e = ScanQRTextEdit(allow_multi=True, config=self.config)
         keys_e.setTabChangesFocus(True)
         vbox.addWidget(keys_e)
+        vbox.addWidget(QLabel(_("Send to address") + ":"))
 
         addresses = self.wallet.get_unused_addresses()
         if not addresses:
@@ -2566,7 +2567,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         vbox.addWidget(WWLabel(msg2))
         grid = QGridLayout()
         grid.addWidget(QLabel(_('Total size') + ':'), 0, 0)
-        grid.addWidget(QLabel('%d bytes'% total_size), 0, 1)
+        grid.addWidget(QLabel(f"{total_size} {UI_UNIT_NAME_TXSIZE_VBYTES}"), 0, 1)
         max_fee = new_tx.output_value()
         grid.addWidget(QLabel(_('Input amount') + ':'), 1, 0)
         grid.addWidget(QLabel(self.format_amount(max_fee) + ' ' + self.base_unit()), 1, 1)

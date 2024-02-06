@@ -1657,7 +1657,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             if fee is not None:
                 size = tx.estimated_size()
                 fee_per_byte = fee / size
-                extra.append(format_fee_satoshis(fee_per_byte) + ' gro/b')
+                extra.append(format_fee_satoshis(fee_per_byte) + f" {util.UI_UNIT_NAME_FEERATE_SAT_PER_VB}")
             if fee is not None and height in (TX_HEIGHT_UNCONF_PARENT, TX_HEIGHT_UNCONFIRMED) \
                and self.config.has_fee_mempool():
                 exp_n = self.config.fee_to_depth(fee_per_byte)
@@ -2443,6 +2443,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                 self.lnworker.swap_manager.add_txin_info(txin)
             return
         txin.script_descriptor = self.get_script_descriptor_for_address(address)
+        txin.is_mine = True
         self._add_txinout_derivation_info(txin, address, only_der_suffix=only_der_suffix)
         txin.block_height = self.adb.get_tx_height(txin.prevout.txid.hex()).height
 
@@ -3184,7 +3185,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         elif feerate > FEERATE_WARNING_HIGH_FEE / 1000:
             long_warning = ' '.join([
                 _("The fee for this transaction seems unusually high."),
-                _("(feerate: {} gro/byte)").format(f'{feerate:.2f}')
+                _("(feerate: {})").format(self.config.format_fee_rate(1000 * feerate))
             ])
             short_warning = _("high fee rate") + "!"
         if long_warning is None:
@@ -3734,9 +3735,9 @@ class Deterministic_Wallet(Abstract_Wallet):
         return self.txin_type
 
 
-class Simple_Deterministic_Wallet(Simple_Wallet, Deterministic_Wallet):
-
+class Standard_Wallet(Simple_Wallet, Deterministic_Wallet):
     """ Deterministic Wallet with a single pubkey per address """
+    wallet_type = 'standard'
 
     def __init__(self, db, *, config):
         Deterministic_Wallet.__init__(self, db, config=config)
@@ -3759,14 +3760,6 @@ class Simple_Deterministic_Wallet(Simple_Wallet, Deterministic_Wallet):
 
     def derive_pubkeys(self, c, i):
         return [self.keystore.derive_pubkey(c, i).hex()]
-
-
-
-
-
-
-class Standard_Wallet(Simple_Deterministic_Wallet):
-    wallet_type = 'standard'
 
     def pubkeys_to_address(self, pubkeys):
         pubkey = pubkeys[0]

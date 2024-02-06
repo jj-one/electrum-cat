@@ -1,5 +1,6 @@
 import threading
 from enum import IntEnum
+from typing import Optional, TYPE_CHECKING
 
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject, pyqtEnum
 
@@ -7,7 +8,7 @@ from electrum_grs.i18n import _
 from electrum_grs.gui import messages
 from electrum_grs.logging import get_logger
 from electrum_grs.lnutil import LOCAL, REMOTE
-from electrum_grs.lnchannel import ChanCloseOption, ChannelState
+from electrum_grs.lnchannel import ChanCloseOption, ChannelState, AbstractChannel, Channel
 from electrum_grs.util import format_short_id
 
 from .auth import AuthMixin, auth_protect
@@ -33,9 +34,9 @@ class QEChannelDetails(AuthMixin, QObject, QtEventListener):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self._wallet = None
-        self._channelid = None
-        self._channel = None
+        self._wallet = None  # type: Optional[QEWallet]
+        self._channelid = None  # type: Optional[str]
+        self._channel = None  # type: Optional[AbstractChannel]
 
         self._capacity = QEAmount()
         self._local_capacity = QEAmount()
@@ -109,6 +110,13 @@ class QEChannelDetails(AuthMixin, QObject, QtEventListener):
     def remoteScidAlias(self):
         rsa = self._channel.get_remote_scid_alias()
         return format_short_id(rsa) if rsa else ''
+
+    @pyqtProperty(str, notify=channelChanged)
+    def currentFeerate(self):
+        if self._channel.is_backup():
+            return ''
+        assert isinstance(self._channel, Channel)
+        return self._wallet.wallet.config.format_fee_rate(4 * self._channel.get_latest_feerate(LOCAL))
 
     @pyqtProperty(str, notify=channelChanged)
     def state(self):

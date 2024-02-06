@@ -123,7 +123,7 @@ ElDialog {
                     }
 
                     Label {
-                        text: 'gro/vB'
+                        text: UI_UNIT_NAME.FEERATE_SAT_PER_VB
                         color: Material.accentColor
                     }
                 }
