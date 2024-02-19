@@ -5,19 +5,11 @@ import threading
 import tempfile
 import shutil
 
-<<<<<<<< HEAD:electrum_grs/tests/__init__.py
 import electrum_grs
 import electrum_grs.logging
 from electrum_grs import constants
 from electrum_grs import util
-========
-import electrum
-import electrum.logging
-from electrum import constants
-from electrum import util
-from electrum.logging import Logger
->>>>>>>> upstream/master:tests/__init__.py
-
+from electrum_grs.logging import Logger
 
 # Set this locally to make the test suite run faster.
 # If set, unit tests that would normally test functions with multiple implementations,

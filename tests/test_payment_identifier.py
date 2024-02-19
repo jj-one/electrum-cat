@@ -1,19 +1,13 @@
-<<<<<<<< HEAD:electrum_grs/tests/test_payment_identifier.py
-from electrum_grs import SimpleConfig
-from electrum_grs.payment_identifier import (maybe_extract_lightning_payment_identifier, PaymentIdentifier,
-                                         PaymentIdentifierType)
-========
 import os
 
-from electrum import SimpleConfig
-from electrum.invoices import Invoice
-from electrum.payment_identifier import (maybe_extract_lightning_payment_identifier, PaymentIdentifier,
+from electrum_grs import SimpleConfig
+from electrum_grs.invoices import Invoice
+from electrum_grs.payment_identifier import (maybe_extract_lightning_payment_identifier, PaymentIdentifier,
                                          PaymentIdentifierType, invoice_from_payment_identifier)
-from electrum.wallet import restore_wallet_from_text
->>>>>>>> upstream/master:tests/test_payment_identifier.py
+from electrum_grs.wallet import restore_wallet_from_text
 
 from . import ElectrumTestCase
-from electrum.transaction import PartialTxOutput
+from electrum_grs.transaction import PartialTxOutput
 
 
 class WalletMock:
