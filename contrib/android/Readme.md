@@ -97,7 +97,7 @@ adb logcat | grep -F "`adb shell ps | grep org.groestlcoin.Electrumgrs | cut -c1
 ### The Qml GUI can be run directly on Linux Desktop. How?
 Install requirements:
 ```
-python3 -m pip install "pyqt6==6.5.2" "Pillow>=8.4"
+python3 -m pip install ".[qml_gui]"
 ```
 
 Run electrum-grs with the `-g` switch: `electrum_grs -g qml`

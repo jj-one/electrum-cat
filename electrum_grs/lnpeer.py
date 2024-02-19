@@ -109,7 +109,8 @@ class Peer(Logger):
         self.funding_created_sent = set() # for channels in PREOPENING
         self.funding_signed_sent = set()  # for channels in PREOPENING
         self.shutdown_received = {} # chan_id -> asyncio.Future()
-        self.channel_reestablish_msg = defaultdict(self.asyncio_loop.create_future)
+        self.channel_reestablish_msg = defaultdict(self.asyncio_loop.create_future)  # type: Dict[bytes, asyncio.Future]
+        self._chan_reest_finished = defaultdict(asyncio.Event)  # type: Dict[bytes, asyncio.Event]
         self.orphan_channel_updates = OrderedDict()  # type: OrderedDict[ShortChannelID, dict]
         Logger.__init__(self)
         self.taskgroup = OldTaskGroup()
@@ -198,7 +199,7 @@ class Peer(Logger):
             self.pong_event.clear()
             await self.pong_event.wait()
 
-    def process_message(self, message: bytes):
+    async def _process_message(self, message: bytes) -> None:
         try:
             message_type, payload = decode_msg(message)
         except UnknownOptionalMsgType as e:
@@ -236,9 +237,22 @@ class Peer(Logger):
             # raw message is needed to check signature
             if message_type in ['node_announcement', 'channel_announcement', 'channel_update']:
                 payload['raw'] = message
-            execution_result = f(*args)
+            # note: the message handler might be async or non-async. In either case, by default,
+            #       we wait for it to complete before we return, i.e. before the next message is processed.
             if asyncio.iscoroutinefunction(f):
-                asyncio.ensure_future(self.taskgroup.spawn(execution_result))
+                await f(*args)
+            else:
+                f(*args)
+
+    def non_blocking_msg_handler(func):
+        """Makes a message handler non-blocking: while processing the message,
+        the message_loop keeps processing subsequent incoming messages asynchronously.
+        """
+        assert asyncio.iscoroutinefunction(func), 'func needs to be a coroutine'
+        @functools.wraps(func)
+        async def wrapper(self: 'Peer', *args, **kwargs):
+            return await self.taskgroup.spawn(func(self, *args, **kwargs))
+        return wrapper
 
     def on_warning(self, payload):
         chan_id = payload.get("channel_id")
@@ -602,7 +616,7 @@ class Peer(Logger):
         except (OSError, asyncio.TimeoutError, HandshakeFailed) as e:
             raise GracefulDisconnect(f'initialize failed: {repr(e)}') from e
         async for msg in self.transport.read_messages():
-            self.process_message(msg)
+            await self._process_message(msg)
             if self.DELAY_INC_MSG_PROCESSING_SLEEP:
                 # rate-limit message-processing a bit, to make it harder
                 # for a single peer to bog down the event loop / cpu:
@@ -944,6 +958,7 @@ class Peer(Logger):
         # set db to None, because we do not want to write updates until channel is saved
         return StoredDict(chan_dict, None, [])
 
+    @non_blocking_msg_handler
     async def on_open_channel(self, payload):
         """Implements the channel acceptance flow.
 
@@ -1147,7 +1162,7 @@ class Peer(Logger):
             self.logger.info(f"tried to force-close channel {chan.get_id_for_log()} "
                              f"but close option is not allowed. {chan.get_state()=!r}")
 
-    def on_channel_reestablish(self, chan: Channel, msg):
+    async def on_channel_reestablish(self, chan: Channel, msg):
         # Note: it is critical for this message handler to block processing of further messages,
         #       until this msg is processed. If we are behind (lost state), and send chan_reest to the remote,
         #       when the remote realizes we are behind, they might send an "error" message - but the spec mandates
@@ -1245,6 +1260,11 @@ class Peer(Logger):
         else:
             # all good
             fut.set_result((we_must_resend_revoke_and_ack, their_next_local_ctn))
+        # Block processing of further incoming messages until we finished our part of chan-reest.
+        # This is needed for the replaying of our local unacked updates to be sane (if the peer
+        # also replays some messages we must not react to them until we finished replaying our own).
+        # (it would be sufficient to only block messages related to this channel, but this is easier)
+        await self._chan_reest_finished[chan.channel_id].wait()
 
     def _send_channel_reestablish(self, chan: Channel):
         assert self.is_initialized()
@@ -1362,6 +1382,7 @@ class Peer(Logger):
             resend_revoke_and_ack()
 
         chan.peer_state = PeerState.GOOD
+        self._chan_reest_finished[chan.channel_id].set()
         if chan.is_funded():
             chan_just_became_ready = (their_next_local_ctn == next_local_ctn == 1)
             if chan_just_became_ready or self.features.supports(LnFeatures.OPTION_SCID_ALIAS_OPT):
@@ -1372,7 +1393,7 @@ class Peer(Logger):
         util.trigger_callback('channel', self.lnworker.wallet, chan)
         # if we have sent a previous shutdown, it must be retransmitted (Bolt2)
         if chan.get_state() == ChannelState.SHUTDOWN:
-            await self.send_shutdown(chan)
+            await self.taskgroup.spawn(self.send_shutdown(chan))
 
     def send_channel_ready(self, chan: Channel):
         assert chan.is_funded()
@@ -1399,6 +1420,8 @@ class Peer(Logger):
 
     def on_channel_ready(self, chan: Channel, payload):
         self.logger.info(f"on_channel_ready. channel: {chan.channel_id.hex()}")
+        if chan.peer_state != PeerState.GOOD:  # should never happen
+            raise Exception(f"received channel_ready in unexpected {chan.peer_state=!r}")
         # save remote alias for use in invoices
         scid_alias = payload.get('channel_ready_tlvs', {}).get('short_channel_id', {}).get('alias')
         if scid_alias:
@@ -1512,6 +1535,8 @@ class Peer(Logger):
         htlc_id = payload["id"]
         reason = payload["reason"]
         self.logger.info(f"on_update_fail_htlc. chan {chan.short_channel_id}. htlc_id {htlc_id}")
+        if chan.peer_state != PeerState.GOOD:  # should never happen
+            raise Exception(f"received update_fail_htlc in unexpected {chan.peer_state=!r}")
         chan.receive_fail_htlc(htlc_id, error_bytes=reason)  # TODO handle exc and maybe fail channel (e.g. bad htlc_id)
         self.maybe_send_commitment(chan)
 
@@ -1657,6 +1682,8 @@ class Peer(Logger):
         if chan.peer_state == PeerState.BAD:
             return
         self.logger.info(f'on_commitment_signed. chan {chan.short_channel_id}. ctn: {chan.get_next_ctn(LOCAL)}.')
+        if chan.peer_state != PeerState.GOOD:  # should never happen
+            raise Exception(f"received commitment_signed in unexpected {chan.peer_state=!r}")
         # make sure there were changes to the ctx, otherwise the remote peer is misbehaving
         if not chan.has_pending_changes(LOCAL):
             # TODO if feerate changed A->B->A; so there were updates but the value is identical,
@@ -1678,6 +1705,8 @@ class Peer(Logger):
         payment_hash = sha256(preimage)
         htlc_id = payload["id"]
         self.logger.info(f"on_update_fulfill_htlc. chan {chan.short_channel_id}. htlc_id {htlc_id}")
+        if chan.peer_state != PeerState.GOOD:  # should never happen
+            raise Exception(f"received update_fulfill_htlc in unexpected {chan.peer_state=!r}")
         chan.receive_htlc_settle(preimage, htlc_id)  # TODO handle exc and maybe fail channel (e.g. bad htlc_id)
         self.lnworker.save_preimage(payment_hash, preimage)
         self.maybe_send_commitment(chan)
@@ -1687,6 +1716,8 @@ class Peer(Logger):
         failure_code = payload["failure_code"]
         self.logger.info(f"on_update_fail_malformed_htlc. chan {chan.get_id_for_log()}. "
                          f"htlc_id {htlc_id}. failure_code={failure_code}")
+        if chan.peer_state != PeerState.GOOD:  # should never happen
+            raise Exception(f"received update_fail_malformed_htlc in unexpected {chan.peer_state=!r}")
         if failure_code & OnionFailureCodeMetaFlag.BADONION == 0:
             self.schedule_force_closing(chan.channel_id)
             raise RemoteMisbehaving(f"received update_fail_malformed_htlc with unexpected failure code: {failure_code}")
@@ -1709,6 +1740,8 @@ class Peer(Logger):
         self.logger.info(f"on_update_add_htlc. chan {chan.short_channel_id}. htlc={str(htlc)}")
         if chan.get_state() != ChannelState.OPEN:
             raise RemoteMisbehaving(f"received update_add_htlc while chan.get_state() != OPEN. state was {chan.get_state()!r}")
+        if chan.peer_state != PeerState.GOOD:  # should never happen
+            raise Exception(f"received update_add_htlc in unexpected {chan.peer_state=!r}")
         if cltv_abs > bitcoin.NLOCKTIME_BLOCKHEIGHT_MAX:
             self.schedule_force_closing(chan.channel_id)
             raise RemoteMisbehaving(f"received update_add_htlc with {cltv_abs=} > BLOCKHEIGHT_MAX")
@@ -2202,6 +2235,8 @@ class Peer(Logger):
         if chan.peer_state == PeerState.BAD:
             return
         self.logger.info(f'on_revoke_and_ack. chan {chan.short_channel_id}. ctn: {chan.get_oldest_unrevoked_ctn(REMOTE)}')
+        if chan.peer_state != PeerState.GOOD:  # should never happen
+            raise Exception(f"received revoke_and_ack in unexpected {chan.peer_state=!r}")
         rev = RevokeAndAck(payload["per_commitment_secret"], payload["next_per_commitment_point"])
         chan.receive_revocation(rev)
         self.lnworker.save_channel(chan)
@@ -2210,6 +2245,8 @@ class Peer(Logger):
         self._received_revack_event.clear()
 
     def on_update_fee(self, chan: Channel, payload):
+        if chan.peer_state != PeerState.GOOD:  # should never happen
+            raise Exception(f"received update_fee in unexpected {chan.peer_state=!r}")
         feerate = payload["feerate_per_kw"]
         chan.update_fee(feerate, False)
 
@@ -2278,10 +2315,13 @@ class Peer(Logger):
                 raise Exception('The remote peer did not send their final signature. The channel may not have been be closed')
         return txid
 
+    @non_blocking_msg_handler
     async def on_shutdown(self, chan: Channel, payload):
         # TODO: A receiving node: if it hasn't received a funding_signed (if it is a
         #  funder) or a funding_created (if it is a fundee):
         #  SHOULD send an error and fail the channel.
+        if chan.peer_state != PeerState.GOOD:  # should never happen
+            raise Exception(f"received shutdown in unexpected {chan.peer_state=!r}")
         their_scriptpubkey = payload['scriptpubkey']
         their_upfront_scriptpubkey = chan.config[REMOTE].upfront_shutdown_script
         # BOLT-02 check if they use the upfront shutdown script they advertized
