@@ -538,7 +538,7 @@ class TrustedCoinPlugin(BasePlugin):
 
     def make_seed(self, seed_type):
         if not is_any_2fa_seed_type(seed_type):
-            raise Exception(f'unexpected seed type: {seed_type}')
+            raise Exception(f'unexpected seed type: {seed_type!r}')
         return Mnemonic('english').make_seed(seed_type=seed_type)
 
     @hook
@@ -558,7 +558,7 @@ class TrustedCoinPlugin(BasePlugin):
     def xkeys_from_seed(self, seed, passphrase):
         t = seed_type(seed)
         if not is_any_2fa_seed_type(t):
-            raise Exception(f'unexpected seed type: {t}')
+            raise Exception(f'unexpected seed type: {t!r}')
         words = seed.split()
         n = len(words)
         if t == '2fa':
@@ -566,8 +566,8 @@ class TrustedCoinPlugin(BasePlugin):
                 # note: pre-2.7 2fa seeds were typically 24-25 words, however they
                 # could probabilistically be arbitrarily shorter due to a bug. (see #3611)
                 # the probability of it being < 20 words is about 2^(-(256+12-19*11)) = 2^(-59)
-                if passphrase != '':
-                    raise Exception('old 2fa seed cannot have passphrase')
+                if passphrase:
+                    raise Exception("old '2fa'-type electrum seed cannot have passphrase")
                 xprv1, xpub1 = self.get_xkeys(' '.join(words[0:12]), t, '', "m/")
                 xprv2, xpub2 = self.get_xkeys(' '.join(words[12:]), t, '', "m/")
             elif n == 12:  # new scheme
@@ -579,7 +579,7 @@ class TrustedCoinPlugin(BasePlugin):
             xprv1, xpub1 = self.get_xkeys(seed, t, passphrase, "m/0'/")
             xprv2, xpub2 = self.get_xkeys(seed, t, passphrase, "m/1'/")
         else:
-            raise Exception(f'unexpected seed type: {t}')
+            raise Exception(f'unexpected seed type: {t!r}')
         return xprv1, xpub1, xprv2, xpub2
 
     @hook

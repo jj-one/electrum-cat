@@ -415,15 +415,15 @@ class NewWalletWizard(AbstractWizard):
     def keystore_from_data(self, wallet_type: str, data: dict):
         if data['keystore_type'] in ['createseed', 'haveseed'] and 'seed' in data:
             if data['seed_variant'] == 'electrum':
-                return keystore.from_seed(data['seed'], data['seed_extra_words'], True)
+                return keystore.from_seed(data['seed'], passphrase=data['seed_extra_words'], for_multisig=True)
             elif data['seed_variant'] == 'bip39':
-                root_seed = keystore.bip39_to_seed(data['seed'], data['seed_extra_words'])
+                root_seed = keystore.bip39_to_seed(data['seed'], passphrase=data['seed_extra_words'])
                 derivation = normalize_bip32_derivation(data['derivation_path'])
                 if wallet_type == 'multisig':
                     script = data['script_type'] if data['script_type'] != 'p2sh' else 'standard'
                 else:
                     script = data['script_type'] if data['script_type'] != 'p2pkh' else 'standard'
-                return keystore.from_bip43_rootseed(root_seed, derivation, xtype=script)
+                return keystore.from_bip43_rootseed(root_seed, derivation=derivation, xtype=script)
             elif data['seed_variant'] == 'slip39':
                 root_seed = data['seed'].decrypt(data['seed_extra_words'])
                 derivation = normalize_bip32_derivation(data['derivation_path'])
@@ -431,7 +431,7 @@ class NewWalletWizard(AbstractWizard):
                     script = data['script_type'] if data['script_type'] != 'p2sh' else 'standard'
                 else:
                     script = data['script_type'] if data['script_type'] != 'p2pkh' else 'standard'
-                return keystore.from_bip43_rootseed(root_seed, derivation, xtype=script)
+                return keystore.from_bip43_rootseed(root_seed, derivation=derivation, xtype=script)
             else:
                 raise Exception('Unsupported seed variant %s' % data['seed_variant'])
         elif data['keystore_type'] == 'masterkey' and 'master_key' in data:
@@ -486,11 +486,14 @@ class NewWalletWizard(AbstractWizard):
         seed_type = ''
         seed_valid = False
         validation_message = ''
+        can_passphrase = True
 
         if seed_variant == 'electrum':
             seed_type = mnemonic.seed_type(seed)
             if seed_type != '':
                 seed_valid = True
+            if seed_type in ['old', '2fa']:
+                can_passphrase = False
         elif seed_variant == 'bip39':
             is_checksum, is_wordlist = keystore.bip39_is_checksum_valid(seed)
             validation_message = ('' if is_checksum else _('BIP39 checksum failed')) if is_wordlist else _('Unknown BIP39 wordlist')
@@ -518,9 +521,9 @@ class NewWalletWizard(AbstractWizard):
         elif wallet_type == 'multisig' and seed_type not in ['standard', 'segwit', 'bip39', 'slip39']:
             seed_valid = False
 
-        self._logger.debug(f'seed verified: {seed_valid}, type={seed_type}, validation_message={validation_message}')
+        self._logger.debug(f'seed verified: {seed_valid}, type={seed_type!r}, validation_message={validation_message}')
 
-        return seed_valid, seed_type, validation_message
+        return seed_valid, seed_type, validation_message, can_passphrase
 
     def create_storage(self, path: str, data: dict):
         assert data['wallet_type'] in ['standard', '2fa', 'imported', 'multisig']
@@ -548,11 +551,11 @@ class NewWalletWizard(AbstractWizard):
         elif data['keystore_type'] in ['createseed', 'haveseed']:
             if data['seed_type'] in ['old', 'standard', 'segwit']:
                 self._logger.debug('creating keystore from electrum seed')
-                k = keystore.from_seed(data['seed'], data['seed_extra_words'], data['wallet_type'] == 'multisig')
+                k = keystore.from_seed(data['seed'], passphrase=data['seed_extra_words'], for_multisig=data['wallet_type'] == 'multisig')
             elif data['seed_type'] in ['bip39', 'slip39']:
                 self._logger.debug('creating keystore from %s seed' % data['seed_type'])
                 if data['seed_type'] == 'bip39':
-                    root_seed = keystore.bip39_to_seed(data['seed'], data['seed_extra_words'])
+                    root_seed = keystore.bip39_to_seed(data['seed'], passphrase=data['seed_extra_words'])
                 else:
                     root_seed = data['seed'].decrypt(data['seed_extra_words'])
                 derivation = normalize_bip32_derivation(data['derivation_path'])
@@ -560,7 +563,7 @@ class NewWalletWizard(AbstractWizard):
                     script = data['script_type'] if data['script_type'] != 'p2sh' else 'standard'
                 else:
                     script = data['script_type'] if data['script_type'] != 'p2pkh' else 'standard'
-                k = keystore.from_bip43_rootseed(root_seed, derivation, xtype=script)
+                k = keystore.from_bip43_rootseed(root_seed, derivation=derivation, xtype=script)
             elif is_any_2fa_seed_type(data['seed_type']):
                 self._logger.debug('creating keystore from 2fa seed')
                 k = keystore.from_xprv(data['x1']['xprv'])
