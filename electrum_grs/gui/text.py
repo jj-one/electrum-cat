@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Optional
 try:
     import pyperclip
 except ImportError:  # only use vendored lib as fallback, to allow Linux distros to bring their own
-    from electrum._vendor import pyperclip
+    from electrum_grs._vendor import pyperclip
 
 import electrum_grs
 from electrum_grs.gui import BaseElectrumGui
