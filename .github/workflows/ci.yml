@@ -115,6 +115,11 @@ jobs:
           codeql-images: true
           large-packages: true
           swap-storage: true
+      - name: Get more space
+        run: |
+          df . -h
+          sudo rm -rf ${GITHUB_WORKSPACE}/.git
+          df . -h
       - name: Builder image
         run: docker build -t electrum-grs-android-builder-img --file contrib/android/Dockerfile .
       - name: Compile Android apk
