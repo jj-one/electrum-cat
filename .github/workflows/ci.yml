@@ -181,7 +181,7 @@ jobs:
         with:
           name: electrum-grs-${{ github.sha }}-android-armeabi-v7a
 
-  android-qml-x86-64:
+  android-qml-x86_64:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -215,14 +215,14 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-android-x86-64
+          name: electrum-grs-${{ github.sha }}-android-x86_64
           path: dist/*.apk
           if-no-files-found: error
           retention-days: 7
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-android-x86-64
+          name: electrum-grs-${{ github.sha }}-android-x86_64
 
   macos:
     runs-on: macos-11
