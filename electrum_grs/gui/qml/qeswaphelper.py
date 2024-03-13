@@ -12,7 +12,7 @@ from electrum_grs.logging import get_logger
 from electrum_grs.transaction import PartialTxOutput, PartialTransaction
 from electrum_grs.util import NotEnoughFunds, NoDynamicFeeEstimates, profiler, get_asyncio_loop
 
-from electrum.gui import messages
+from electrum_grs.gui import messages
 
 from .auth import AuthMixin, auth_protect
 from .qetypes import QEAmount
