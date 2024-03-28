@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright 2023-2024 Soren Stoutner <soren@debian.org>.
+
+  This file can be validated using `appstreamcli validate org.groestlcoin.electrum-grs.metainfo.xml`.
+
+  Distributed under the MIT software license, see the accompanying file LICENCE or http://www.opensource.org/licenses/mit-license.php.
+-->
+
 <component type="desktop-application">
   <id>org.groestlcoin.electrum-grs</id>
 
@@ -10,12 +19,17 @@
 
   <description>
     <p>
-      Electrum-GRS is a lightweight Groestlcoin wallet focused is speed, with low resource usage and simplifying Groestlcoin.
+      Electrum-GRS is a lightweight Groestlcoin wallet focused on speed, with low resource usage and simplifying Groestlcoin.
       Startup times are instant because it operates in conjunction with high-performance servers that handle the most complicated parts of the Groestlcoin system.
     </p>
   </description>
 
-  <launchable type="desktop-id">org.groestlcoin.electrum-grs.desktop</launchable>
+  <url type="homepage">https://www.groestlcoin.org/</url>
+  <developer id="org.groestlcoin">
+      <name>The Groestlcoin developers</name>
+  </developer>
+
+  <launchable type="desktop-id">electrum-grs.desktop</launchable>
 
   <content_rating type="oars-1.1" />
 </component>
