@@ -5,7 +5,7 @@ set -e
 security -v unlock-keychain login.keychain
 
 
-PACKAGE=Electrum
+PACKAGE=Electrum-GRS
 
 
 . "$(dirname "$0")/../build_tools_util.sh"
@@ -73,6 +73,6 @@ if [ ! -z "$CODESIGN_CERT" ]; then
 fi
 
 info "Creating .DMG"
-hdiutil create -fs HFS+ -volname $PACKAGE -srcfolder dist/$PACKAGE.app dist/electrum-$VERSION.dmg || fail "Could not create .DMG"
+hdiutil create -fs HFS+ -volname $PACKAGE -srcfolder dist/$PACKAGE.app dist/electrum-grs-$VERSION.dmg || fail "Could not create .DMG"
 
-DoCodeSignMaybe ".DMG" "dist/electrum-${VERSION}.dmg"
+DoCodeSignMaybe ".DMG" "dist/electrum-grs-${VERSION}.dmg"
