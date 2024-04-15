@@ -4,11 +4,11 @@ from ctypes import (
 )
 import io
 
-from electrum import ecc
-from electrum.ecc import ECPubkey, ECPrivkey
-from electrum.ecc_fast import _libsecp256k1
-from electrum import crypto
-from electrum.crypto import sha256
+from electrum_grs import ecc
+from electrum_grs.ecc import ECPubkey, ECPrivkey
+from electrum_grs.ecc_fast import _libsecp256k1
+from electrum_grs import crypto
+from electrum_grs.crypto import sha256
 
 from . import ElectrumTestCase
 
