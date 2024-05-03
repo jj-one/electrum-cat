@@ -8,7 +8,7 @@ from electrum_grs import ecc
 from electrum_grs import bip32
 from electrum_grs import descriptor
 from electrum_grs.crypto import hash_160
-from electrum_grs.bitcoin import int_to_hex, var_int, is_segwit_script_type, is_b58_address
+from electrum_grs.bitcoin import var_int, is_segwit_script_type, is_b58_address
 from electrum_grs.bip32 import BIP32Node, convert_bip32_intpath_to_strpath, normalize_bip32_derivation
 from electrum_grs.i18n import _
 from electrum_grs.keystore import Hardware_KeyStore
@@ -388,7 +388,7 @@ class Ledger_KeyStore(Hardware_KeyStore):
                 self.give_error("No matching pubkey for sign_transaction")  # should never happen
             full_path = convert_bip32_intpath_to_strpath(full_path)[2:]
 
-            redeemScript = Transaction.get_preimage_script(txin)
+            redeemScript = Transaction.get_preimage_script(txin).hex()
             txin_prev_tx = txin.utxo
             if txin_prev_tx is None and not txin.is_segwit():
                 raise UserFacingException(_('Missing previous tx for legacy input.'))
@@ -408,13 +408,14 @@ class Ledger_KeyStore(Hardware_KeyStore):
                 if not is_txin_legacy_multisig(txin):
                     self.give_error("P2SH / regular input mixed in same transaction not supported") # should never happen
 
-        txOutput = var_int(len(tx.outputs()))
+        txOutput = bytearray()
+        txOutput += var_int(len(tx.outputs()))
         for o in tx.outputs():
-            txOutput += int_to_hex(o.value, 8)
-            script = o.scriptpubkey.hex()
-            txOutput += var_int(len(script)//2)
+            txOutput += int.to_bytes(o.value, length=8, byteorder="little", signed=False)
+            script = o.scriptpubkey
+            txOutput += var_int(len(script))
             txOutput += script
-        txOutput = bfh(txOutput)
+        txOutput = bytes(txOutput)
 
         if not client_electrum.supports_multi_output():
             if len(tx.outputs()) > 2:
@@ -454,11 +455,11 @@ class Ledger_KeyStore(Hardware_KeyStore):
             for input_idx, utxo in enumerate(inputs):
                 self.handler.show_message(_("Preparing transaction inputs...")
                                           + f" (phase1, {input_idx}/{len(inputs)})")
-                sequence = int_to_hex(utxo[5], 4)
+                sequence = int.to_bytes(utxo[5], length=4, byteorder="little", signed=False)
                 if segwitTransaction and not client_electrum.supports_segwit_trustedInputs():
                     tmp = bfh(utxo[3])[::-1]
-                    tmp += bfh(int_to_hex(utxo[1], 4))
-                    tmp += bfh(int_to_hex(utxo[6], 8))  # txin['value']
+                    tmp += int.to_bytes(utxo[1], length=4, byteorder="little", signed=False)
+                    tmp += int.to_bytes(utxo[6], length=8, byteorder="little", signed=False)  # txin['value']
                     chipInputs.append({'value' : tmp, 'witness' : True, 'sequence' : sequence})
                     redeemScripts.append(bfh(utxo[2]))
                 elif (not p2shTransaction) or client_electrum.supports_multi_output():
@@ -474,7 +475,7 @@ class Ledger_KeyStore(Hardware_KeyStore):
                         redeemScripts.append(txtmp.outputs[utxo[1]].script)
                 else:
                     tmp = bfh(utxo[3])[::-1]
-                    tmp += bfh(int_to_hex(utxo[1], 4))
+                    tmp += int.to_bytes(utxo[1], length=4, byteorder="little", signed=False)
                     chipInputs.append({'value' : tmp, 'sequence' : sequence})
                     redeemScripts.append(bfh(utxo[2]))
 
@@ -509,8 +510,8 @@ class Ledger_KeyStore(Hardware_KeyStore):
                     inputSignature[0] = 0x30 # force for 1.4.9+
                     my_pubkey = inputs[inputIndex][4]
                     tx.add_signature_to_txin(txin_idx=inputIndex,
-                                             signing_pubkey=my_pubkey.hex(),
-                                             sig=inputSignature.hex())
+                                             signing_pubkey=my_pubkey,
+                                             sig=inputSignature)
                     inputIndex = inputIndex + 1
             else:
                 while inputIndex < len(inputs):
@@ -536,8 +537,8 @@ class Ledger_KeyStore(Hardware_KeyStore):
                         inputSignature[0] = 0x30 # force for 1.4.9+
                         my_pubkey = inputs[inputIndex][4]
                         tx.add_signature_to_txin(txin_idx=inputIndex,
-                                                 signing_pubkey=my_pubkey.hex(),
-                                                 sig=inputSignature.hex())
+                                                 signing_pubkey=my_pubkey,
+                                                 sig=inputSignature)
                         inputIndex = inputIndex + 1
                     firstTransaction = False
         except UserWarning:
