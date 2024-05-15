@@ -1113,7 +1113,7 @@ class SwapManager(Logger):
         self.init_pairs()
         #request = await r.json()
         req_type = request['type']
-        assert request['pairId'] == 'BTC/BTC'
+        assert request['pairId'] == 'GRS/GRS'
         if req_type == 'reversesubmarine':
             lightning_amount_sat=request['invoiceAmount']
             payment_hash=bytes.fromhex(request['preimageHash'])
