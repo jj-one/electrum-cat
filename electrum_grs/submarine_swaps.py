@@ -565,7 +565,8 @@ class SwapManager(Logger):
         self.add_lnwatcher_callback(swap)
         return swap
 
-    def add_invoice(self, invoice: str, pay_now: bool = False) -> None:
+    def server_add_swap_invoice(self, request):
+        invoice = request['invoice']
         invoice = Invoice.from_bech32(invoice)
         key = invoice.rhash
         payment_hash = bytes.fromhex(key)
@@ -573,11 +574,13 @@ class SwapManager(Logger):
         swap = self.swaps[key]
         assert swap.lightning_amount == int(invoice.get_amount_sat())
         self.wallet.save_invoice(invoice)
-        if pay_now:
-            # check that we have the preimage
-            assert sha256(swap.preimage) == payment_hash
-            assert swap.spending_txid is None
-            self.invoices_to_pay[key] = 0
+        # check that we have the preimage
+        assert sha256(swap.preimage) == payment_hash
+        assert swap.spending_txid is None
+        self.invoices_to_pay[key] = 0
+
+    async def send_request_to_server(self, method, request_data):
+        raise NotImplementedError()
 
     async def normal_swap(
             self,
@@ -632,12 +635,7 @@ class SwapManager(Logger):
             "invoiceAmount": lightning_amount_sat,
             "refundPublicKey": refund_pubkey.hex()
         }
-        response = await self.network.async_send_http_on_proxy(
-            'post',
-            self.api_url + '/createnormalswap',
-            json=request_data,
-            timeout=30)
-        data = json.loads(response)
+        data = await self.send_request_to_server('createnormalswap', request_data)
         payment_hash = bytes.fromhex(data["preimageHash"])
 
         zeroconf = data["acceptZeroConf"]
@@ -701,12 +699,7 @@ class SwapManager(Logger):
             "invoice": invoice,
             "refundPublicKey": refund_pubkey.hex(),
         }
-        response = await self.network.async_send_http_on_proxy(
-            'post',
-            self.api_url + '/addswapinvoice',
-            json=request_data,
-            timeout=30)
-        data = json.loads(response)
+        data = await self.send_request_to_server('addswapinvoice', request_data)
         # wait for funding tx
         lnaddr = lndecode(invoice)
         while swap.funding_txid is None and not lnaddr.is_expired():
@@ -795,12 +788,7 @@ class SwapManager(Logger):
             "preimageHash": payment_hash.hex(),
             "claimPublicKey": our_pubkey.hex()
         }
-        response = await self.network.async_send_http_on_proxy(
-            'post',
-            self.api_url + '/createswap',
-            json=request_data,
-            timeout=30)
-        data = json.loads(response)
+        data = await self.send_request_to_server('createswap', request_data)
         invoice = data['invoice']
         fee_invoice = data.get('minerFeeInvoice')
         lockup_address = data['lockupAddress']
@@ -881,15 +869,10 @@ class SwapManager(Logger):
         """Might raise SwapServerError."""
         from .network import Network
         try:
-            response = await Network.async_send_http_on_proxy(
-                'get',
-                self.api_url + '/getpairs',
-                timeout=30)
+            pairs = await self.send_request_to_server('getpairs', None)
         except aiohttp.ClientError as e:
             self.logger.error(f"Swap server errored: {e!r}")
             raise SwapServerError() from e
-        # we assume server response is well-formed; otherwise let an exception propagate to the crash reporter
-        pairs = json.loads(response)
         # cache data to disk
         with open(self.pairs_filename(), 'w', encoding='utf-8') as f:
             f.write(json.dumps(pairs))
@@ -1102,3 +1085,67 @@ class SwapManager(Logger):
         max_amt_oc = self.get_send_amount(max_amt_ln, is_reverse=False) or 0
         min_amt_oc = self.get_send_amount(self.get_min_amount(), is_reverse=False) or 0
         return max_amt_oc if max_amt_oc >= min_amt_oc else None
+
+    def server_create_normal_swap(self, request):
+        # normal for client, reverse for server
+        #request = await r.json()
+        lightning_amount_sat = request['invoiceAmount']
+        their_pubkey = bytes.fromhex(request['refundPublicKey'])
+        assert len(their_pubkey) == 33
+        swap = self.create_reverse_swap(
+            lightning_amount_sat=lightning_amount_sat,
+            their_pubkey=their_pubkey,
+        )
+        response = {
+            "id": swap.payment_hash.hex(),
+            'preimageHash': swap.payment_hash.hex(),
+            "acceptZeroConf": False,
+            "expectedAmount": swap.onchain_amount,
+            "timeoutBlockHeight": swap.locktime,
+            "address": swap.lockup_address,
+            "redeemScript": swap.redeem_script.hex(),
+        }
+        return response
+
+    def server_create_swap(self, request):
+        # reverse for client, forward for server
+        # requesting a normal swap (old protocol) will raise an exception
+        self.init_pairs()
+        #request = await r.json()
+        req_type = request['type']
+        assert request['pairId'] == 'BTC/BTC'
+        if req_type == 'reversesubmarine':
+            lightning_amount_sat=request['invoiceAmount']
+            payment_hash=bytes.fromhex(request['preimageHash'])
+            their_pubkey=bytes.fromhex(request['claimPublicKey'])
+            assert len(payment_hash) == 32
+            assert len(their_pubkey) == 33
+            swap, invoice, prepay_invoice = self.create_normal_swap(
+                lightning_amount_sat=lightning_amount_sat,
+                payment_hash=payment_hash,
+                their_pubkey=their_pubkey
+            )
+            response = {
+                'id': payment_hash.hex(),
+                'invoice': invoice,
+                'minerFeeInvoice': prepay_invoice,
+                'lockupAddress': swap.lockup_address,
+                'redeemScript': swap.redeem_script.hex(),
+                'timeoutBlockHeight': swap.locktime,
+                "onchainAmount": swap.onchain_amount,
+            }
+        elif req_type == 'submarine':
+            raise Exception('Deprecated API. Please upgrade your version of Electrum')
+        else:
+            raise Exception('unsupported request type:' + req_type)
+        return response
+
+
+class HttpSwapManager(SwapManager):
+    async def send_request_to_server(self, method, request_data):
+        response = await self.network.async_send_http_on_proxy(
+            'post' if request_data else 'get',
+            self.api_url + '/' + method,
+            json=request_data,
+            timeout=30)
+        return json.loads(response)
