@@ -10,11 +10,6 @@ electrum_grs/locale/
 .devlocaltmp/
 *_trial_temp
 packages
-!contrib/electrum-grs-release/helpers/packages
-*.gnupg/
-*.local/
-*.bash*
-*.pip/
 env/
 .buildozer
 .buildozer_*/
@@ -51,8 +46,8 @@ contrib/libusb/
 contrib/.venv_make_packages/
 
 # shared objects
-electrum/*.so
-electrum/*.so.*
-electrum/*.dll
-electrum/*.dylib
+electrum_grs/*.so
+electrum_grs/*.so.*
+electrum_grs/*.dll
+electrum_grs/*.dylib
 contrib/osx/*.dylib

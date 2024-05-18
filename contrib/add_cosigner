@@ -11,8 +11,8 @@
 #   (using release.sh, and perhaps some manual steps)
 # - BUILDER creates a PR against https://github.com/spesmilo/electrum-signatures/
 #   to add their sigs for a given release, which then gets merged
-# - SFTPUSER runs `$ SSHUSER=$SFTPUSER electrum/contrib/add_cosigner $BUILDER`
-# - SFTPUSER runs `$ electrum/contrib/make_download $WWW_DIR`
+# - SFTPUSER runs `$ SSHUSER=$SFTPUSER electrum-grs/contrib/add_cosigner $BUILDER`
+# - SFTPUSER runs `$ electrum-grs/contrib/make_download $WWW_DIR`
 # -     $ (cd $WWW_DIR; git commit -a -m "add_cosigner"; git push)
 # - SFTPUSER runs `$ electrum-web/publish.sh $SFTPUSER`
 # - (for the website to be updated, both ThomasV and SomberNight needs to run publish.sh)

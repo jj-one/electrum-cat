@@ -3,7 +3,7 @@
 # It prunes the offline servers from the existing list (note: run with Tor proxy to keep .onions),
 # and adds new servers from provided file(s) of candidate servers.
 # A file of new candidate servers can be created via e.g.:
-# $ ./electrum/scripts/servers.py > reply.txt
+# $ ./electrum_grs/scripts/servers.py > reply.txt
 
 import asyncio
 import sys
