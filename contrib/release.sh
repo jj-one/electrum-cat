@@ -63,6 +63,8 @@ if [ "$GPGUSER" == "jackielove4u" ]; then
     PUBKEY="--local-user 287A E4CA1187C68C08B49CB2D11BD4F33F1DB499"
     export SSHUSER=jackielove4u
     RELEASEMANAGER=1
+else
+    warn "unexpected GPGUSER=$GPGUSER"
 fi
 
 
