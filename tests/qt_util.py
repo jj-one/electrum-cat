@@ -6,7 +6,7 @@ from unittest import SkipTest
 
 from PyQt6.QtCore import QCoreApplication, QMetaObject, Qt, pyqtSlot, QObject
 
-from electrum.util import traceback_format_exception
+from electrum_grs.util import traceback_format_exception
 
 
 class TestQCoreApplication(QCoreApplication):
