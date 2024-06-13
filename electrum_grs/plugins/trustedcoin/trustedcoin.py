@@ -36,7 +36,7 @@ from electrum_grs import ecc, constants, keystore, version, bip32, bitcoin
 from electrum_grs.bip32 import BIP32Node, xpub_type
 from electrum_grs.crypto import sha256
 from electrum_grs.transaction import PartialTxOutput, PartialTxInput, PartialTransaction, Transaction
-from electrum_grs.mnemonic import Mnemonic, seed_type, is_any_2fa_seed_type
+from electrum_grs.mnemonic import Mnemonic, calc_seed_type, is_any_2fa_seed_type
 from electrum_grs.wallet import Multisig_Wallet, Deterministic_Wallet
 from electrum_grs.i18n import _
 from electrum_grs.plugin import BasePlugin, hook
@@ -444,11 +444,6 @@ class TrustedCoinPlugin(BasePlugin):
         self.wallet_class.plugin = self
         self.requesting = False
 
-    @staticmethod
-    def is_valid_seed(seed):
-        t = seed_type(seed)
-        return is_any_2fa_seed_type(t)
-
     def is_available(self):
         return True
 
@@ -556,7 +551,7 @@ class TrustedCoinPlugin(BasePlugin):
 
     @classmethod
     def xkeys_from_seed(self, seed, passphrase):
-        t = seed_type(seed)
+        t = calc_seed_type(seed)
         if not is_any_2fa_seed_type(t):
             raise Exception(f'unexpected seed type: {t!r}')
         words = seed.split()
