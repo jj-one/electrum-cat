@@ -33,7 +33,7 @@ from . import version
 from . import segwit_addr
 from . import constants
 from . import ecc
-from .crypto import groestlHash, sha256d, sha256, hash_160, hmac_oneshot
+from .crypto import groestlHash, sha256, hash_160, hmac_oneshot
 
 if TYPE_CHECKING:
     from .network import Network
@@ -847,11 +847,11 @@ def control_block_for_taproot_script_spend(
 def usermessage_magic(message: bytes) -> bytes:
     from .bitcoin import var_int
     length = var_int(len(message))
-    return b"\x18Bitcoin Signed Message:\n" + length + message
+    return b"\x1cGroestlCoin Signed Message:\n" + length + message
 
 def ecdsa_sign_usermessage(ec_privkey, message: Union[bytes, str], *, is_compressed: bool) -> bytes:
     message = to_bytes(message, 'utf8')
-    msg32 = sha256d(usermessage_magic(message))
+    msg32 = sha256(usermessage_magic(message))
     return ec_privkey.ecdsa_sign_recoverable(msg32, is_compressed=is_compressed)
 
 def verify_usermessage_with_address(address: str, sig65: bytes, message: bytes, *, net=None) -> bool:
@@ -859,7 +859,7 @@ def verify_usermessage_with_address(address: str, sig65: bytes, message: bytes, 
     from .ecc import ECPubkey
     assert_bytes(sig65, message)
     if net is None: net = constants.net
-    h = sha256d(usermessage_magic(message))
+    h = sha256(usermessage_magic(message))
     try:
         public_key, compressed, txin_type_guess = ECPubkey.from_ecdsa_sig65(sig65, h)
     except Exception as e:
