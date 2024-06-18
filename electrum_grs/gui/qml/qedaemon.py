@@ -12,7 +12,7 @@ from electrum_grs.util import WalletFileException, standardize_path, InvalidPass
 from electrum_grs.plugin import run_hook
 from electrum_grs.lnchannel import ChannelState
 from electrum_grs.bitcoin import is_address
-from electrum_grs.ecc import verify_usermessage_with_address
+from electrum_grs.bitcoin import verify_usermessage_with_address
 from electrum_grs.storage import StorageReadWriteError
 
 from .auth import AuthMixin, auth_protect
