@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QProgressBar,
 
 from electrum_grs import version
 from electrum_grs import constants
-from electrum_grs import ecc
+from electrum_grs.bitcoin import verify_usermessage_with_address
 from electrum_grs.i18n import _
 from electrum_grs.util import make_aiohttp_session
 from electrum_grs.logging import Logger
@@ -122,8 +122,10 @@ class UpdateCheckThread(QThread, Logger):
                         continue
                     sig = base64.b64decode(sig)
                     msg = version_num.encode('utf-8')
-                    if ecc.verify_usermessage_with_address(address=address, sig65=sig, message=msg,
-                                                           net=constants.BitcoinMainnet):
+                    if verify_usermessage_with_address(
+                        address=address, sig65=sig, message=msg,
+                        net=constants.BitcoinMainnet
+                    ):
                         self.logger.info(f"valid sig for version announcement '{version_num}' from address '{address}'")
                         break
                 else:
