@@ -225,7 +225,7 @@ jobs:
           name: electrum-grs-${{ github.sha }}-android-x86_64
 
   macos:
-    runs-on: macos-11
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -234,7 +234,7 @@ jobs:
           python-version: 3.11.9
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 13.2.1
+          xcode-version: latest-stable
       - name: Compile OSX dmg
         run: ./contrib/osx/make_osx.sh
       - name: Upload Artifact
