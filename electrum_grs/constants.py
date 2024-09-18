@@ -161,7 +161,7 @@ class BitcoinTestnet(AbstractNet):
 class BitcoinTestnet4(BitcoinTestnet):
 
     NET_NAME = "testnet4"
-    GENESIS = "00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043"
+    GENESIS = "000000519399f41322d7a8c24bfdc409aa13a80160b43a57668c2ad62802fa5c"
     DEFAULT_SERVERS = read_json('servers_testnet4.json', {})
     CHECKPOINTS = read_json('checkpoints_testnet4.json', [])
     LN_DNS_SEEDS = []

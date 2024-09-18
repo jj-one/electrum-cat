@@ -964,7 +964,7 @@ testnet_block_explorers = {
 }
 
 testnet4_block_explorers = {
-    'mempool.space': ('https://mempool.space/testnet4/',
+    'blockbook': ('https://blockbook-testnet4.groestlcoin.org/',
                         {'tx': 'tx/', 'addr': 'address/'}),
 }
 
