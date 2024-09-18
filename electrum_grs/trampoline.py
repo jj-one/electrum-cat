@@ -23,6 +23,8 @@ TRAMPOLINE_NODES_TESTNET = {
     'eclair testnet': LNPeerAddr(host='108.61.99.169', port=9735, pubkey=bytes.fromhex('021fedfc02b43971339bf9052e2c639e182be6565435d1606761718352be666f15')),
 }
 
+TRAMPOLINE_NODES_TESTNET4 = {}
+
 TRAMPOLINE_NODES_SIGNET = {
     'eclair signet': LNPeerAddr(host='108.61.99.169', port=9735, pubkey=bytes.fromhex('021fedfc02b43971339bf9052e2c639e182be6565435d1606761718352be666f15')),
 }
@@ -36,6 +38,8 @@ def hardcoded_trampoline_nodes() -> Mapping[str, LNPeerAddr]:
         return TRAMPOLINE_NODES_MAINNET
     elif constants.net.NET_NAME == "testnet":
         return TRAMPOLINE_NODES_TESTNET
+    elif constants.net.NET_NAME == "testnet4":
+        return TRAMPOLINE_NODES_TESTNET4
     elif constants.net.NET_NAME == "signet":
         return TRAMPOLINE_NODES_SIGNET
     else:
