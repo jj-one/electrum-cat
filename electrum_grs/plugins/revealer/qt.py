@@ -41,7 +41,7 @@ from .revealer import RevealerPlugin
 
 
 if TYPE_CHECKING:
-    from electrum.gui.qt import ElectrumGui
+    from electrum_grs.gui.qt import ElectrumGui
 
 
 class Plugin(RevealerPlugin):
