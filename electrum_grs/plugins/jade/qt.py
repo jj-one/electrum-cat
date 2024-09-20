@@ -1,7 +1,7 @@
 from functools import partial
 from typing import TYPE_CHECKING
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from electrum_grs.i18n import _
 from electrum_grs.plugin import hook

@@ -5,8 +5,8 @@
 import asyncio
 import base64
 
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QProgressBar,
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QLabel, QProgressBar,
                              QHBoxLayout, QPushButton, QDialog)
 
 from electrum_grs import version
@@ -37,7 +37,7 @@ class UpdateCheck(QDialog, Logger):
         self.content.addWidget(self.heading_label)
 
         self.detail_label = QLabel()
-        self.detail_label.setTextInteractionFlags(Qt.LinksAccessibleByMouse)
+        self.detail_label.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
         self.detail_label.setOpenExternalLinks(True)
         self.content.addWidget(self.detail_label)
 
