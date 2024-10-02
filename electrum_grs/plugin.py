@@ -178,6 +178,10 @@ class Plugins(DaemonThread):
             os.unlink(filename)
             raise Exception(f"wrong plugin hash {name}")
 
+    def remove_external_plugin(self, name):
+        filename = self.external_plugin_path(name)
+        os.unlink(filename)
+
     def load_external_plugin(self, name):
         if name in self.plugins:
             return self.plugins[name]
@@ -240,7 +244,7 @@ class Plugins(DaemonThread):
 
     def load_external_plugins(self):
         for name, d in self.external_plugin_metadata.items():
-            if not d.get('requires_wallet_type') and self.config.get('use_' + name):
+            if not d.get('requires_wallet_type') and self.config.get('enable_plugin_' + name):
                 try:
                     self.load_external_plugin(name)
                 except BaseException as e:
