@@ -38,7 +38,7 @@ For elliptic curve operations,
 [libsecp256k1](https://github.com/bitcoin-core/secp256k1)
 is a required dependency.
 
-If you "pip install" Electrum, by default libsecp will get compiled locally,
+If you "pip install" Electrum-GRS, by default libsecp will get compiled locally,
 as part of the `electrum-ecc` dependency. This can be opted-out of,
 by setting the `ELECTRUM_ECC_DONT_COMPILE=1` environment variable.
 For the compilation to work, besides a C compiler, you need at least:

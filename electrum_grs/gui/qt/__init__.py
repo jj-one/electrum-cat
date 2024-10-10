@@ -73,7 +73,7 @@ from electrum_grs.storage import WalletStorage
 from electrum_grs.wizard import WizardViewState
 from electrum_grs.keystore import load_keystore
 
-from electrum.gui.common_qt.i18n import ElectrumTranslator
+from electrum_grs.gui.common_qt.i18n import ElectrumTranslator
 
 from .util import read_QIcon, ColorScheme, custom_message_box, MessageBoxMixin, WWLabel
 from .main_window import ElectrumWindow

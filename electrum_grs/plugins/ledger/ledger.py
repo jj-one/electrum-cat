@@ -4,7 +4,7 @@ import sys
 import traceback
 from typing import Optional, Tuple, TYPE_CHECKING
 
-from electrum_grs import ecc
+import electrum_ecc as ecc
 from electrum_grs import bip32
 from electrum_grs import descriptor
 from electrum_grs.crypto import hash_160
