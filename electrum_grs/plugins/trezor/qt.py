@@ -14,6 +14,7 @@ from electrum_grs.plugin import hook
 from electrum_grs.keystore import ScriptTypeNotSupported
 
 from electrum_grs.plugins.hw_wallet.qt import QtHandlerBase, QtPluginBase
+from electrum_grs.plugins.hw_wallet.trezor_qt_pinmatrix import PinMatrixWidget
 from electrum_grs.plugins.hw_wallet.plugin import only_hook_if_libraries_available, OutdatedHwFirmwareException
 
 from electrum_grs.gui.qt.util import (WindowModalDialog, WWLabel, Buttons, CancelButton,
@@ -462,7 +463,6 @@ class Plugin(TrezorPlugin, QtPlugin):
 
     @classmethod
     def pin_matrix_widget_class(self):
-        from trezorlib.qt.pinmatrix import PinMatrixWidget
         return PinMatrixWidget
 
     @hook
