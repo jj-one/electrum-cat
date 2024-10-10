@@ -47,9 +47,11 @@ from PyQt6.QtWidgets import (QMessageBox, QSystemTrayIcon, QTabWidget,
                              QWidget, QSizePolicy, QStatusBar, QToolTip,
                              QMenu, QToolButton)
 
+import electrum_ecc as ecc
+
 import electrum_grs
 from electrum_grs.gui import messages
-from electrum_grs import (keystore, ecc, constants, util, bitcoin, commands,
+from electrum_grs import (keystore, constants, util, bitcoin, commands,
                       paymentrequest, lnutil)
 from electrum_grs.bitcoin import COIN, is_address, DummyAddress
 from electrum_grs.plugin import run_hook, BasePlugin
@@ -2387,10 +2389,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
 
         addresses = self.wallet.get_unused_addresses()
         if not addresses:
-            try:
-                addresses = self.wallet.get_receiving_addresses()
-            except AttributeError:
-                addresses = self.wallet.get_addresses()
+            addresses = self.wallet.get_receiving_addresses()
         h, address_e = address_field(addresses)
         vbox.addLayout(h)
 

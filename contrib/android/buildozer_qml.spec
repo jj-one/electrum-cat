@@ -19,8 +19,14 @@ source.include_exts = py,png,jpg,qml,qmltypes,ttf,txt,gif,pem,mo,json,csv,so,svg
 source.exclude_exts = spec
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-source.exclude_dirs = bin, build, dist, contrib, env,
+source.exclude_dirs =
+    bin,
+    build,
+    dist,
+    contrib,
+    env,
     tests,
+    fastlane,
     electrum_grs/www,
     electrum_grs/scripts,
     electrum_grs/utils,
@@ -40,7 +46,7 @@ source.exclude_patterns = Makefile,setup*,
     packages/frozenlist-*.dist-info/*
 
 # (str) Application versioning (method 1)
-version.regex = APK_VERSION = '(.*)'
+version.regex = ELECTRUM_VERSION = '(.*)'
 version.filename = %(source.dir)s/electrum_grs/version.py
 
 # (str) Application versioning (method 2)

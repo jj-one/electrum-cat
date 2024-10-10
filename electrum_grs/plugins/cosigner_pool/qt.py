@@ -31,8 +31,9 @@ import ssl
 from PyQt6.QtCore import QObject, pyqtSignal
 from PyQt6.QtWidgets import QPushButton
 import certifi
+import electrum_ecc as ecc
 
-from electrum_grs import util, keystore, ecc, crypto
+from electrum_grs import util, keystore, crypto
 from electrum_grs.transaction import Transaction, PartialTransaction, tx_from_any, SerializationError
 from electrum_grs.bip32 import BIP32Node
 from electrum_grs.plugin import BasePlugin, hook

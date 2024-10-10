@@ -4,9 +4,11 @@ from ctypes import (
 )
 import io
 
-from electrum_grs import ecc, bitcoin
-from electrum_grs.ecc import ECPubkey, ECPrivkey
-from electrum_grs.ecc_fast import _libsecp256k1
+import electrum_ecc as ecc
+from electrum_ecc import ECPubkey, ECPrivkey
+from electrum_ecc import _libsecp256k1
+
+from electrum_grs import bitcoin
 from electrum_grs import crypto
 from electrum_grs.crypto import sha256
 

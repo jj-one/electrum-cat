@@ -1,12 +1,12 @@
 from typing import TYPE_CHECKING, Optional
-
 from PyQt6.QtWidgets import QLabel, QVBoxLayout, QGridLayout, QPushButton, QComboBox, QLineEdit, QSpacerItem, QWidget, QHBoxLayout
+
+import electrum_ecc as ecc
 
 from electrum_grs.i18n import _
 from electrum_grs.transaction import PartialTxOutput, PartialTransaction
 from electrum_grs.lnutil import MIN_FUNDING_SAT
 from electrum_grs.lnworker import hardcoded_trampoline_nodes
-from electrum_grs import ecc
 from electrum_grs.util import NotEnoughFunds, NoDynamicFeeEstimates
 
 from electrum_grs.gui import messages
@@ -114,6 +114,7 @@ class NewChannelDialog(WindowModalDialog):
 
     def spend_min(self):
         self.max_button.setChecked(False)
+        self.amount_e.setFrozen(False)
         self.amount_e.setAmount(self.min_amount_sat)
 
     def spend_max(self):

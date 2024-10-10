@@ -10,6 +10,8 @@ To generate an APK file, follow these instructions.
 ✓ _These binaries should be reproducible, meaning you should be able to generate
    binaries that match the official releases._
 
+- _Minimum supported target system (i.e. what end-users need): Android 6.0 (API 23)_
+
 This assumes an Ubuntu (x86_64) host, but it should not be too hard to adapt to another
 similar system.
 
@@ -145,10 +147,25 @@ $ adb push ~/wspace/tmp/my_wallet /data/local/tmp
 $ adb shell
 adb$ ls -la /data/local/tmp
 adb$ run-as org.groestlcoin.testnet.electrumgrs cp /data/local/tmp/my_wallet /data/data/org.groestlcoin.testnet.electrumgrs/files/data/testnet/wallets/
+adb$ run-as org.groestlcoin.testnet.electrumgrs chmod -R 700 /data/data/org.groestlcoin.testnet.electrumgrs/files/data/testnet/wallets
+adb$ run-as org.groestlcoin.testnet.electrumgrs chmod -R u-x,u+X /data/data/org.groestlcoin.testnet.electrumgrs/files/data/testnet/wallets
 adb$ rm /data/local/tmp/my_wallet
 ```
 
 Or use Android Studio: "Device File Explorer", which can download/upload data directly from device (via adb).
+
+#### Device with multiple user profiles
+
+There are further complications if using an Android device
+[with multiple user profiles](https://source.android.com/docs/devices/admin/multi-user-testing)
+(typical for GrapheneOS/etc).
+
+Run `$ adb shell pm list users` to get a list of all existing users, and take note of the user ids.
+
+Instead of `/data/data/{app.path}`, private app data is stored at `/data/user/{userId}/{app.path}`.
+
+Further, instead of `adb$ run-as org.groestlcoin.testnet.electrumgrs`,
+you need `adb$ run-as org.groestlcoin.testnet.electrumgrs --user {userId}`.
 
 ### How to investigate diff between binaries if reproducibility fails?
 ```

@@ -13,6 +13,7 @@ import unittest
 from typing import Iterable, NamedTuple, Tuple, List, Dict
 
 from aiorpcx import timeout_after, TaskTimeout
+from electrum_ecc import ECPrivkey
 
 import electrum_grs
 import electrum_grs.trampoline
@@ -20,7 +21,6 @@ from electrum_grs import bitcoin
 from electrum_grs import util
 from electrum_grs import constants
 from electrum_grs.network import Network
-from electrum_grs.ecc import ECPrivkey
 from electrum_grs import simple_config, lnutil
 from electrum_grs.lnaddr import lnencode, LnAddr, lndecode
 from electrum_grs.bitcoin import COIN, sha256
