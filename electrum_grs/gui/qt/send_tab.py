@@ -20,7 +20,7 @@ from electrum_grs.transaction import Transaction, PartialTxInput, PartialTxOutpu
 from electrum_grs.network import TxBroadcastError, BestEffortRequestFailed
 from electrum_grs.payment_identifier import (PaymentIdentifierType, PaymentIdentifier, invoice_from_payment_identifier,
                                          payment_identifier_from_invoice)
-from electrum.submarine_swaps import SwapServerError
+from electrum_grs.submarine_swaps import SwapServerError
 
 from .amountedit import AmountEdit, BTCAmountEdit, SizedFreezableLineEdit
 from .paytoedit import InvalidPaymentIdentifier
