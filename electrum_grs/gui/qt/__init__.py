@@ -72,6 +72,7 @@ from electrum_grs.simple_config import SimpleConfig
 from electrum_grs.storage import WalletStorage
 from electrum_grs.wizard import WizardViewState
 from electrum_grs.keystore import load_keystore
+from electrum_grs.bip32 import is_xprv
 
 from electrum_grs.gui.common_qt.i18n import ElectrumTranslator
 
@@ -211,7 +212,8 @@ class ElectrumGui(BaseElectrumGui, Logger):
             m = self.tray.contextMenu()
             m.clear()
         network = self.daemon.network
-        m.addAction(_("Network"), self.show_network_dialog)
+        if network:
+            m.addAction(_("Network"), self.show_network_dialog)
         if network and network.lngossip:
             m.addAction(_("Lightning Network"), self.show_lightning_dialog)
         if network and network.local_watchtower:
@@ -467,6 +469,8 @@ class ElectrumGui(BaseElectrumGui, Logger):
                 xprv = k1.get_master_private_key(d['password'])
             else:
                 xprv = db.get('x1')['xprv']
+                if not is_xprv(xprv):
+                    xprv = k1
             _wiz_data_updates = {
                 'wallet_name': wallet_file,
                 'xprv1': xprv,

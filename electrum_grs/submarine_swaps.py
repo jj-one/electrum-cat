@@ -253,6 +253,8 @@ class SwapManager(Logger):
 
     def cancel_normal_swap(self, swap: SwapData):
         """ we must not have broadcast the funding tx """
+        if swap is None:
+            return
         if swap.funding_txid is not None:
             self.logger.info(f'cannot cancel swap {swap.payment_hash.hex()}: already funded')
             return
@@ -877,7 +879,7 @@ class SwapManager(Logger):
 
     def init_pairs(self) -> None:
         """ for server """
-        self.percentage = 0.5
+        self.percentage = float(self.config.SWAPSERVER_FEE_MILLIONTHS) / 10000
         self._min_amount = 20000
         self._max_amount = 10000000
         self.normal_fee = self.get_fee(CLAIM_FEE_SIZE)
