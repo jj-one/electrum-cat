@@ -1394,6 +1394,7 @@ class Peer(Logger):
                 self.send_channel_ready(chan)
 
         self.maybe_send_announcement_signatures(chan)
+        self.maybe_update_fee(chan)  # if needed, update fee ASAP, to avoid force-closures from this
         # checks done
         util.trigger_callback('channel', self.lnworker.wallet, chan)
         # if we have sent a previous shutdown, it must be retransmitted (Bolt2)
@@ -2263,6 +2264,8 @@ class Peer(Logger):
         """
         if not chan.can_send_ctx_updates():
             return
+        if chan.get_state() != ChannelState.OPEN:
+            return
         feerate_per_kw = self.lnworker.current_target_feerate_per_kw()
         def does_chan_fee_need_update(chan_feerate: Union[float, int]) -> bool:
             # We raise fees more aggressively than we lower them. Overpaying is not too bad,
@@ -2374,7 +2377,7 @@ class Peer(Logger):
         if chan.config[LOCAL].upfront_shutdown_script:
             scriptpubkey = chan.config[LOCAL].upfront_shutdown_script
         else:
-            scriptpubkey = bitcoin.address_to_script(chan.sweep_address)
+            scriptpubkey = bitcoin.address_to_script(chan.get_sweep_address())
         assert scriptpubkey
         # wait until no more pending updates (bolt2)
         chan.set_can_send_ctx_updates(False)
@@ -2427,7 +2430,7 @@ class Peer(Logger):
         if chan.config[LOCAL].upfront_shutdown_script:
             our_scriptpubkey = chan.config[LOCAL].upfront_shutdown_script
         else:
-            our_scriptpubkey = bitcoin.address_to_script(chan.sweep_address)
+            our_scriptpubkey = bitcoin.address_to_script(chan.get_sweep_address())
         assert our_scriptpubkey
         # estimate fee of closing tx
         dummy_sig, dummy_tx = chan.make_closing_tx(our_scriptpubkey, their_scriptpubkey, fee_sat=0)

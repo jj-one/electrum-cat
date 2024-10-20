@@ -191,7 +191,6 @@ class AbstractChannel(Logger, ABC):
     funding_outpoint: Outpoint
     node_id: bytes  # note that it might not be the full 33 bytes; for OCB it is only the prefix
     _state: ChannelState
-    sweep_address: str
 
     def set_short_channel_id(self, short_id: ShortChannelID) -> None:
         self.short_channel_id = short_id
@@ -225,17 +224,17 @@ class AbstractChannel(Logger, ABC):
     def get_state(self) -> ChannelState:
         return self._state
 
-    def is_funded(self):
+    def is_funded(self) -> bool:
         return self.get_state() >= ChannelState.FUNDED
 
-    def is_open(self):
+    def is_open(self) -> bool:
         return self.get_state() == ChannelState.OPEN
 
-    def is_closed(self):
+    def is_closed(self) -> bool:
         # the closing txid has been saved
         return self.get_state() >= ChannelState.CLOSING
 
-    def is_redeemed(self):
+    def is_redeemed(self) -> bool:
         return self.get_state() == ChannelState.REDEEMED
 
     def need_to_subscribe(self) -> bool:
@@ -268,7 +267,7 @@ class AbstractChannel(Logger, ABC):
     def save_funding_height(self, *, txid: str, height: int, timestamp: Optional[int]) -> None:
         self.storage['funding_height'] = txid, height, timestamp
 
-    def get_funding_height(self):
+    def get_funding_height(self) -> Optional[Tuple[str, int, Optional[int]]]:
         return self.storage.get('funding_height')
 
     def delete_funding_height(self):
@@ -277,19 +276,19 @@ class AbstractChannel(Logger, ABC):
     def save_closing_height(self, *, txid: str, height: int, timestamp: Optional[int]) -> None:
         self.storage['closing_height'] = txid, height, timestamp
 
-    def get_closing_height(self):
+    def get_closing_height(self) -> Optional[Tuple[str, int, Optional[int]]]:
         return self.storage.get('closing_height')
 
     def delete_closing_height(self):
         self.storage.pop('closing_height', None)
 
-    def create_sweeptxs_for_our_ctx(self, ctx):
-        return create_sweeptxs_for_our_ctx(chan=self, ctx=ctx, sweep_address=self.sweep_address)
+    def create_sweeptxs_for_our_ctx(self, ctx: Transaction) -> Optional[Dict[str, SweepInfo]]:
+        return create_sweeptxs_for_our_ctx(chan=self, ctx=ctx, sweep_address=self.get_sweep_address())
 
-    def create_sweeptxs_for_their_ctx(self, ctx):
-        return create_sweeptxs_for_their_ctx(chan=self, ctx=ctx, sweep_address=self.sweep_address)
+    def create_sweeptxs_for_their_ctx(self, ctx: Transaction) -> Optional[Dict[str, SweepInfo]]:
+        return create_sweeptxs_for_their_ctx(chan=self, ctx=ctx, sweep_address=self.get_sweep_address())
 
-    def is_backup(self):
+    def is_backup(self) -> bool:
         return False
 
     def get_local_scid_alias(self, *, create_new_if_needed: bool = False) -> Optional[bytes]:
@@ -338,7 +337,7 @@ class AbstractChannel(Logger, ABC):
                 closing_height=closing_height,
                 keep_watching=keep_watching)
 
-    def update_unfunded_state(self):
+    def update_unfunded_state(self) -> None:
         self.delete_funding_height()
         self.delete_closing_height()
         if self.get_state() in [ChannelState.PREOPENING, ChannelState.OPENING, ChannelState.FORCE_CLOSING] and self.lnworker:
@@ -414,6 +413,14 @@ class AbstractChannel(Logger, ABC):
 
     @abstractmethod
     def get_funding_address(self) -> str:
+        pass
+
+    @abstractmethod
+    def get_sweep_address(self) -> str:
+        """Returns a wallet address we can use to sweep coins to.
+        It could be something static to the channel (fixed for its lifecycle),
+        or it might just ask the wallet now for an unused address.
+        """
         pass
 
     def get_state_for_GUI(self) -> str:
@@ -575,7 +582,7 @@ class ChannelBackup(AbstractChannel):
 
     def create_sweeptxs_for_our_ctx(self, ctx):
         if self.is_imported:
-            return create_sweeptxs_for_our_ctx(chan=self, ctx=ctx, sweep_address=self.sweep_address)
+            return create_sweeptxs_for_our_ctx(chan=self, ctx=ctx, sweep_address=self.get_sweep_address())
         else:
             # backup from op_return
             return {}
@@ -613,8 +620,7 @@ class ChannelBackup(AbstractChannel):
     def is_frozen_for_receiving(self) -> bool:
         return False
 
-    @property
-    def sweep_address(self) -> str:
+    def get_sweep_address(self) -> str:
         return self.lnworker.wallet.get_new_sweep_address_for_channel()
 
     def get_local_pubkey(self) -> bytes:
@@ -812,7 +818,7 @@ class Channel(AbstractChannel):
         self._outgoing_channel_update = chan_upd
         return chan_upd
 
-    def construct_channel_announcement_without_sigs(self) -> bytes:
+    def construct_channel_announcement_without_sigs(self) -> Tuple[bytes, bool]:
         bitcoin_keys = [
             self.config[REMOTE].multisig_key.pubkey,
             self.config[LOCAL].multisig_key.pubkey]
@@ -846,10 +852,8 @@ class Channel(AbstractChannel):
         channel_type = ChannelType(self.storage.get('channel_type'))
         return bool(channel_type & ChannelType.OPTION_ZEROCONF)
 
-    @property
-    def sweep_address(self) -> str:
+    def get_sweep_address(self) -> str:
         # TODO: in case of unilateral close with pending HTLCs, this address will be reused
-        addr = None
         assert self.is_static_remotekey_enabled()
         our_payment_pubkey = self.config[LOCAL].payment_basepoint.pubkey
         addr = make_commitment_output_to_remote_address(our_payment_pubkey)
@@ -1415,10 +1419,10 @@ class Channel(AbstractChannel):
         ctn = self.get_oldest_unrevoked_ctn(subject)
         return self.get_commitment(subject, ctn=ctn)
 
-    def create_sweeptxs(self, ctn: int) -> List[Transaction]:
+    def create_sweeptxs_for_watchtower(self, ctn: int) -> List[Transaction]:
         from .lnsweep import create_sweeptxs_for_watchtower
         secret, ctx = self.get_secret_and_commitment(REMOTE, ctn=ctn)
-        return create_sweeptxs_for_watchtower(self, ctx, secret, self.sweep_address)
+        return create_sweeptxs_for_watchtower(self, ctx, secret, self.get_sweep_address())
 
     def get_oldest_unrevoked_ctn(self, subject: HTLCOwner) -> int:
         return self.hm.ctn_oldest_unrevoked(subject)
@@ -1645,7 +1649,7 @@ class Channel(AbstractChannel):
 
     def maybe_sweep_revoked_htlc(self, ctx: Transaction, htlc_tx: Transaction) -> Optional[SweepInfo]:
         # look at the output address, check if it matches
-        return create_sweeptx_for_their_revoked_htlc(self, ctx, htlc_tx, self.sweep_address)
+        return create_sweeptx_for_their_revoked_htlc(self, ctx, htlc_tx, self.get_sweep_address())
 
     def has_pending_changes(self, subject: HTLCOwner) -> bool:
         next_htlcs = self.hm.get_htlcs_in_next_ctx(subject)

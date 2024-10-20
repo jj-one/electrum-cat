@@ -24,6 +24,7 @@ from electrum_grs.network import Network
 from electrum_grs import simple_config, lnutil
 from electrum_grs.lnaddr import lnencode, LnAddr, lndecode
 from electrum_grs.bitcoin import COIN, sha256
+from electrum_grs.transaction import Transaction
 from electrum_grs.util import NetworkRetryManager, bfh, OldTaskGroup, EventListener, InvoiceError
 from electrum_grs.lnpeer import Peer
 from electrum_grs.lnutil import LNPeerAddr, Keypair, privkey_to_pubkey
@@ -147,7 +148,7 @@ class MockLNWallet(Logger, EventListener, NetworkRetryManager[LNPeerAddr]):
         Logger.__init__(self)
         NetworkRetryManager.__init__(self, max_retry_delay_normal=1, init_retry_delay_normal=1)
         self.node_keypair = local_keypair
-        self.payment_secret_key = os.urandom(256) # does not need to be deterministic in tests
+        self.payment_secret_key = os.urandom(32)  # does not need to be deterministic in tests
         self._user_dir = tempfile.mkdtemp(prefix="electrum-lnpeer-test-")
         self.config = SimpleConfig({}, read_user_dir_function=lambda: self._user_dir)
         self.network = MockNetwork(tx_queue, config=self.config)
@@ -312,6 +313,8 @@ class MockLNWallet(Logger, EventListener, NetworkRetryManager[LNPeerAddr]):
     save_forwarding_failure = LNWallet.save_forwarding_failure
     get_forwarding_failure = LNWallet.get_forwarding_failure
     maybe_cleanup_forwarding = LNWallet.maybe_cleanup_forwarding
+    current_target_feerate_per_kw = LNWallet.current_target_feerate_per_kw
+    current_low_feerate_per_kw = LNWallet.current_low_feerate_per_kw
 
 
 class MockTransport:
@@ -1228,7 +1231,7 @@ class TestPeerDirect(TestPeer):
                 await util.wait_for2(p2.initialized, 1)
                 # bob closes channel with different shutdown script
                 await p1.close_channel(alice_channel.channel_id)
-                gath.cancel()
+                self.fail("p1.close_channel should have raised above!")
 
             async def main_loop(peer):
                     async with peer.taskgroup as group:
@@ -1241,7 +1244,11 @@ class TestPeerDirect(TestPeer):
 
         with self.assertRaises(GracefulDisconnect):
             await test()
+        # check that neither party broadcast a closing tx (as it was not even signed)
+        self.assertEqual(0, q1.qsize())
+        self.assertEqual(0, q2.qsize())
 
+        # -- new scenario:
         # bob sends the same upfront_shutdown_script has he announced
         alice_channel.config[HTLCOwner.REMOTE].upfront_shutdown_script = bob_uss
         bob_channel.config[HTLCOwner.LOCAL].upfront_shutdown_script = bob_uss
@@ -1270,6 +1277,12 @@ class TestPeerDirect(TestPeer):
 
         with self.assertRaises(asyncio.CancelledError):
             await test()
+
+        # check if p1 has broadcast the closing tx, and if it pays to Bob's uss
+        self.assertEqual(1, q1.qsize())
+        closing_tx = q1.get_nowait()  # type: Transaction
+        self.assertEqual(2, len(closing_tx.outputs()))
+        self.assertEqual(1, len(closing_tx.get_output_idxs_from_address(bob_uss_addr)))
 
     async def test_channel_usage_after_closing(self):
         alice_channel, bob_channel = create_test_channels()
