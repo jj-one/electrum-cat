@@ -24,33 +24,32 @@
 # SOFTWARE.
 
 from functools import partial
-import threading
 import os
 from typing import TYPE_CHECKING
 
 from PyQt6.QtGui import QPixmap, QMovie, QColor
 from PyQt6.QtCore import QObject, pyqtSignal, QSize, Qt
 from PyQt6.QtWidgets import (QTextEdit, QVBoxLayout, QLabel, QGridLayout, QHBoxLayout,
-                             QRadioButton, QCheckBox, QLineEdit, QPushButton, QWidget)
+                             QRadioButton, QCheckBox, QPushButton, QWidget)
 
 from electrum_grs.i18n import _
 from electrum_grs.plugin import hook
-from electrum_grs.util import is_valid_email, InvalidPassword
+from electrum_grs.util import InvalidPassword
 from electrum_grs.logging import Logger, get_logger
 from electrum_grs import keystore
 
-from electrum_grs.gui.qt.util import (read_QIcon, WindowModalDialog, WaitingDialog, OkButton,
-                                  CancelButton, Buttons, icon_path, internal_plugin_icon_path, WWLabel, CloseButton, ColorScheme,
+from electrum_grs.gui.qt.util import (WindowModalDialog, WaitingDialog, OkButton, CancelButton, Buttons, icon_path,
+                                  internal_plugin_icon_path, WWLabel, CloseButton, ColorScheme,
                                   ChoiceWidget, PasswordLineEdit, char_width_in_lineedit)
 from electrum_grs.gui.qt.qrcodewidget import QRCodeWidget
 from electrum_grs.gui.qt.amountedit import AmountEdit
 from electrum_grs.gui.qt.main_window import StatusBarButton
-from electrum_grs.gui.qt.wizard.wallet import WCCreateSeed, WCConfirmSeed, WCHaveSeed, WCEnterExt, WCConfirmExt
-from electrum_grs.gui.qt.wizard.wizard import WizardComponent
+from electrum_grs.gui.qt.wizard.wallet import (WCCreateSeed, WCConfirmSeed, WCHaveSeed, WCEnterExt, WCConfirmExt,
+                                           WalletWizardComponent)
 from electrum_grs.gui.qt.util import read_QIcon_from_bytes
 
 from .common_qt import TrustedcoinPluginQObject
-from .trustedcoin import TrustedCoinPlugin, server, DISCLAIMER
+from .trustedcoin import TrustedCoinPlugin, DISCLAIMER
 
 if TYPE_CHECKING:
     from electrum_grs.gui.qt.main_window import ElectrumWindow
@@ -116,7 +115,7 @@ class Plugin(TrustedCoinPlugin):
     def auth_dialog(self, window):
         d = WindowModalDialog(window, _("Authorization"))
         vbox = QVBoxLayout(d)
-        pw = AmountEdit(None, is_int = True)
+        pw = AmountEdit(None, is_int=True)
         msg = _('Please enter your Google Authenticator code')
         vbox.addWidget(QLabel(msg))
         grid = QGridLayout()
@@ -139,6 +138,7 @@ class Plugin(TrustedCoinPlugin):
     def waiting_dialog_for_billing_info(self, window, *, on_finished=None):
         def task():
             return self.request_billing_info(window.wallet, suppress_connection_error=False)
+
         def on_error(exc_info):
             e = exc_info[1]
             window.show_error("{header}\n{exc}\n\n{tor}"
@@ -216,6 +216,7 @@ class Plugin(TrustedCoinPlugin):
             grid.addWidget(QLabel(window.format_amount(v/k) + ' ' + window.base_unit() + "/tx"), i, 1)
             b = QRadioButton()
             b.setChecked(k == n_prepay)
+
             def on_click(b, k):
                 self.config.PLUGIN_TRUSTEDCOIN_NUM_PREPAY = k
             b.clicked.connect(partial(on_click, k=k))
@@ -338,9 +339,9 @@ class Plugin(TrustedCoinPlugin):
             wizard_data['x2'] = k2.dump()
 
 
-class WCDisclaimer(WizardComponent):
+class WCDisclaimer(WalletWizardComponent):
     def __init__(self, parent, wizard):
-        WizardComponent.__init__(self, parent, wizard, title=_('Disclaimer'))
+        WalletWizardComponent.__init__(self, parent, wizard, title=_('Disclaimer'))
 
         self.layout().addWidget(WWLabel('\n\n'.join(DISCLAIMER)))
         self.layout().addStretch(1)
@@ -351,9 +352,9 @@ class WCDisclaimer(WizardComponent):
         pass
 
 
-class WCChooseSeed(WizardComponent):
+class WCChooseSeed(WalletWizardComponent):
     def __init__(self, parent, wizard):
-        WizardComponent.__init__(self, parent, wizard, title=_('Create or restore'))
+        WalletWizardComponent.__init__(self, parent, wizard, title=_('Create or restore'))
         message = _('Do you want to create a new seed, or restore a wallet using an existing seed?')
         choices = [
             ('createseed',  _('Create a new seed')),
@@ -370,16 +371,15 @@ class WCChooseSeed(WizardComponent):
         self.wizard_data['keystore_type'] = self.choice_w.selected_key
 
 
-class WCTerms(WizardComponent):
+class WCTerms(WalletWizardComponent):
     def __init__(self, parent, wizard):
-        WizardComponent.__init__(self, parent, wizard, title=_('Terms and conditions'))
+        WalletWizardComponent.__init__(self, parent, wizard, title=_('Terms and conditions'))
         self._has_tos = False
-
-    def on_ready(self):
         self.tos_e = TOS()
         self.tos_e.setReadOnly(True)
         self.layout().addWidget(self.tos_e)
 
+    def on_ready(self):
         self.fetch_terms_and_conditions()
 
     def fetch_terms_and_conditions(self):
@@ -406,11 +406,11 @@ class WCTerms(WizardComponent):
         pass
 
 
-class WCShowConfirmOTP(WizardComponent):
+class WCShowConfirmOTP(WalletWizardComponent):
     _logger = get_logger(__name__)
 
     def __init__(self, parent, wizard):
-        WizardComponent.__init__(self, parent, wizard, title=_('Authenticator secret'))
+        WalletWizardComponent.__init__(self, parent, wizard, title=_('Authenticator secret'))
         self._otp_verified = False
         self._is_online_continuation = False
 
@@ -554,9 +554,9 @@ class WCShowConfirmOTP(WizardComponent):
         pass
 
 
-class WCKeepDisable(WizardComponent):
+class WCKeepDisable(WalletWizardComponent):
     def __init__(self, parent, wizard):
-        WizardComponent.__init__(self, parent, wizard, title=_('Restore 2FA wallet'))
+        WalletWizardComponent.__init__(self, parent, wizard, title=_('Restore 2FA wallet'))
         message = ' '.join([
             'You are going to restore a wallet protected with two-factor authentication.',
             'Do you want to keep using two-factor authentication with this wallet,',
@@ -577,9 +577,10 @@ class WCKeepDisable(WizardComponent):
         self.wizard_data['trustedcoin_keepordisable'] = self.choice_w.selected_key
 
 
-class WCContinueOnline(WizardComponent):
+class WCContinueOnline(WalletWizardComponent):
     def __init__(self, parent, wizard):
-        WizardComponent.__init__(self, parent, wizard, title=_('Continue Online'))
+        WalletWizardComponent.__init__(self, parent, wizard, title=_('Continue Online'))
+        self.cb_online = QCheckBox(_('Go online to complete wallet creation'))
 
     def on_ready(self):
         path = os.path.join(os.path.dirname(self.wizard._daemon.config.get_wallet_path()), self.wizard_data['wallet_name'])
@@ -596,7 +597,6 @@ class WCContinueOnline(WizardComponent):
         self.layout().addWidget(WWLabel('\n\n'.join(msg)))
         self.layout().addStretch(1)
 
-        self.cb_online = QCheckBox(_('Go online to complete wallet creation'))
         self.cb_online.setChecked(True)
         self.cb_online.stateChanged.connect(self.on_updated)
         # self.cb_online.setToolTip(_("Check this box to request a new secret. You will need to retype your seed."))
@@ -610,11 +610,9 @@ class WCContinueOnline(WizardComponent):
         self.wizard_data['trustedcoin_go_online'] = self.cb_online.isChecked()
 
 
-class WCKeystorePassword(WizardComponent):
+class WCKeystorePassword(WalletWizardComponent):
     def __init__(self, parent, wizard):
-        WizardComponent.__init__(self, parent, wizard, title=_('Unlock Keystore'))
-
-    def on_ready(self):
+        WalletWizardComponent.__init__(self, parent, wizard, title=_('Unlock Keystore'))
         self.layout().addStretch(1)
 
         hbox2 = QHBoxLayout()
@@ -627,11 +625,11 @@ class WCKeystorePassword(WizardComponent):
         hbox2.addWidget(self.pw_e)
         hbox2.addStretch(1)
         self.layout().addLayout(hbox2)
-
         self.layout().addStretch(1)
 
-        self._valid = False
+        self.ks = None
 
+    def on_ready(self):
         self.ks = self.wizard_data['xprv1']
 
     def on_text(self):

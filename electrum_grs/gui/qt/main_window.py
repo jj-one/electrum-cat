@@ -72,7 +72,7 @@ from electrum_grs.network import Network, UntrustedServerReturnedError, NetworkE
 from electrum_grs.exchange_rate import FxThread
 from electrum_grs.simple_config import SimpleConfig
 from electrum_grs.logging import Logger
-from electrum_grs.lnutil import extract_nodeid, ConnStringFormatError
+from electrum_grs.lntransport import extract_nodeid, ConnStringFormatError
 from electrum_grs.lnaddr import lndecode
 from electrum_grs.submarine_swaps import SwapServerError
 
@@ -2525,8 +2525,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         self.close_wallet()
 
         if self._update_check_thread:
-            self._update_check_thread.exit()
-            self._update_check_thread.wait()
+            self._update_check_thread.stop()
         if self.tray:
             self.tray = None
         self.gui_object.timer.timeout.disconnect(self.timer_actions)

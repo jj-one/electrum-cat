@@ -24,7 +24,6 @@
 # SOFTWARE.
 
 from electrum_grs.i18n import _
-from electrum_grs.plugin import hook
 from .trustedcoin import TrustedCoinPlugin
 
 
@@ -42,4 +41,3 @@ class Plugin(TrustedCoinPlugin):
             else:
                 self.logger.info("twofactor: xpub3 not needed")
             wallet.auth_code = auth_code
-
