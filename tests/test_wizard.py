@@ -1,10 +1,10 @@
 import os
 
-from electrum import SimpleConfig
-from electrum.interface import ServerAddr
-from electrum.network import NetworkParameters
-from electrum.plugin import Plugins
-from electrum.wizard import ServerConnectWizard, NewWalletWizard
+from electrum_grs import SimpleConfig
+from electrum_grs.interface import ServerAddr
+from electrum_grs.network import NetworkParameters
+from electrum_grs.plugin import Plugins
+from electrum_grs.wizard import ServerConnectWizard, NewWalletWizard
 from tests import ElectrumTestCase
 
 
