@@ -24,6 +24,7 @@ from . import bitcoin, util
 from . import constants
 from .util import (bfh, log_exceptions, ignore_exceptions, chunks, OldTaskGroup,
                    UnrelatedTransactionException, error_text_bytes_to_safe_str, AsyncHangDetector)
+from .util import event_listener, EventListener
 from . import transaction
 from .bitcoin import make_op_return, DummyAddress
 from .transaction import PartialTxOutput, match_script_against_template, Sighash
@@ -64,7 +65,7 @@ if TYPE_CHECKING:
 LN_P2P_NETWORK_TIMEOUT = 20
 
 
-class Peer(Logger):
+class Peer(Logger, EventListener):
     # note: in general this class is NOT thread-safe. Most methods are assumed to be running on asyncio thread.
 
     LOGGING_SHORTCUT = 'P'
@@ -122,6 +123,7 @@ class Peer(Logger):
         self._received_revack_event = asyncio.Event()
         self.received_commitsig_event = asyncio.Event()
         self.downstream_htlc_resolved_event = asyncio.Event()
+        self.register_callbacks()
 
     def send_message(self, message_name: str, **kwargs):
         assert util.get_running_loop() == util.get_asyncio_loop(), f"this must be run on the asyncio thread!"
@@ -633,6 +635,7 @@ class Peer(Logger):
         # note: This method might get called multiple times!
         #       E.g. if you call close_and_cleanup() to cause a disconnection from the peer,
         #       it will get called a second time in handle_disconnect().
+        self.unregister_callbacks()
         try:
             if self.transport:
                 self.transport.close()
@@ -2251,6 +2254,13 @@ class Peer(Logger):
         self._received_revack_event.set()
         self._received_revack_event.clear()
 
+    @event_listener
+    async def on_event_fee(self, *args):
+        async def async_wrapper():
+            for chan in self.channels.values():
+                self.maybe_update_fee(chan)
+        await self.taskgroup.spawn(async_wrapper)
+
     def on_update_fee(self, chan: Channel, payload):
         if chan.peer_state != PeerState.GOOD:  # should never happen
             raise Exception(f"received update_fee in unexpected {chan.peer_state=!r}")
@@ -2750,6 +2760,7 @@ class Peer(Logger):
                 # return payment_key so this branch will not be executed again
                 return None, payment_key, None
             elif preimage:
+                self.lnworker.maybe_cleanup_mpp(chan.get_scid_or_local_alias(), htlc)
                 return preimage, None, None
             else:
                 # we are waiting for mpp consolidation or preimage
@@ -2761,7 +2772,10 @@ class Peer(Logger):
             preimage = self.lnworker.get_preimage(payment_hash)
             error_bytes, error_reason = self.lnworker.get_forwarding_failure(payment_key)
             if error_bytes or error_reason or preimage:
-                self.lnworker.maybe_cleanup_forwarding(payment_key, chan.get_scid_or_local_alias(), htlc)
+                cleanup_keys = self.lnworker.maybe_cleanup_mpp(chan.get_scid_or_local_alias(), htlc)
+                is_htlc_key = ':' in payment_key
+                if is_htlc_key or payment_key in cleanup_keys:
+                    self.lnworker.maybe_cleanup_forwarding(payment_key)
             if error_bytes:
                 return None, None, error_bytes
             if error_reason:

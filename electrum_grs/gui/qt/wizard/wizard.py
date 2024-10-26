@@ -107,6 +107,8 @@ class QEAbstractWizard(QDialog, MessageBoxMixin):
         outer_vbox.addLayout(hbox)
         outer_vbox.addLayout(Buttons(self.back_button, self.next_button))
 
+        self.setTabOrder(self.back_button, self.next_button)
+
         self.icon_filename = None
         self.set_icon('electrum.png')
 
@@ -127,6 +129,7 @@ class QEAbstractWizard(QDialog, MessageBoxMixin):
         else:
             viewstate = self.start_wizard()
         self.load_next_component(viewstate.view, viewstate.wizard_data, viewstate.params)
+        self.next_button.setFocus()
         # TODO: re-test if needed on macOS
         self.refresh_gui()  # Need for QT on MacOSX.  Lame.
 
@@ -143,6 +146,7 @@ class QEAbstractWizard(QDialog, MessageBoxMixin):
 
         comp = self.view_to_component(view)
         try:
+            self._logger.debug(f'load_next_component: {comp!r}')
             page = comp(self.main_widget, self)
         except Exception as e:
             self._logger.error(f'not a class: {comp!r}')
@@ -151,13 +155,11 @@ class QEAbstractWizard(QDialog, MessageBoxMixin):
         page.params = params
         page.on_ready()  # call before component emits any signals
 
-        self._logger.debug(f'load_next_component: {page=!r}')
-
         page.updated.connect(self.on_page_updated)
 
         # add to stack and update wizard
-        self.main_widget.setCurrentIndex(self.main_widget.addWidget(page))
         page.apply()
+        self.main_widget.setCurrentIndex(self.main_widget.addWidget(page))
         self.update()
 
     @pyqtSlot(object)
@@ -218,7 +220,11 @@ class QEAbstractWizard(QDialog, MessageBoxMixin):
                 self.prev()  # rollback the submit above
         else:
             view = self.submit(wd)
-            self.load_next_component(view.view, view.wizard_data, view.params)
+            try:
+                self.load_next_component(view.view, view.wizard_data, view.params)
+            except Exception as e:
+                self.prev()  # rollback the submit above
+                raise e
 
     def start_wizard(self) -> 'WizardViewState':
         self.start()
