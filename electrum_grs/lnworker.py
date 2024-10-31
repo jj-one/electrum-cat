@@ -31,7 +31,7 @@ from electrum_ecc import ecdsa_der_sig_from_ecdsa_sig64
 
 from . import constants, util
 from . import keystore
-from .util import profiler, chunks, OldTaskGroup
+from .util import profiler, chunks, OldTaskGroup, ESocksProxy
 from .invoices import Invoice, PR_UNPAID, PR_EXPIRED, PR_PAID, PR_INFLIGHT, PR_FAILED, PR_ROUTING, LN_EXPIRY_NEVER
 from .invoices import BaseInvoice
 from .util import NetworkRetryManager, JsonRPCClient, NotEnoughFunds
@@ -325,7 +325,7 @@ class LNWorker(Logger, EventListener, NetworkRetryManager[LNPeerAddr]):
         if node_id == self.node_keypair.pubkey:
             raise ErrorAddingPeer("cannot connect to self")
         transport = LNTransport(self.node_keypair.privkey, peer_addr,
-                                proxy=self.network.proxy)
+                                e_proxy=ESocksProxy.from_network_settings(self.network))
         peer = await self._add_peer_from_transport(node_id=node_id, transport=transport)
         assert peer
         return peer
@@ -2304,8 +2304,7 @@ class LNWallet(LNWorker):
     def is_accepted_mpp(self, payment_hash: bytes) -> bool:
         payment_key = self._get_payment_key(payment_hash)
         status = self.received_mpp_htlcs.get(payment_key.hex())
-        assert status is not None
-        return status.resolution == RecvMPPResolution.ACCEPTED
+        return status and status.resolution == RecvMPPResolution.ACCEPTED
 
     def get_first_timestamp_of_mpp(self, payment_key: bytes) -> int:
         mpp_status = self.received_mpp_htlcs.get(payment_key.hex())
@@ -2317,9 +2316,9 @@ class LNWallet(LNWorker):
             self,
             short_channel_id: ShortChannelID,
             htlc: UpdateAddHtlc,
-    ) -> Sequence[str]:
+    ) -> None:
+
         htlc_key = (short_channel_id, htlc)
-        cleanup_keys = []
         for payment_key_hex, mpp_status in list(self.received_mpp_htlcs.items()):
             if htlc_key not in mpp_status.htlc_set:
                 continue
@@ -2329,8 +2328,7 @@ class LNWallet(LNWorker):
             if len(mpp_status.htlc_set) == 0:
                 self.logger.info(f'maybe_cleanup_mpp: removing mpp {payment_key_hex}')
                 self.received_mpp_htlcs.pop(payment_key_hex)
-                cleanup_keys.append(payment_key_hex)
-        return cleanup_keys
+                self.maybe_cleanup_forwarding(payment_key_hex)
 
     def maybe_cleanup_forwarding(self, payment_key_hex: str) -> None:
         self.active_forwardings.pop(payment_key_hex, None)
@@ -3024,7 +3022,7 @@ class LNWallet(LNWorker):
         async def _request_fclose(addresses):
             for host, port, timestamp in addresses:
                 peer_addr = LNPeerAddr(host, port, node_id)
-                transport = LNTransport(privkey, peer_addr, proxy=self.network.proxy)
+                transport = LNTransport(privkey, peer_addr, e_proxy=ESocksProxy.from_network_settings(self.network))
                 peer = Peer(self, node_id, transport, is_channel_backup=True)
                 try:
                     async with OldTaskGroup(wait=any) as group:
