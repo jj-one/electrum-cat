@@ -819,6 +819,10 @@ class WCHaveMasterKey(WalletWizardComponent):
             _("To create a watching-only wallet, please enter your master public key (xpub/ypub/zpub)."),
             _("To create a spending wallet, please enter a master private key (xprv/yprv/zprv).")
         ])
+        self.message_multisig = ' '.join([
+            _('Please enter your master private key (xprv).'),
+            _('You can also enter a public key (xpub) here, but be aware you will then create a watch-only wallet if all cosigners are added using public keys'),
+        ])
         self.message_cosign = ' '.join([
             _('Please enter the master public key (xpub) of your cosigner.'),
             _('Enter their master private key (xprv) if you want to be able to sign for them.')
@@ -837,19 +841,23 @@ class WCHaveMasterKey(WalletWizardComponent):
             self.label.setText(self.message_create)
 
             def is_valid(x) -> bool:
-                return bool(keystore.from_master_key(x))
+                self.apply()
+                key_valid, message = self.wizard.validate_master_key(x, self.wizard_data['wallet_type'])
+                self.warn_label.setText(message)
+                return key_valid
         elif self.wizard_data['wallet_type'] == 'multisig':
             if 'multisig_current_cosigner' in self.wizard_data:
                 self.title = _("Add Cosigner {}").format(self.wizard_data['multisig_current_cosigner'])
                 self.label.setText(self.message_cosign)
             else:
-                self.label.setText(self.message_create)
+                self.label.setText(self.message_multisig)
 
             def is_valid(x) -> bool:
-                if not keystore.is_bip32_key(x):
-                    self.warn_label.setText(_('Invalid key'))
-                    return False
                 self.apply()
+                key_valid, message = self.wizard.validate_master_key(x, self.wizard_data['wallet_type'])
+                if not key_valid:
+                    self.warn_label.setText(message)
+                    return False
                 musig_valid, errortext = self.wizard.check_multisig_constraints(self.wizard_data)
                 self.warn_label.setText(errortext)
                 if not musig_valid:

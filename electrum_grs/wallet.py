@@ -93,6 +93,7 @@ if TYPE_CHECKING:
     from .network import Network
     from .exchange_rate import FxThread
     from .submarine_swaps import SwapData
+    from .lnchannel import AbstractChannel
 
 
 _logger = get_logger(__name__)
@@ -1906,8 +1907,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                 # do not use multiple change addresses
                 if len(change) == 1:
                     amount = change[0].value
-                    ln_amount = self.lnworker.swap_manager.get_recv_amount(amount, is_reverse=False)
-                    if ln_amount and ln_amount <= self.lnworker.num_sats_can_receive():
+                    if amount <= self.lnworker.num_sats_can_receive():
                         tx.replace_output_address(change[0].address, DummyAddress.SWAP)
         else:
             # "spend max" branch
@@ -2033,13 +2033,20 @@ class Abstract_Wallet(ABC, Logger, EventListener):
 
     def set_reserved_state_of_address(self, addr: str, *, reserved: bool) -> None:
         if not self.is_mine(addr):
+            # silently ignore non-ismine addresses
             return
         with self.lock:
+            has_changed = (addr in self._reserved_addresses) != reserved
             if reserved:
                 self._reserved_addresses.add(addr)
             else:
                 self._reserved_addresses.discard(addr)
-            self.db.put('reserved_addresses', list(self._reserved_addresses))
+            if has_changed:
+                self.db.put('reserved_addresses', list(self._reserved_addresses))
+
+    def set_reserved_addresses_for_chan(self, chan: 'AbstractChannel', *, reserved: bool) -> None:
+        for addr in chan.get_wallet_addresses_channel_might_want_reserved():
+            self.set_reserved_state_of_address(addr, reserved=reserved)
 
     def can_export(self):
         return not self.is_watching_only() and hasattr(self.keystore, 'get_private_key')
