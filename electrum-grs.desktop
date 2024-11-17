@@ -17,6 +17,7 @@ Terminal=false
 Type=Application
 MimeType=x-scheme-handler/groestlcoin;x-scheme-handler/lightning;
 Actions=Testnet;
+Keywords=crypto;currency;GRS
 
 [Desktop Action Testnet]
 Exec=electrum-grs --testnet %u

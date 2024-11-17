@@ -35,23 +35,23 @@ import electrum_ecc as ecc
 import electrum_aionostr as aionostr
 from electrum_aionostr.key import PrivateKey
 
-from electrum.crypto import sha256
-from electrum import util
-from electrum.transaction import Transaction, PartialTransaction, tx_from_any, SerializationError
-from electrum.bip32 import BIP32Node
-from electrum.plugin import BasePlugin, hook
-from electrum.i18n import _
-from electrum.wallet import Multisig_Wallet, Abstract_Wallet
-from electrum.logging import Logger
-from electrum.network import Network
-from electrum.util import log_exceptions, OldTaskGroup, UserCancelled
+from electrum_grs.crypto import sha256
+from electrum_grs import util
+from electrum_grs.transaction import Transaction, PartialTransaction, tx_from_any, SerializationError
+from electrum_grs.bip32 import BIP32Node
+from electrum_grs.plugin import BasePlugin, hook
+from electrum_grs.i18n import _
+from electrum_grs.wallet import Multisig_Wallet, Abstract_Wallet
+from electrum_grs.logging import Logger
+from electrum_grs.network import Network
+from electrum_grs.util import log_exceptions, OldTaskGroup, UserCancelled
 
-from electrum.gui.qt.transaction_dialog import show_transaction, TxDialog
-from electrum.gui.qt.util import WaitingDialog
+from electrum_grs.gui.qt.transaction_dialog import show_transaction, TxDialog
+from electrum_grs.gui.qt.util import WaitingDialog
 
 if TYPE_CHECKING:
-    from electrum.gui.qt import ElectrumGui
-    from electrum.gui.qt.main_window import ElectrumWindow
+    from electrum_grs.gui.qt import ElectrumGui
+    from electrum_grs.gui.qt.main_window import ElectrumWindow
 
 
 NOSTR_DM = 4
