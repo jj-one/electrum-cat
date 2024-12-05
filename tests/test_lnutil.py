@@ -799,6 +799,19 @@ class TestLNUtil(ElectrumTestCase):
 
     @disable_ecdsa_r_value_grinding
     def test_commitment_tx_anchors_test_vectors(self):
+        # this test is only valid for the original anchor output test vectors (not anchors-zero-fee-htlcs),
+        # therefore we patch the effective htlc tx weight to result in a finite weight
+        from electrum import lnutil
+        effective_htlc_tx_weight_original = lnutil.effective_htlc_tx_weight
+        def effective_htlc_tx_weight_patched(success: bool, has_anchors: bool):
+            return lnutil.HTLC_SUCCESS_WEIGHT_ANCHORS if success else lnutil.HTLC_TIMEOUT_WEIGHT_ANCHORS
+        lnutil.effective_htlc_tx_weight = effective_htlc_tx_weight_patched
+        try:
+            self._test_commitment_tx_anchors_test_vectors()
+        finally:
+            lnutil.effective_htlc_tx_weight = effective_htlc_tx_weight_original
+
+    def _test_commitment_tx_anchors_test_vectors(self):
         for test_vector in ANCHOR_TEST_VECTORS:
             with self.subTest(test_vector['Name']):
                 to_local_msat = test_vector['LocalBalance']

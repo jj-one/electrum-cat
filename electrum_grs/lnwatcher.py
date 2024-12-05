@@ -454,22 +454,23 @@ class LNWalletWatcher(LNWatcher):
         # create and broadcast transactions
         for prevout, sweep_info in sweep_info_dict.items():
             prev_txid, prev_index = prevout.split(':')
+            name = sweep_info.name + ' ' + chan.get_id_for_log()
             if not self.adb.get_transaction(prev_txid):
                 # do not keep watching if prevout does not exist
+                self.logger.info(f'prevout does not exist for {name}: {prev_txid}')
                 continue
-            name = sweep_info.name + ' ' + chan.get_id_for_log()
             spender_txid = spenders.get(prevout)
             spender_tx = self.adb.get_transaction(spender_txid) if spender_txid else None
             if spender_tx:
                 # the spender might be the remote, revoked or not
-                e_htlc_tx = chan.maybe_sweep_revoked_htlc(closing_tx, spender_tx)
-                if e_htlc_tx:
-                    spender2 = spenders.get(spender_txid+':0')
-                    if spender2:
-                        keep_watching |= not self.is_deeply_mined(spender2)
+                htlc_idx_to_sweepinfo = chan.maybe_sweep_revoked_htlcs(closing_tx, spender_tx)
+                for idx, htlc_revocation_sweep_info in htlc_idx_to_sweepinfo.items():
+                    htlc_tx_spender = spenders.get(spender_txid+f':{idx}')
+                    if htlc_tx_spender:
+                        keep_watching |= not self.is_deeply_mined(htlc_tx_spender)
                     else:
                         keep_watching = True
-                    await self.maybe_redeem(spenders, spender_txid+':0', e_htlc_tx, name)
+                    await self.maybe_redeem(spenders, spender_txid+f':{idx}', htlc_revocation_sweep_info, name)
                 else:
                     keep_watching |= not self.is_deeply_mined(spender_txid)
                     txin_idx = spender_tx.get_input_idx_that_spent_prevout(TxOutpoint.from_str(prevout))
@@ -546,7 +547,10 @@ class LNWalletWatcher(LNWatcher):
                 return
         if can_broadcast:
             self.logger.info(f'we can broadcast: {name}')
-            tx_was_added = await self.network.try_broadcasting(new_tx, name)
+            if await self.network.try_broadcasting(new_tx, name):
+                tx_was_added = self.adb.add_transaction(new_tx, is_new=(old_tx is None))
+            else:
+                tx_was_added = False
         else:
             # we may have a tx with a different fee, in which case it will be replaced
             if not old_tx or (old_tx and old_tx.txid() != new_tx.txid()):
