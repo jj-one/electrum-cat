@@ -135,7 +135,7 @@ task:
 task:
   name: "check submodules"
   container:
-    image: python:3.8
+    image: python:3.9
     cpu: 1
     memory: 1G
   fetch_script:

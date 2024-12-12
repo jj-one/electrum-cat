@@ -4,6 +4,7 @@
 
 from typing import NamedTuple, Iterable, TYPE_CHECKING
 import os
+import copy
 import asyncio
 from enum import IntEnum, auto
 from typing import NamedTuple, Dict
@@ -13,7 +14,7 @@ from .sql_db import SqlDB, sql
 from .wallet_db import WalletDB
 from .util import bfh, log_exceptions, ignore_exceptions, TxMinedInfo, random_shuffled_copy
 from .address_synchronizer import AddressSynchronizer, TX_HEIGHT_LOCAL, TX_HEIGHT_UNCONF_PARENT, TX_HEIGHT_UNCONFIRMED, TX_HEIGHT_FUTURE
-from .transaction import Transaction, TxOutpoint
+from .transaction import Transaction, TxOutpoint, PartialTransaction
 from .transaction import match_script_against_template
 from .lnutil import WITNESS_TEMPLATE_RECEIVED_HTLC, WITNESS_TEMPLATE_OFFERED_HTLC
 from .logging import Logger
@@ -203,18 +204,17 @@ class LNWatcher(Logger, EventListener):
         # early return if address has not been added yet
         if not self.adb.is_mine(address):
             return
-        spenders = self.inspect_tx_candidate(funding_outpoint, 0)
         # inspect_tx_candidate might have added new addresses, in which case we return early
         if not self.adb.is_up_to_date():
             return
         funding_txid = funding_outpoint.split(':')[0]
         funding_height = self.adb.get_tx_height(funding_txid)
-        closing_txid = spenders.get(funding_outpoint)
+        closing_txid = self.get_spender(funding_outpoint)
         closing_height = self.adb.get_tx_height(closing_txid)
         if closing_txid:
             closing_tx = self.adb.get_transaction(closing_txid)
             if closing_tx:
-                keep_watching = await self.sweep_commitment_transaction(funding_outpoint, closing_tx, spenders)
+                keep_watching = await self.sweep_commitment_transaction(funding_outpoint, closing_tx)
             else:
                 self.logger.info(f"channel {funding_outpoint} closed by {closing_txid}. still waiting for tx itself...")
                 keep_watching = True
@@ -230,13 +230,31 @@ class LNWatcher(Logger, EventListener):
         if not keep_watching:
             await self.unwatch_channel(address, funding_outpoint)
 
-    async def sweep_commitment_transaction(self, funding_outpoint, closing_tx, spenders) -> bool:
+    async def sweep_commitment_transaction(self, funding_outpoint, closing_tx) -> bool:
         raise NotImplementedError()  # implemented by subclasses
 
     async def update_channel_state(self, *, funding_outpoint: str, funding_txid: str,
                                    funding_height: TxMinedInfo, closing_txid: str,
                                    closing_height: TxMinedInfo, keep_watching: bool) -> None:
         raise NotImplementedError()  # implemented by subclasses
+
+
+    def get_spender(self, outpoint) -> str:
+        """
+        returns txid spending outpoint.
+        subscribes to addresses as a side effect.
+        """
+        prev_txid, index = outpoint.split(':')
+        spender_txid = self.adb.db.get_spent_outpoint(prev_txid, int(index))
+        if not spender_txid:
+            return
+        spender_tx = self.adb.get_transaction(spender_txid)
+        for i, o in enumerate(spender_tx.outputs()):
+            if o.address is None:
+                continue
+            if not self.adb.is_mine(o.address):
+                self.adb.add_address(o.address)
+        return spender_txid
 
     def inspect_tx_candidate(self, outpoint, n: int) -> Dict[str, str]:
         """
@@ -261,6 +279,7 @@ class LNWatcher(Logger, EventListener):
         spender_tx = self.adb.get_transaction(spender_txid)
         if n == 1:
             # if tx input is not a first-stage HTLC, we can stop recursion
+            # FIXME: this is not true for anchor channels
             if len(spender_tx.inputs()) != 1:
                 return result
             o = spender_tx.inputs()[0]
@@ -339,7 +358,8 @@ class WatchTower(LNWatcher):
         for outpoint, address in random_shuffled_copy(lst):
             self.add_channel(outpoint, address)
 
-    async def sweep_commitment_transaction(self, funding_outpoint, closing_tx, spenders):
+    async def sweep_commitment_transaction(self, funding_outpoint, closing_tx):
+        spenders = self.inspect_tx_candidate(funding_outpoint, 0)
         keep_watching = False
         for prevout, spender in spenders.items():
             if spender is not None:
@@ -436,7 +456,7 @@ class LNWalletWatcher(LNWatcher):
         await self.lnworker.handle_onchain_state(chan)
 
     @log_exceptions
-    async def sweep_commitment_transaction(self, funding_outpoint, closing_tx, spenders) -> bool:
+    async def sweep_commitment_transaction(self, funding_outpoint, closing_tx) -> bool:
         """This function is called when a channel was closed. In this case
         we need to check for redeemable outputs of the commitment transaction
         or spenders down the line (HTLC-timeout/success transactions).
@@ -459,18 +479,18 @@ class LNWalletWatcher(LNWatcher):
                 # do not keep watching if prevout does not exist
                 self.logger.info(f'prevout does not exist for {name}: {prev_txid}')
                 continue
-            spender_txid = spenders.get(prevout)
+            spender_txid = self.get_spender(prevout)
             spender_tx = self.adb.get_transaction(spender_txid) if spender_txid else None
             if spender_tx:
                 # the spender might be the remote, revoked or not
-                htlc_idx_to_sweepinfo = chan.maybe_sweep_revoked_htlcs(closing_tx, spender_tx)
-                for idx, htlc_revocation_sweep_info in htlc_idx_to_sweepinfo.items():
-                    htlc_tx_spender = spenders.get(spender_txid+f':{idx}')
+                htlc_sweepinfo = chan.maybe_sweep_htlcs(closing_tx, spender_tx)
+                for prevout2, htlc_sweep_info in htlc_sweepinfo.items():
+                    htlc_tx_spender = self.get_spender(prevout2)
                     if htlc_tx_spender:
                         keep_watching |= not self.is_deeply_mined(htlc_tx_spender)
                     else:
                         keep_watching = True
-                    await self.maybe_redeem(spenders, spender_txid+f':{idx}', htlc_revocation_sweep_info, name)
+                    await self.maybe_redeem(prevout2, htlc_sweep_info, name)
                 else:
                     keep_watching |= not self.is_deeply_mined(spender_txid)
                     txin_idx = spender_tx.get_input_idx_that_spent_prevout(TxOutpoint.from_str(prevout))
@@ -480,21 +500,36 @@ class LNWalletWatcher(LNWatcher):
             else:
                 keep_watching = True
             # broadcast or maybe update our own tx
-            await self.maybe_redeem(spenders, prevout, sweep_info, name)
+            await self.maybe_redeem(prevout, sweep_info, name)
 
         return keep_watching
 
-    def get_redeem_tx(self, spenders, prevout: str, sweep_info: 'SweepInfo', name: str):
+    def get_redeem_tx(self, prevout: str, sweep_info: 'SweepInfo', name: str):
         # check if redeem tx needs to be updated
         # if it is in the mempool, we need to check fee rise
-        txid = spenders.get(prevout)
+        txid = self.get_spender(prevout)
         old_tx = self.adb.get_transaction(txid)
         assert old_tx is not None or txid is None
         tx_depth = self.get_tx_mined_depth(txid) if txid else None
         if txid and tx_depth not in [TxMinedDepth.FREE, TxMinedDepth.MEMPOOL]:
             assert old_tx is not None
             return old_tx, None
-        new_tx = sweep_info.gen_tx()
+        # fixme: deepcopy is needed because tx.serialize() is destructive
+        inputs = [copy.deepcopy(sweep_info.txin)]
+        outputs = [sweep_info.txout] if sweep_info.txout else []
+        if sweep_info.name == 'first-stage-htlc':
+            new_tx = PartialTransaction.from_io(inputs, outputs, locktime=sweep_info.cltv_abs, version=2)
+            self.lnworker.wallet.sign_transaction(new_tx, password=None, ignore_warnings=True)
+        else:
+            # password is needed for 1st stage htlc tx with anchors because we add inputs
+            password = self.lnworker.wallet.get_unlocked_password()
+            new_tx = self.lnworker.wallet.create_transaction(
+                inputs = inputs,
+                outputs = outputs,
+                password = password,
+                locktime = sweep_info.cltv_abs,
+                BIP69_sort=False,
+            )
         if new_tx is None:
             self.logger.info(f'{name} could not claim output: {prevout}, dust')
             assert old_tx is not None
@@ -517,8 +552,8 @@ class LNWalletWatcher(LNWatcher):
             assert old_tx is not None
             return old_tx, None
 
-    async def maybe_redeem(self, spenders, prevout, sweep_info: 'SweepInfo', name: str) -> None:
-        old_tx, new_tx = self.get_redeem_tx(spenders, prevout, sweep_info, name)
+    async def maybe_redeem(self, prevout, sweep_info: 'SweepInfo', name: str) -> None:
+        old_tx, new_tx = self.get_redeem_tx(prevout, sweep_info, name)
         if new_tx is None:
             return
         prev_txid, prev_index = prevout.split(':')
