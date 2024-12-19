@@ -1824,12 +1824,15 @@ class Abstract_Wallet(ABC, Logger, EventListener):
     ) -> PartialTransaction:
         """Can raise NotEnoughFunds or NoDynamicFeeEstimates."""
 
-        if not coins:  # any bitcoin tx must have at least 1 input by consensus
+        if not inputs and not coins:  # any bitcoin tx must have at least 1 input by consensus
             raise NotEnoughFunds()
         if any([c.already_has_some_signatures() for c in coins]):
             raise Exception("Some inputs already contain signatures!")
         if inputs is None:
             inputs = []
+        if inputs:
+            input_set = set(txin.prevout for txin in inputs)
+            coins = [coin for coin in coins if (coin.prevout not in input_set)]
         if base_tx is None and self.config.WALLET_BATCH_RBF:
             base_tx = self.get_unconfirmed_base_tx_for_batching(outputs, coins)
         if send_change_to_lightning is None:
@@ -1876,8 +1879,13 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                 # make sure we don't try to spend change from the tx-to-be-replaced:
                 coins = [c for c in coins if c.prevout.txid.hex() != base_tx.txid()]
                 is_local = self.adb.get_tx_height(base_tx.txid()).height == TX_HEIGHT_LOCAL
-                base_tx = PartialTransaction.from_tx(base_tx)
-                base_tx.add_info_from_wallet(self)
+                if not isinstance(base_tx, PartialTransaction):
+                    base_tx = PartialTransaction.from_tx(base_tx)
+                    base_tx.add_info_from_wallet(self)
+                else:
+                    # don't cast PartialTransaction, because it removes make_witness
+                    for txin in base_tx.inputs():
+                        txin.witness = None
                 base_tx_fee = base_tx.get_fee()
                 base_feerate = Decimal(base_tx_fee)/base_tx.estimated_size()
                 relayfeerate = Decimal(self.relayfee()) / 1000
