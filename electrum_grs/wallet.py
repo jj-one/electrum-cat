@@ -502,12 +502,22 @@ class Abstract_Wallet(ABC, Logger, EventListener):
     def has_lightning(self) -> bool:
         return bool(self.lnworker)
 
+    def has_channels(self):
+        return self.lnworker is not None and len(self.lnworker._channels) > 0
+
+    def requires_unlock(self):
+        return self.config.ENABLE_ANCHOR_CHANNELS and self.has_channels()
+
     def can_have_lightning(self) -> bool:
-        # we want static_remotekey to be a wallet address
-        return self.txin_type == 'p2wpkh'
+        if self.config.ENABLE_ANCHOR_CHANNELS:
+            # this excludes hardware wallets, watching-only wallets
+            return self.can_have_deterministic_lightning()
+        else:
+            # we want static_remotekey to be a wallet address
+            return self.txin_type == 'p2wpkh'
 
     def can_have_deterministic_lightning(self) -> bool:
-        if not self.can_have_lightning():
+        if not self.txin_type == 'p2wpkh':
             return False
         if not self.keystore:
             return False
@@ -2977,8 +2987,8 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         if self.storage and self.storage.file_exists():
             self.db.write_and_force_consolidation()
         # if wallet was previously unlocked, update password in memory
-        if self._password_in_memory is not None:
-            self._password_in_memory = new_pw
+        if self.requires_unlock():
+            self.unlock(new_pw)
 
     @abstractmethod
     def _update_password_for_keystore(self, old_pw: Optional[str], new_pw: Optional[str]) -> None:
