@@ -5,15 +5,15 @@ from typing import TYPE_CHECKING
 
 from aiohttp import web
 
-from electrum.util import log_exceptions, ignore_exceptions
-from electrum.logging import Logger
-from electrum.util import EventListener
-from electrum.lnaddr import lndecode
-from electrum.daemon import AuthenticatedServer
+from electrum_grs.util import log_exceptions, ignore_exceptions
+from electrum_grs.logging import Logger
+from electrum_grs.util import EventListener
+from electrum_grs.lnaddr import lndecode
+from electrum_grs.daemon import AuthenticatedServer
 
 
 if TYPE_CHECKING:
-    from electrum.network import Network
+    from electrum_grs.network import Network
 
 
 class WatchTowerServer(AuthenticatedServer):
@@ -43,4 +43,3 @@ class WatchTowerServer(AuthenticatedServer):
 
     async def add_sweep_tx(self, *args):
         return await self.lnwatcher.sweepstore.add_sweep_tx(*args)
-
