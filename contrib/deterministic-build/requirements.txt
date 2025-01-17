@@ -18,8 +18,6 @@ electrum-aionostr==0.0.6 \
     --hash=sha256:6eead6193edc6ab8455b7ddee1b3f4f5cb3c65d0ea1bdbdadb44506eb8f67092
 electrum-ecc==0.0.3 \
     --hash=sha256:c8ab69fecb294825367030da532b2d191883fa169789faa2942c256b4043d0a2
-electrum-aionostr==0.0.6 \
-    --hash=sha256:6eead6193edc6ab8455b7ddee1b3f4f5cb3c65d0ea1bdbdadb44506eb8f67092
 frozenlist==1.3.3 \
     --hash=sha256:58bcc55721e8a90b88332d6cd441261ebb22342e238296bb330968952fbb3a6a
 idna==3.6 \
