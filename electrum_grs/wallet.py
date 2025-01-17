@@ -206,7 +206,11 @@ async def sweep(
     return tx
 
 
-def get_locktime_for_new_transaction(network: 'Network') -> int:
+def get_locktime_for_new_transaction(
+    network: 'Network',
+    *,
+    include_random_component: bool = True,
+) -> int:
     # if no network or not up to date, just set locktime to zero
     if not network:
         return 0
@@ -225,8 +229,9 @@ def get_locktime_for_new_transaction(network: 'Network') -> int:
     locktime = min(chain_height, server_height)
     # sometimes pick locktime a bit further back, to help privacy
     # of setups that need more time (offline/multisig/coinjoin/...)
-    if random.randint(0, 9) == 0:
-        locktime = max(0, locktime - random.randint(0, 99))
+    if include_random_component:
+        if random.randint(0, 9) == 0:
+            locktime = max(0, locktime - random.randint(0, 99))
     locktime = max(0, locktime)
     return locktime
 
@@ -411,6 +416,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         self.transaction_lock = self.adb.transaction_lock
         self._last_full_history = None
         self._tx_parents_cache = {}
+        self._default_labels = {}
 
         self.taskgroup = OldTaskGroup()
 
@@ -1158,9 +1164,8 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                 'date': timestamp_to_datetime(hist_item.tx_mined_status.timestamp),
                 'label': self.get_label_for_txid(hist_item.txid),
                 'txpos_in_block': hist_item.tx_mined_status.txpos,
+                'wanted_height': hist_item.tx_mined_status.wanted_height,
             }
-            if wanted_height := hist_item.tx_mined_status.wanted_height:
-                d['wanted_height'] = wanted_height
             yield d
 
     def create_invoice(self, *, outputs: List[PartialTxOutput], message, pr, URI) -> Invoice:
@@ -1419,6 +1424,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                     parent['date'] = timestamp_to_datetime(tx_item['timestamp'])
                     parent['height'] = tx_item['height']
                     parent['confirmations'] = tx_item['confirmations']
+                    parent['wanted_height'] = tx_item.get('wanted_height')
                 parent['children'].append(tx_item)
 
         now = time.time()
@@ -1625,11 +1631,33 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             label = request.get_message()
         return label
 
+    def set_default_label(self, key:str, value:str):
+        self._default_labels[key] = value
+
+    def get_label_for_outpoint(self, outpoint:str) -> str:
+        return self._labels.get(outpoint) or self._get_default_label_for_outpoint(outpoint)
+
+    def _get_default_label_for_outpoint(self, outpoint: str) -> str:
+        return self._default_labels.get(outpoint)
+
     def get_label_for_txid(self, tx_hash: str) -> str:
         return self._labels.get(tx_hash) or self._get_default_label_for_txid(tx_hash)
 
     def _get_default_label_for_txid(self, tx_hash: str) -> str:
+        if label := self._default_labels.get(tx_hash):
+            return label
         labels = []
+        tx = self.adb.get_transaction(tx_hash)
+        if tx:
+            for i in range(len(tx.outputs())):
+                outpoint = tx_hash + f':{i}'
+                if label := self.get_label_for_outpoint(outpoint):
+                    labels.append(label)
+            for txin in tx.inputs():
+                outpoint = txin.prevout.to_str()
+                if label := self.get_label_for_outpoint(outpoint):
+                    labels.append(label)
+
         # note: we don't deserialize tx as the history calls us for every tx, and that would be slow
         if not self.db.get_txi_addresses(tx_hash):
             # no inputs are ismine -> likely incoming payment -> concat labels of output addresses
@@ -1642,8 +1670,8 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             for invoice in self.get_relevant_invoices_for_tx(tx_hash):
                 if invoice.message:
                     labels.append(invoice.message)
-        if not labels and self.lnworker and (label:= self.lnworker.get_label_for_txid(tx_hash)):
-            labels.append(label)
+        #if not labels and self.lnworker and (label:= self.lnworker.get_label_for_txid(tx_hash)):
+        #    labels.append(label)
         return ', '.join(labels)
 
     def _get_default_label_for_rhash(self, rhash: str) -> str:

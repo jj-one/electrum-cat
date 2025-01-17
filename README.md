@@ -3,7 +3,7 @@
 ```
 Licence: MIT Licence
 Author: Groestlcoin Developers
-Language: Python (>= 3.8)
+Language: Python (>= 3.10)
 Homepage: https://groestlcoin.org/
 ```
 

@@ -359,6 +359,24 @@ class Commands:
             cv.set(value)
 
     @command('')
+    async def listconfig(self):
+        """Returns the list of all configuration variables. """
+        return self.config.list_config_vars()
+
+    @command('')
+    async def helpconfig(self, key):
+        """Returns help about a configuration variable. """
+        cv = self.config.cv.from_key(key)
+        short = cv.get_short_desc()
+        long = cv.get_long_desc()
+        if short and long:
+            return short + "\n---\n\n" + long
+        elif short or long:
+            return short or long
+        else:
+            return f"No description available for '{key}'"
+
+    @command('')
     async def make_seed(self, nbits=None, language=None, seed_type=None):
         """Create a seed"""
         from .mnemonic import Mnemonic
