@@ -6,7 +6,7 @@ import asyncio
 import concurrent.futures
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QLabel, QListWidget, QListWidgetItem
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QListWidget, QListWidgetItem
 
 from electrum_grs.i18n import _
 from electrum_grs.network import Network
@@ -14,7 +14,7 @@ from electrum_grs.bip39_recovery import account_discovery
 from electrum_grs.logging import get_logger
 from electrum_grs.util import get_asyncio_loop, UserFacingException
 
-from .util import WindowModalDialog, MessageBoxMixin, TaskThread, Buttons, CancelButton, OkButton
+from .util import WindowModalDialog, TaskThread, Buttons, CancelButton, OkButton
 
 
 _logger = get_logger(__name__)

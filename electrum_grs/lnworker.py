@@ -106,24 +106,6 @@ CB_MAGIC_BYTES = bytes([0, 0, 0, CB_VERSION])
 NODE_ID_PREFIX_LEN = 16
 
 
-FALLBACK_NODE_LIST_TESTNET = (
-    LNPeerAddr(host='95.179.140.39', port=9735, pubkey=bfh('0384dee0ec597a7b8235ccf56c68ffa0af5dae72b3455aa3ecb81c4fc4eef9ef2c')),
-    LNPeerAddr(host='45.32.236.128', port=9735, pubkey=bfh('02435dea09ad875c36c88f680845277245e7e8bdd28b3bb20470e82e4de0c3cb09')),
-    LNPeerAddr(host='78.141.220.223', port=9735, pubkey=bfh('025da2bb1df5afad0f31680414755800d13eb382423ad59e984d93c68c1ea78542')),
-)
-
-# Python3
-# bytes.fromhex('0391c8d0e27fe61ed8cb8784aeae5848bd8b193ea5720dea32ca2694a326fe41f9')
-# verify with b'\x03\x91\xc8\xd0\xe2\x7f\xe6\x1e\xd8\xcb\x87\x84\xae\xaeXH\xbd\x8b\x19>\xa5r\r\xea2\xca&\x94\xa3&\xfeA\xf9'.hex()
-FALLBACK_NODE_LIST_MAINNET = [
-    LNPeerAddr(host='104.236.133.196', port=9735, pubkey=bfh('02c0ef8fad8a9d3176424826367a7f9470feb2ad86fa4634d9454190eda876d0ad')),
-    LNPeerAddr(host='104.236.130.222', port=9735, pubkey=bfh('0221af9e2a67c90ffac37db331ab847439509465d599933d4b9b20352ae493c1c1')),
-    LNPeerAddr(host='104.236.14.225', port=9735, pubkey=bfh('02cfc4c212e4183ca8bd8bd21e18996603f69706553d5f4e1464fdc6cb612b433b')),
-    LNPeerAddr(host='104.236.15.120', port=9735, pubkey=bfh('02f31ea82a5c07387abec0274b457db35355ef874e21bb2fdc4f4abb3f5d0d82ce')),
-]
-
-FALLBACK_NODE_LIST_SIGNET = ()
-
 from .trampoline import trampolines_by_id, hardcoded_trampoline_nodes, is_hardcoded_trampoline
 
 
@@ -442,15 +424,7 @@ class LNWorker(Logger, EventListener, NetworkRetryManager[LNPeerAddr]):
                 return [peer]
 
         # getting desperate... let's try hardcoded fallback list of peers
-        if constants.net in (constants.BitcoinTestnet,):
-            fallback_list = FALLBACK_NODE_LIST_TESTNET
-        elif constants.net in (constants.BitcoinMainnet,):
-            fallback_list = FALLBACK_NODE_LIST_MAINNET
-        elif constants.net in (constants.BitcoinSignet,):
-            fallback_list = FALLBACK_NODE_LIST_SIGNET
-        else:
-            return []  # regtest??
-
+        fallback_list = constants.net.FALLBACK_LN_NODES
         fallback_list = [peer for peer in fallback_list if self._can_retry_addr(peer, now=now)]
         if fallback_list:
             return [random.choice(fallback_list)]
@@ -1088,7 +1062,7 @@ class LNWallet(LNWorker):
                 'txid': closing_txid,
                 'label': self.wallet.get_label_for_txid(closing_txid),
                 'type': 'channel_closure',
-                'amount_msat': -chan.balance_minus_outgoing_htlcs(LOCAL),
+                'amount_msat': -chan.balance(LOCAL),
                 'direction': PaymentDirection.SENT,
                 'timestamp': tx_height.timestamp,
                 'monotonic_timestamp': tx_height.timestamp or TX_TIMESTAMP_INF,
@@ -1118,6 +1092,10 @@ class LNWallet(LNWorker):
         for item in out:
             balance_msat += item['amount_msat']
             item['balance_msat'] = balance_msat
+
+        lb = sum(chan.balance(LOCAL) if not chan.is_closed() else 0
+                for chan in self.channels.values())
+        assert balance_msat  == lb
         return out
 
     def channel_peers(self) -> List[bytes]:

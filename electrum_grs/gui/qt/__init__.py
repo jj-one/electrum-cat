@@ -63,13 +63,12 @@ if sys.platform == "linux" and os.environ.get("APPIMAGE"):
 from electrum_grs.i18n import _, set_language
 from electrum_grs.plugin import run_hook
 from electrum_grs.util import (UserCancelled, profiler, send_exception_to_crash_reporter,
-                           WalletFileException, BitcoinException, get_new_wallet_name, InvalidPassword)
+                           WalletFileException, get_new_wallet_name, InvalidPassword)
 from electrum_grs.wallet import Wallet, Abstract_Wallet
-from electrum_grs.wallet_db import WalletDB, WalletRequiresSplit, WalletRequiresUpgrade, WalletUnfinished
+from electrum_grs.wallet_db import WalletRequiresSplit, WalletRequiresUpgrade, WalletUnfinished
 from electrum_grs.logging import Logger
 from electrum_grs.gui import BaseElectrumGui
 from electrum_grs.simple_config import SimpleConfig
-from electrum_grs.storage import WalletStorage
 from electrum_grs.wizard import WizardViewState
 from electrum_grs.keystore import load_keystore
 from electrum_grs.bip32 import is_xprv
