@@ -96,7 +96,7 @@ jobs:
           name: electrum-grs-${{ github.sha }}-source-only-tarball
 
   android-qml-arm64-v8a:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Free Disk Space (Ubuntu)
@@ -139,7 +139,7 @@ jobs:
           name: electrum-grs-${{ github.sha }}-android-arm64-v8a
 
   android-qml-armeabi-v7a:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Free Disk Space (Ubuntu)
@@ -182,7 +182,7 @@ jobs:
           name: electrum-grs-${{ github.sha }}-android-armeabi-v7a
 
   android-qml-x86_64:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Free Disk Space (Ubuntu)
