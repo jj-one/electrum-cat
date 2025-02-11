@@ -49,8 +49,10 @@ DGW3_START_HEIGHT = 100000
 class MissingHeader(Exception):
     pass
 
+
 class InvalidHeader(Exception):
     pass
+
 
 def serialize_header(header_dict: dict) -> bytes:
     s = (
@@ -61,6 +63,7 @@ def serialize_header(header_dict: dict) -> bytes:
         + int.to_bytes(int(header_dict['bits']), length=4, byteorder="little", signed=False)
         + int.to_bytes(int(header_dict['nonce']), length=4, byteorder="little", signed=False))
     return s
+
 
 def deserialize_header(s: bytes, height: int) -> dict:
     if not s:
@@ -76,6 +79,7 @@ def deserialize_header(s: bytes, height: int) -> dict:
     h['nonce'] = int.from_bytes(s[76:80], byteorder='little')
     h['block_height'] = height
     return h
+
 
 def hash_header(header: dict) -> str:
     if header is None:
@@ -163,6 +167,7 @@ def read_blockchains(config: 'SimpleConfig'):
 
 def get_best_chain() -> 'Blockchain':
     return blockchains[constants.net.GENESIS]
+
 
 # block hash -> chain work; up to and including that block
 _CHAINWORK_CACHE = {
