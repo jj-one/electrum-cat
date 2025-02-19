@@ -19,6 +19,7 @@ from .my_treeview import create_toolbar_with_menu
 
 if TYPE_CHECKING:
     from .main_window import ElectrumWindow
+    from electrum.submarine_swaps import SwapServerTransport
 
 CANNOT_RECEIVE_WARNING = _(
 """The requested amount is higher than what you can receive in your currently open channels.
@@ -33,7 +34,7 @@ class InvalidSwapParameters(Exception): pass
 
 class SwapDialog(WindowModalDialog, QtEventListener):
 
-    def __init__(self, window: 'ElectrumWindow', transport, is_reverse=None, recv_amount_sat=None, channels=None):
+    def __init__(self, window: 'ElectrumWindow', transport: 'SwapServerTransport', is_reverse=None, recv_amount_sat=None, channels=None):
         WindowModalDialog.__init__(self, window, _('Submarine Swap'))
         self.window = window
         self.config = window.config
@@ -192,6 +193,7 @@ class SwapDialog(WindowModalDialog, QtEventListener):
 
     def _spend_max_reverse_swap(self) -> None:
         amount = min(self.lnworker.num_sats_can_send(), self.swap_manager.get_max_amount())
+        amount = int(amount)  # round down msats
         self.send_amount_e.setAmount(amount)
 
     def on_send_edited(self):

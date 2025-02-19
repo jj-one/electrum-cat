@@ -71,6 +71,7 @@ from electrum_grs.simple_config import SimpleConfig
 from electrum_grs.logging import Logger
 from electrum_grs.lntransport import extract_nodeid, ConnStringFormatError
 from electrum_grs.lnaddr import lndecode
+from electrum_grs.submarine_swaps import SwapServerTransport, NostrTransport
 
 from .rate_limiter import rate_limited
 from .exception_window import Exception_Hook
@@ -1028,9 +1029,9 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
             name = ''
         elif num_tasks == 1:
             with self._coroutines_scheduled_lock:
-                name = list(self._coroutines_scheduled.values())[0]  + '...'
+                name = list(self._coroutines_scheduled.values())[0] + '...'
         else:
-            name = "%d"%num_tasks + _('tasks')  + '...'
+            name = f"{num_tasks} " + _('tasks') + '...'
         self.tasks_label.setText(name)
         self.tasks_label.setVisible(num_tasks > 0)
 
@@ -1187,25 +1188,25 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
             except UserCancelled:
                 return
 
-    def create_sm_transport(self):
+    def create_sm_transport(self) -> Optional['SwapServerTransport']:
         sm = self.wallet.lnworker.swap_manager
         if sm.is_server:
             self.show_error(_('Swap server is active'))
-            return False
+            return None
 
         if self.network is None:
-            return False
+            return None
 
         if not self.config.SWAPSERVER_URL and not self.config.SWAPSERVER_NPUB:
             if not self.question('\n'.join([
                     _('Electrum uses Nostr in order to find liquidity providers.'),
                     _('Do you want to enable Nostr?'),
             ])):
-                return False
+                return None
 
         return sm.create_transport()
 
-    def initialize_swap_manager(self, transport):
+    def initialize_swap_manager(self, transport: 'SwapServerTransport'):
         sm = self.wallet.lnworker.swap_manager
         if not sm.is_initialized.is_set():
             async def wait_until_initialized():
@@ -1226,7 +1227,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         assert sm.is_initialized.is_set()
         return True
 
-    def choose_swapserver_dialog(self, transport):
+    def choose_swapserver_dialog(self, transport: NostrTransport) -> bool:
+        assert isinstance(transport, NostrTransport)
         if not transport.is_connected.is_set():
             self.show_message(
                 '\n'.join([
@@ -1234,8 +1236,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
                     _('Please check your relays and network connection'),
                 ]))
             return False
-        now = int(time.time())
-        recent_offers = [x for x in transport.offers.values() if now - x['timestamp'] < 3600]
+        recent_offers = transport.get_recent_offers()
         if not recent_offers:
             self.show_message(
                 '\n'.join([
@@ -1245,7 +1246,9 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         sm = self.wallet.lnworker.swap_manager
         def descr(x):
             last_seen = util.age(x['timestamp'])
-            return f"pubkey={x['pubkey'][0:10]},  fee={x['percentage_fee']}% + {x['reverse_mining_fee']} sats"
+            return (f"pubkey={x['pubkey'][0:10]},  "
+                    f"fee={x['percentage_fee']}% + {x['reverse_mining_fee']} sats,  "
+                    f"last_seen: {last_seen}")
         server_keys = [(x['pubkey'], descr(x)) for x in recent_offers]
         msg = '\n'.join([
             _("Please choose a server from this list."),
@@ -1257,7 +1260,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
             title = _("Choose Swap Server"),
             default_choice = self.config.SWAPSERVER_NPUB
         )
-        if choice not in transport.offers:
+        if choice is None:
             return False
         self.config.SWAPSERVER_NPUB = choice
         pairs = transport.get_offer(choice)

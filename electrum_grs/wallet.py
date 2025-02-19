@@ -88,6 +88,7 @@ from .util import read_json_file, write_json_file, UserFacingException, FileImpo
 from .util import EventListener, event_listener
 from . import descriptor
 from .descriptor import Descriptor
+from .util import OnchainHistoryItem, LightningHistoryItem
 
 if TYPE_CHECKING:
     from .network import Network
@@ -944,8 +945,8 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                         size = tx.estimated_size()
                         fee_per_byte = fee / size
                         exp_n = self.config.fee_to_depth(fee_per_byte)
-                    can_bump = (is_any_input_ismine or is_swap) and tx.is_rbf_enabled()
-                    can_dscancel = (is_any_input_ismine and tx.is_rbf_enabled()
+                    can_bump = (is_any_input_ismine or is_swap) and self.can_rbf_tx(tx)
+                    can_dscancel = (is_any_input_ismine and self.can_rbf_tx(tx, is_dscancel=True)
                                     and not all([self.is_mine(txout.address) for txout in tx.outputs()]))
                     try:
                         self.cpfp(tx, 0)
@@ -959,7 +960,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                         num_blocks_remainining = max(0, num_blocks_remainining)
                         status = _('Local (future: {})').format(_('in {} blocks').format(num_blocks_remainining))
                     can_broadcast = self.network is not None
-                    can_bump = (is_any_input_ismine or is_swap) and tx.is_rbf_enabled()
+                    can_bump = (is_any_input_ismine or is_swap) and self.can_rbf_tx(tx)
             else:
                 status = _("Signed")
                 can_broadcast = self.network is not None
@@ -978,7 +979,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             amount = None
 
         if is_lightning_funding_tx:
-            can_bump = False  # would change txid
+            assert not can_bump  # would change txid
 
         return TxWalletDetails(
             txid=tx_hash,
@@ -1012,11 +1013,11 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         """
         with self.lock, self.transaction_lock:
             if self._last_full_history is None:
-                self._last_full_history = self.get_full_history(None, include_lightning=False)
+                self._last_full_history = self.get_onchain_history()
                 # populate cache in chronological order (confirmed tx only)
                 # todo: get_full_history should return unconfirmed tx topologically sorted
                 for _txid, tx_item in self._last_full_history.items():
-                    if tx_item['height'] > 0:
+                    if tx_item.tx_mined_status.height > 0:
                         self.get_tx_parents(_txid)
 
             result = self._tx_parents_cache.get(txid, None)
@@ -1145,28 +1146,53 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         # return last balance
         return balance
 
-    def get_onchain_history(self, *, domain=None):
+    def get_onchain_history(
+            self, *,
+            domain=None,
+            from_timestamp=None,
+            to_timestamp=None,
+            from_height=None,
+            to_height=None) -> Dict[str, OnchainHistoryItem]:
+        # sanity check
+        if (from_timestamp is not None or to_timestamp is not None) \
+                and (from_height is not None or to_height is not None):
+            raise UserFacingException('timestamp and block height based filtering cannot be used together')
+        # call lnworker first, because it adds accounting addresses
+        groups = self.lnworker.get_groups_for_onchain_history() if self.lnworker else {}
         if domain is None:
             domain = self.get_addresses()
+
+        now = time.time()
+        transactions = OrderedDictWithIndex()
         monotonic_timestamp = 0
         for hist_item in self.adb.get_history(domain=domain):
-            monotonic_timestamp = max(monotonic_timestamp, (hist_item.tx_mined_status.timestamp or TX_TIMESTAMP_INF))
-            d = {
-                'txid': hist_item.txid,
-                'fee_sat': hist_item.fee,
-                'height': hist_item.tx_mined_status.height,
-                'confirmations': hist_item.tx_mined_status.conf,
-                'timestamp': hist_item.tx_mined_status.timestamp,
-                'monotonic_timestamp': monotonic_timestamp,
-                'incoming': True if hist_item.delta>0 else False,
-                'bc_value': Satoshis(hist_item.delta),
-                'bc_balance': Satoshis(hist_item.balance),
-                'date': timestamp_to_datetime(hist_item.tx_mined_status.timestamp),
-                'label': self.get_label_for_txid(hist_item.txid),
-                'txpos_in_block': hist_item.tx_mined_status.txpos,
-                'wanted_height': hist_item.tx_mined_status.wanted_height,
-            }
-            yield d
+            timestamp = (hist_item.tx_mined_status.timestamp or TX_TIMESTAMP_INF)
+            height = hist_item.tx_mined_status
+            if from_timestamp and (timestamp or now) < from_timestamp:
+                continue
+            if to_timestamp and (timestamp or now) >= to_timestamp:
+                continue
+            if from_height is not None and from_height > height > 0:
+                continue
+            if to_height is not None and (height >= to_height or height <= 0):
+                continue
+            monotonic_timestamp = max(monotonic_timestamp, timestamp)
+            txid = hist_item.txid
+            group_id = groups.get(txid)
+            label = self.get_label_for_txid(txid)
+            tx_item = OnchainHistoryItem(
+                txid=hist_item.txid,
+                amount_sat=hist_item.delta,
+                fee_sat=hist_item.fee,
+                balance_sat=hist_item.balance,
+                tx_mined_status=hist_item.tx_mined_status,
+                label=label,
+                monotonic_timestamp=monotonic_timestamp,
+                group_id=group_id,
+            )
+            transactions[hist_item.txid] = tx_item
+
+        return transactions
 
     def create_invoice(self, *, outputs: List[PartialTxOutput], message, pr, URI) -> Invoice:
         height = self.adb.get_local_height()
@@ -1342,44 +1368,26 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         return is_paid, conf_needed
 
     @profiler
-    def get_full_history(self, fx=None, *, onchain_domain=None, include_lightning=True, include_fiat=False):
+    def get_full_history(self, fx=None, *, onchain_domain=None, include_lightning=True, include_fiat=False) -> dict:
+        """
+        includes both onchain and lightning
+        includes grouping information
+        """
         transactions_tmp = OrderedDictWithIndex()
         # add on-chain txns
         onchain_history = self.get_onchain_history(domain=onchain_domain)
-        for tx_item in onchain_history:
-            txid = tx_item['txid']
-            transactions_tmp[txid] = tx_item
-        # add lnworker onchain transactions to transactions_tmp
-        # add group_id to tx that are in a group
-        lnworker_history = self.lnworker.get_onchain_history() if self.lnworker and include_lightning else {}
-        for txid, item in lnworker_history.items():
-            if txid in transactions_tmp:
-                tx_item = transactions_tmp[txid]
-                tx_item['group_id'] = item.get('group_id')  # for swaps
-                tx_item['label'] = item['label']
-                tx_item['type'] = item['type']
-                ln_value = Decimal(item['amount_msat']) / 1000   # for channel open/close tx
-                tx_item['ln_value'] = Satoshis(ln_value)
-                if channel_id := item.get('channel_id'):
-                    tx_item['channel_id'] = channel_id
-            else:
-                if item['type'] == 'swap':
-                    # swap items do not have all the fields. We can skip skip them
-                    # because they will eventually be in onchain_history
-                    # TODO: use attr.s objects instead of dicts
-                    continue
-                transactions_tmp[txid] = item
-                ln_value = Decimal(item['amount_msat']) / 1000   # for channel open/close tx
-                item['ln_value'] = Satoshis(ln_value)
+        for tx_item in onchain_history.values():
+            txid = tx_item.txid
+            transactions_tmp[txid] = tx_item.to_dict()
+            transactions_tmp[txid]['lightning'] = False
+
         # add lightning_transactions
         lightning_history = self.lnworker.get_lightning_history() if self.lnworker and include_lightning else {}
         for tx_item in lightning_history.values():
-            txid = tx_item.get('txid')
-            ln_value = Decimal(tx_item['amount_msat']) / 1000
-            tx_item['lightning'] = True
-            tx_item['ln_value'] = Satoshis(ln_value)
-            key = tx_item.get('txid') or tx_item['payment_hash']
-            transactions_tmp[key] = tx_item
+            key = tx_item.payment_hash or 'ln:' + tx_item.group_id
+            transactions_tmp[key] = tx_item.to_dict()
+            transactions_tmp[key]['lightning'] = True
+
         # sort on-chain and LN stuff into new dict, by timestamp
         # (we rely on this being a *stable* sort)
         def sort_key(x):
@@ -1396,10 +1404,10 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             else:
                 key = 'group:' + group_id
                 parent = transactions.get(key)
-                label = self.get_label_for_txid(group_id)
+                group_label = self.get_label_for_group(group_id)
                 if parent is None:
                     parent = {
-                        'label': label,
+                        'label': group_label,
                         'fiat_value': Fiat(Decimal(0), fx.ccy) if fx else None,
                         'bc_value': Satoshis(0),
                         'ln_value': Satoshis(0),
@@ -1408,6 +1416,10 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                         'timestamp': 0,
                         'date': timestamp_to_datetime(0),
                         'fee_sat': 0,
+                        # fixme: there is no guarantee that there will be an onchain tx in the group
+                        'height': 0,
+                        'confirmations': 0,
+                        'txid': '----',
                     }
                     transactions[key] = parent
                 if 'bc_value' in tx_item:
@@ -1451,20 +1463,12 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         return transactions
 
     @profiler
-    def get_detailed_history(
-            self,
-            from_timestamp=None,
-            to_timestamp=None,
-            fx=None,
-            show_addresses=False,
-            from_height=None,
-            to_height=None):
+    def get_onchain_capital_gains(self, fx, **kwargs):
         # History with capital gains, using utxo pricing
         # FIXME: Lightning capital gains would requires FIFO
-        if (from_timestamp is not None or to_timestamp is not None) \
-                and (from_height is not None or to_height is not None):
-            raise UserFacingException('timestamp and block height based filtering cannot be used together')
-
+        from_timestamp = kwargs.get('from_timestamp')
+        to_timestamp = kwargs.get('to_timestamp')
+        history = self.get_onchain_history(**kwargs)
         show_fiat = fx and fx.is_enabled() and fx.has_history()
         out = []
         income = 0
@@ -1472,26 +1476,13 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         capital_gains = Decimal(0)
         fiat_income = Decimal(0)
         fiat_expenditures = Decimal(0)
-        now = time.time()
-        for item in self.get_onchain_history():
+        for txid, hitem in history.items():
+            item = hitem.to_dict()
+            if item['bc_value'].value == 0:
+                continue
             timestamp = item['timestamp']
-            if from_timestamp and (timestamp or now) < from_timestamp:
-                continue
-            if to_timestamp and (timestamp or now) >= to_timestamp:
-                continue
-            height = item['height']
-            if from_height is not None and from_height > height > 0:
-                continue
-            if to_height is not None and (height >= to_height or height <= 0):
-                continue
             tx_hash = item['txid']
-            tx = self.db.get_transaction(tx_hash)
             tx_fee = item['fee_sat']
-            item['fee'] = Satoshis(tx_fee) if tx_fee is not None else None
-            if show_addresses:
-                item['inputs'] = list(map(lambda x: x.to_json(), tx.inputs()))
-                item['outputs'] = list(map(lambda x: {'address': x.get_ui_address_str(), 'value': Satoshis(x.value)},
-                                           tx.outputs()))
             # fixme: use in and out values
             value = item['bc_value'].value
             if value < 0:
@@ -1502,7 +1493,6 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             if show_fiat:
                 fiat_fields = self.get_tx_item_fiat(tx_hash=tx_hash, amount_sat=value, fx=fx, tx_fee=tx_fee)
                 fiat_value = fiat_fields['fiat_value'].value
-                item.update(fiat_fields)
                 if value < 0:
                     capital_gains += fiat_fields['capital_gain'].value
                     fiat_expenditures += -fiat_value
@@ -1513,12 +1503,8 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         if out:
             first_item = out[0]
             last_item = out[-1]
-            if from_height or to_height:
-                start_height = from_height
-                end_height = to_height
-            else:
-                start_height = first_item['height'] - 1
-                end_height = last_item['height']
+            start_height = first_item['height'] - 1
+            end_height = last_item['height']
 
             b = first_item['bc_balance'].value
             v = first_item['bc_value'].value
@@ -1579,10 +1565,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
 
         else:
             summary = {}
-        return {
-            'transactions': out,
-            'summary': summary
-        }
+        return summary
 
     def acquisition_price(self, coins, price_func, ccy):
         return Decimal(sum(self.coin_price(coin.prevout.txid.hex(), price_func, ccy, self.adb.get_txin_value(coin)) for coin in coins))
@@ -1639,6 +1622,12 @@ class Abstract_Wallet(ABC, Logger, EventListener):
 
     def _get_default_label_for_outpoint(self, outpoint: str) -> str:
         return self._default_labels.get(outpoint)
+
+    def get_label_for_group(self, group_id: str) -> str:
+        return self._default_labels.get('group:' + group_id)
+
+    def set_group_label(self, group_id: str, label: str):
+        self._default_labels['group:' + group_id] = label
 
     def get_label_for_txid(self, tx_hash: str) -> str:
         return self._labels.get(tx_hash) or self._get_default_label_for_txid(tx_hash)
@@ -1758,11 +1747,8 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             # all inputs should be is_mine
             if not all([self.is_mine(self.adb.get_txin_address(txin)) for txin in tx.inputs()]):
                 continue
-            # do not mutate LN funding txs, as that would change their txid
-            if self.is_lightning_funding_tx(txid):
-                continue
             # tx must have opted-in for RBF (even if local, for consistency)
-            if not tx.is_rbf_enabled():
+            if not self.can_rbf_tx(tx):
                 continue
             # reject merge if we need to spend outputs from the base tx
             remaining_amount = sum(c.value_sats() for c in coins if c.prevout.txid.hex() != tx.txid())
@@ -2140,7 +2126,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             tx = PartialTransaction.from_tx(tx)
         assert isinstance(tx, PartialTransaction)
         tx.remove_signatures()
-        if not tx.is_rbf_enabled():
+        if not self.can_rbf_tx(tx):
             raise CannotBumpFee(_('Transaction is final'))
         new_fee_rate = quantize_feerate(new_fee_rate)  # strip excess precision
         tx.add_info_from_wallet(self)
@@ -2362,6 +2348,12 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             return False
         return True
 
+    def can_rbf_tx(self, tx: Transaction, *, is_dscancel: bool = False) -> bool:
+        # do not mutate LN funding txs, as that would change their txid
+        if not is_dscancel and self.is_lightning_funding_tx(tx.txid()):
+            return False
+        return tx.is_rbf_enabled()
+
     def cpfp(self, tx: Transaction, fee: int) -> Optional[PartialTransaction]:
         assert tx
         txid = tx.txid()
@@ -2405,7 +2397,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         assert isinstance(tx, PartialTransaction)
         tx.remove_signatures()
 
-        if not tx.is_rbf_enabled():
+        if not self.can_rbf_tx(tx, is_dscancel=True):
             raise CannotDoubleSpendTx(_('Transaction is final'))
         new_fee_rate = quantize_feerate(new_fee_rate)  # strip excess precision
         tx.add_info_from_wallet(self)
@@ -2505,8 +2497,6 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         if not is_mine:
             is_mine = self._learn_derivation_path_for_address_from_txinout(txin, address)
         if not is_mine:
-            if self.lnworker:
-                self.lnworker.swap_manager.add_txin_info(txin)
             return
         txin.script_descriptor = self.get_script_descriptor_for_address(address)
         txin.is_mine = True
@@ -2592,11 +2582,6 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             return
         if any(DummyAddress.is_dummy_address(txout.address) for txout in tx.outputs()):
             raise DummyAddressUsedInTxException("tried to sign tx with dummy address!")
-        # note: swap signing does not require the password
-        swap = self.get_swap_by_claim_tx(tx)
-        if swap:
-            self.lnworker.swap_manager.sign_tx(tx, swap)
-            return tx
 
         # check if signing is dangerous
         sh_danger = self.check_sighash(tx)
@@ -2611,6 +2596,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                 self.logger.info(f'sign_transaction: adding witness using make_witness')
                 privkey = txin.privkey
                 sig = tx.sign_txin(i, privkey)
+                txin.script_sig = b''
                 txin.witness = txin.make_witness(sig)
                 assert txin.is_complete()
 
