@@ -19,7 +19,7 @@ from .my_treeview import create_toolbar_with_menu
 
 if TYPE_CHECKING:
     from .main_window import ElectrumWindow
-    from electrum.submarine_swaps import SwapServerTransport
+    from electrum_grs.submarine_swaps import SwapServerTransport
 
 CANNOT_RECEIVE_WARNING = _(
 """The requested amount is higher than what you can receive in your currently open channels.
