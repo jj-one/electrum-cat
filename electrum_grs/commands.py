@@ -22,7 +22,7 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import io
 import sys
 import datetime
 import copy
@@ -44,9 +44,12 @@ import electrum_ecc as ecc
 
 from . import util
 from . import keystore
-from .util import (bfh, format_satoshis, json_decode, json_normalize,
-                   is_hash256_str, is_hex_str, to_bytes, parse_max_spend, to_decimal,
-                   UserFacingException, InvalidPassword)
+from .lnmsg import OnionWireSerializer
+from .logging import Logger
+from .onion_message import create_blinded_path, send_onion_message_to
+from .util import (bfh, format_satoshis, json_decode, json_normalize, is_hash256_str, is_hex_str, to_bytes,
+                   parse_max_spend, to_decimal, UserFacingException, InvalidPassword)
+
 from . import bitcoin
 from .bitcoin import is_address,  hash_160, COIN
 from .bip32 import BIP32Node
@@ -175,11 +178,12 @@ def command(s):
     return decorator
 
 
-class Commands:
+class Commands(Logger):
 
     def __init__(self, *, config: 'SimpleConfig',
                  network: 'Network' = None,
                  daemon: 'Daemon' = None, callback=None):
+        Logger.__init__(self)
         self.config = config
         self.daemon = daemon
         self.network = network
@@ -1070,17 +1074,20 @@ class Commands:
         return wallet.get_unused_address()
 
     @command('w')
-    async def add_request(self, amount, memo='', expiry=3600, force=False, wallet: Abstract_Wallet = None):
+    async def add_request(self, amount, memo='', expiry=3600, lightning=False, force=False, wallet: Abstract_Wallet = None):
         """Create a payment request, using the first unused address of the wallet.
         The address will be considered as used after this operation.
         If no payment is received, the address will be considered as unused if the payment request is deleted from the wallet."""
-        addr = wallet.get_unused_address()
-        if addr is None:
-            if force:
-                addr = wallet.create_new_address(False)
-            else:
-                return False
         amount = satoshis(amount)
+        if not lightning:
+            addr = wallet.get_unused_address()
+            if addr is None:
+                if force:
+                    addr = wallet.create_new_address(False)
+                else:
+                    return False
+        else:
+            addr = None
         expiry = int(expiry) if expiry else None
         key = wallet.create_request(amount, memo, expiry, addr)
         req = wallet.get_request(key)
@@ -1414,7 +1421,7 @@ class Commands:
                 funding_txid = None
             else:
                 lightning_amount_sat = satoshis(lightning_amount)
-                claim_fee = sm.get_claim_fee()
+                claim_fee = sm.get_swap_tx_fee()
                 onchain_amount_sat = satoshis(onchain_amount) + claim_fee
                 funding_txid = await wallet.lnworker.swap_manager.reverse_swap(
                     transport,
@@ -1464,6 +1471,63 @@ class Commands:
             "source": self.daemon.fx.exchange.name(),
         }
 
+    @command('wnl')
+    async def send_onion_message(self, node_id_or_blinded_path_hex: str, message: str, wallet: Abstract_Wallet = None):
+        """
+        Send an onion message with onionmsg_tlv.message payload to node_id.
+        """
+        assert wallet
+        assert wallet.lnworker
+        assert node_id_or_blinded_path_hex
+        assert message
+
+        node_id_or_blinded_path = bfh(node_id_or_blinded_path_hex)
+        assert len(node_id_or_blinded_path) >= 33
+
+        destination_payload = {
+            'message': {'text': message.encode('utf-8')}
+        }
+
+        try:
+            send_onion_message_to(wallet.lnworker, node_id_or_blinded_path, destination_payload)
+            return {'success': True}
+        except Exception as e:
+            msg = str(e)
+
+        return {
+            'success': False,
+            'msg': msg
+        }
+
+    @command('wnl')
+    async def get_blinded_path_via(self, node_id: str, dummy_hops: int = 0, wallet: Abstract_Wallet = None):
+        """
+        Create a blinded path with node_id as introduction point. Introduction point must be direct peer of me.
+        """
+        # TODO: allow introduction_point to not be a direct peer and construct a route
+        assert wallet
+        assert node_id
+
+        pubkey = bfh(node_id)
+        assert len(pubkey) == 33, 'invalid node_id'
+
+        peer = wallet.lnworker.peers[pubkey]
+        assert peer, 'node_id not a peer'
+
+        path = [pubkey, wallet.lnworker.node_keypair.pubkey]
+        session_key = os.urandom(32)
+        blinded_path = create_blinded_path(session_key, path=path, final_recipient_data={}, dummy_hops=dummy_hops)
+
+        with io.BytesIO() as blinded_path_fd:
+            OnionWireSerializer.write_field(
+                fd=blinded_path_fd,
+                field_type='blinded_path',
+                count=1,
+                value=blinded_path)
+            encoded_blinded_path = blinded_path_fd.getvalue()
+
+        return encoded_blinded_path.hex()
+
 
 def eval_bool(x: str) -> bool:
     if x == 'false': return False
@@ -1492,6 +1556,7 @@ param_descriptions = {
     'redeem_script': 'redeem script (hexadecimal)',
     'lightning_amount': "Amount sent or received in a submarine swap. Set it to 'dryrun' to receive a value",
     'onchain_amount': "Amount sent or received in a submarine swap. Set it to 'dryrun' to receive a value",
+    'node_id': "Node pubkey in hex format"
 }
 
 command_options = {
@@ -1524,6 +1589,8 @@ command_options = {
     'addtransaction': (None,'Whether transaction is to be used for broadcasting afterwards. Adds transaction to the wallet'),
     'domain':      ("-D", "List of addresses"),
     'memo':        ("-m", "Description of the request"),
+    'amount':      (None, "Requested amount (in btc)"),
+    'lightning':   (None, "Create lightning request"),
     'expiry':      (None, "Time in seconds"),
     'timeout':     (None, "Timeout in seconds"),
     'force':       (None, "Create new address beyond gap limit, if no more addresses are available."),
@@ -1546,6 +1613,7 @@ command_options = {
     'from_ccy':    (None, "Currency to convert from"),
     'to_ccy':      (None, "Currency to convert to"),
     'public':      (None, 'Channel will be announced'),
+    'dummy_hops':  (None, 'Number of dummy hops to add'),
 }
 
 
@@ -1571,6 +1639,7 @@ arg_types = {
     'encrypt_file': eval_bool,
     'rbf': eval_bool,
     'timeout': float,
+    'dummy_hops': int,
 }
 
 config_variables = {

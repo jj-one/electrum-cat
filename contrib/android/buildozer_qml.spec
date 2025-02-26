@@ -76,7 +76,6 @@ requirements =
     cryptography,
     pyqt6sip,
     pyqt6,
-    pillow,
     libzbar,
     groestlcoin_hash==1.0.3
 

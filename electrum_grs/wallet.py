@@ -2833,6 +2833,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         return invoice
 
     def create_request(self, amount_sat: Optional[int], message: Optional[str], exp_delay: Optional[int], address: Optional[str]):
+        """ will create a lightning request if address is None """
         # for receiving
         amount_sat = amount_sat or 0
         assert isinstance(amount_sat, int), f"{amount_sat!r}"
@@ -2841,9 +2842,11 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         address = address or None  # converts "" to None
         exp_delay = exp_delay or 0
         timestamp = int(Request._get_cur_time())
-        payment_hash = None  # type: Optional[bytes]
-        if self.has_lightning():
+        if address is None:
+            assert self.has_lightning()
             payment_hash = self.lnworker.create_payment_info(amount_msat=amount_msat, write_to_disk=False)
+        else:
+            payment_hash = None
         outputs = [PartialTxOutput.from_address_and_value(address, amount_sat)] if address else []
         height = self.adb.get_local_height()
         req = Request(
@@ -3279,6 +3282,9 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         ln_swap_suggestion = None
         ln_rebalance_suggestion = None
         URI = self.get_request_URI(req) or ''
+        lightning_has_channels = (
+            self.lnworker and len([chan for chan in self.lnworker.channels.values() if chan.is_open()]) > 0
+        )
         lightning_online = self.lnworker and self.lnworker.num_peers() > 0
         can_receive_lightning = self.lnworker and amount_sat <= self.lnworker.num_sats_can_receive()
         status = self.get_invoice_status(req)
@@ -3306,7 +3312,10 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                 address_help = URI_help = (_("This address has already been used. "
                                              "For better privacy, do not reuse it for new payments."))
             if req.is_lightning():
-                if not lightning_online:
+                if not lightning_has_channels:
+                    ln_is_error = True
+                    ln_help = _("You must have an open Lightning channel to receive payments.")
+                elif not lightning_online:
                     ln_is_error = True
                     ln_help = _('You must be online to receive Lightning payments.')
                 elif not can_receive_lightning:
@@ -3318,6 +3327,10 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                         ln_help += '\n\n' + _('You may have that capacity if you rebalance your channels.')
                     elif bool(ln_swap_suggestion):
                         ln_help += '\n\n' + _('You may have that capacity if you swap some of your funds.')
+                # for URI that has LN part but no onchain part, copy error:
+                if not addr and ln_is_error:
+                    URI_is_error = ln_is_error
+                    URI_help = ln_help
         return ReceiveRequestHelp(
             address_help=address_help,
             URI_help=URI_help,
