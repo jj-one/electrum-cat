@@ -14,22 +14,22 @@ jobs:
       - name: Builder image
         env:
           TARGET_OS: Windows
-        run: docker build -t electrum-grs-wine-builder-img ./contrib/build-wine/
+        run: docker build -t electrum-cat-wine-builder-img ./contrib/build-wine/
       - name: Compile Windows binary
         env:
           TARGET_OS: Windows
-        run: docker run --name electrum-grs-wine-builder-cont -v $PWD:/opt/wine64/drive_c/electrum-grs --rm --workdir /opt/wine64/drive_c/electrum-grs/contrib/build-wine electrum-grs-wine-builder-img ./make_win.sh
+        run: docker run --name electrum-cat-wine-builder-cont -v $PWD:/opt/wine64/drive_c/electrum-cat --rm --workdir /opt/wine64/drive_c/electrum-cat/contrib/build-wine electrum-cat-wine-builder-img ./make_win.sh
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-windows
+          name: electrum-cat-${{ github.sha }}-windows
           path: contrib/build-wine/dist/*.exe
           if-no-files-found: error
           retention-days: 7
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-windows
+          name: electrum-cat-${{ github.sha }}-windows
 
   appimage:
     runs-on: ubuntu-latest
@@ -40,60 +40,60 @@ jobs:
         with:
           python-version: 3.11.9
       - name: Builder image
-        run: docker build -t electrum-grs-appimage-builder-img ./contrib/build-linux/appimage/
+        run: docker build -t electrum-cat-appimage-builder-img ./contrib/build-linux/appimage/
       - name: Compile Linux AppImage
-        run: docker run --name electrum-grs-appimage-builder-cont -v $PWD:/opt/electrum-grs --rm --workdir /opt/electrum-grs/contrib/build-linux/appimage electrum-grs-appimage-builder-img ./make_appimage.sh
+        run: docker run --name electrum-cat-appimage-builder-cont -v $PWD:/opt/electrum-cat --rm --workdir /opt/electrum-cat/contrib/build-linux/appimage electrum-cat-appimage-builder-img ./make_appimage.sh
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-appimage
+          name: electrum-cat-${{ github.sha }}-appimage
           path: dist/*.AppImage
           if-no-files-found: error
           retention-days: 7
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-appimage
+          name: electrum-cat-${{ github.sha }}-appimage
 
   tarball:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Builder image
-        run: docker build -t electrum-grs-sdist-builder-img ./contrib/build-linux/sdist/
+        run: docker build -t electrum-cat-sdist-builder-img ./contrib/build-linux/sdist/
       - name: Compile Linux tarball
-        run: docker run --name electrum-grs-sdist-builder-cont -v $PWD:/opt/electrum-grs --rm --workdir /opt/electrum-grs/contrib/build-linux/sdist electrum-grs-sdist-builder-img ./make_sdist.sh
+        run: docker run --name electrum-cat-sdist-builder-cont -v $PWD:/opt/electrum-cat --rm --workdir /opt/electrum-cat/contrib/build-linux/sdist electrum-cat-sdist-builder-img ./make_sdist.sh
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-tarball
+          name: electrum-cat-${{ github.sha }}-tarball
           path: dist/*.tar.gz
           if-no-files-found: error
           retention-days: 7
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-tarball
+          name: electrum-cat-${{ github.sha }}-tarball
 
   source-only-tarball:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Builder image
-        run: docker build -t electrum-grs-source-only-tarball-builder-img ./contrib/build-linux/sdist/
+        run: docker build -t electrum-cat-source-only-tarball-builder-img ./contrib/build-linux/sdist/
       - name: Compile Linux tarball
-        run: docker run --name electrum-grs-source-only-tarball-builder-cont -v $PWD:/opt/electrum-grs --rm --workdir /opt/electrum-grs/contrib/build-linux/sdist --env OMIT_UNCLEAN_FILES=1 electrum-grs-source-only-tarball-builder-img ./make_sdist.sh
+        run: docker run --name electrum-cat-source-only-tarball-builder-cont -v $PWD:/opt/electrum-cat --rm --workdir /opt/electrum-cat/contrib/build-linux/sdist --env OMIT_UNCLEAN_FILES=1 electrum-cat-source-only-tarball-builder-img ./make_sdist.sh
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-source-only-tarball
+          name: electrum-cat-${{ github.sha }}-source-only-tarball
           path: dist/*.tar.gz
           if-no-files-found: error
           retention-days: 7
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-source-only-tarball
+          name: electrum-cat-${{ github.sha }}-source-only-tarball
 
   android-qml-arm64-v8a:
     runs-on: ubuntu-22.04
@@ -116,27 +116,27 @@ jobs:
           large-packages: true
           swap-storage: true
       - name: Builder image
-        run: docker build -t electrum-grs-android-builder-img --file contrib/android/Dockerfile .
+        run: docker build -t electrum-cat-android-builder-img --file contrib/android/Dockerfile .
       - name: Compile Android apk
         env:
            ENCODED_STRING: ${{ secrets.ANDROID_SIGNING_KEY }}
         run: |
           TMP_KEYSTORE_FILE_PATH="${RUNNER_TEMP}"/keystore
           mkdir "${TMP_KEYSTORE_FILE_PATH}"
-          echo $ENCODED_STRING | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/electrumgrs.keystore
+          echo $ENCODED_STRING | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/electrumcat.keystore
           sudo mkdir --parents /.buildozer/.gradle
-          sudo docker run --name electrum-grs-android-builder-cont -v $PWD:/home/user/wspace/electrum-grs -v /.buildozer/.gradle:/home/user/.gradle -v $TMP_KEYSTORE_FILE_PATH:/root/.keystore --workdir /home/user/wspace/electrum-grs electrum-grs-android-builder-img ./contrib/android/make_apk.sh qml arm64-v8a release ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          sudo docker run --name electrum-cat-android-builder-cont -v $PWD:/home/user/wspace/electrum-cat -v /.buildozer/.gradle:/home/user/.gradle -v $TMP_KEYSTORE_FILE_PATH:/root/.keystore --workdir /home/user/wspace/electrum-cat electrum-cat-android-builder-img ./contrib/android/make_apk.sh qml arm64-v8a release ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-android-arm64-v8a
+          name: electrum-cat-${{ github.sha }}-android-arm64-v8a
           path: dist/*.apk
           if-no-files-found: error
           retention-days: 7
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-android-arm64-v8a
+          name: electrum-cat-${{ github.sha }}-android-arm64-v8a
 
   android-qml-armeabi-v7a:
     runs-on: ubuntu-22.04
@@ -159,27 +159,27 @@ jobs:
           large-packages: true
           swap-storage: true
       - name: Builder image
-        run: docker build -t electrum-grs-android-builder-img --file contrib/android/Dockerfile .
+        run: docker build -t electrum-cat-android-builder-img --file contrib/android/Dockerfile .
       - name: Compile Android apk
         env:
            ENCODED_STRING: ${{ secrets.ANDROID_SIGNING_KEY }}
         run: |
           TMP_KEYSTORE_FILE_PATH="${RUNNER_TEMP}"/keystore
           mkdir "${TMP_KEYSTORE_FILE_PATH}"
-          echo $ENCODED_STRING | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/electrumgrs.keystore
+          echo $ENCODED_STRING | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/electrumcat.keystore
           sudo mkdir --parents /.buildozer/.gradle
-          sudo docker run --name electrum-grs-android-builder-cont -v $PWD:/home/user/wspace/electrum-grs -v /.buildozer/.gradle:/home/user/.gradle -v $TMP_KEYSTORE_FILE_PATH:/root/.keystore --workdir /home/user/wspace/electrum-grs electrum-grs-android-builder-img ./contrib/android/make_apk.sh qml armeabi-v7a release ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          sudo docker run --name electrum-cat-android-builder-cont -v $PWD:/home/user/wspace/electrum-cat -v /.buildozer/.gradle:/home/user/.gradle -v $TMP_KEYSTORE_FILE_PATH:/root/.keystore --workdir /home/user/wspace/electrum-cat electrum-cat-android-builder-img ./contrib/android/make_apk.sh qml armeabi-v7a release ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-android-armeabi-v7a
+          name: electrum-cat-${{ github.sha }}-android-armeabi-v7a
           path: dist/*.apk
           if-no-files-found: error
           retention-days: 7
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-android-armeabi-v7a
+          name: electrum-cat-${{ github.sha }}-android-armeabi-v7a
 
   android-qml-x86_64:
     runs-on: ubuntu-22.04
@@ -202,27 +202,27 @@ jobs:
           large-packages: true
           swap-storage: true
       - name: Builder image
-        run: docker build -t electrum-grs-android-builder-img --file contrib/android/Dockerfile .
+        run: docker build -t electrum-cat-android-builder-img --file contrib/android/Dockerfile .
       - name: Compile Android apk
         env:
            ENCODED_STRING: ${{ secrets.ANDROID_SIGNING_KEY }}
         run: |
           TMP_KEYSTORE_FILE_PATH="${RUNNER_TEMP}"/keystore
           mkdir "${TMP_KEYSTORE_FILE_PATH}"
-          echo $ENCODED_STRING | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/electrumgrs.keystore
+          echo $ENCODED_STRING | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/electrumcat.keystore
           sudo mkdir --parents /.buildozer/.gradle
-          sudo docker run --name electrum-grs-android-builder-cont -v $PWD:/home/user/wspace/electrum-grs -v /.buildozer/.gradle:/home/user/.gradle -v $TMP_KEYSTORE_FILE_PATH:/root/.keystore --workdir /home/user/wspace/electrum-grs electrum-grs-android-builder-img ./contrib/android/make_apk.sh qml x86_64 release ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          sudo docker run --name electrum-cat-android-builder-cont -v $PWD:/home/user/wspace/electrum-cat -v /.buildozer/.gradle:/home/user/.gradle -v $TMP_KEYSTORE_FILE_PATH:/root/.keystore --workdir /home/user/wspace/electrum-cat electrum-cat-android-builder-img ./contrib/android/make_apk.sh qml x86_64 release ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-android-x86_64
+          name: electrum-cat-${{ github.sha }}-android-x86_64
           path: dist/*.apk
           if-no-files-found: error
           retention-days: 7
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-android-x86_64
+          name: electrum-cat-${{ github.sha }}-android-x86_64
 
   macos:
     runs-on: macos-13
@@ -240,11 +240,11 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-macos
+          name: electrum-cat-${{ github.sha }}-macos
           path: dist/*.dmg
           if-no-files-found: error
           retention-days: 7
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: electrum-grs-${{ github.sha }}-macos
+          name: electrum-cat-${{ github.sha }}-macos
