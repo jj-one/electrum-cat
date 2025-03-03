@@ -4,11 +4,11 @@ from PyInstaller.utils.hooks import collect_data_files, collect_submodules, coll
 
 import sys, os
 
-PACKAGE_NAME='Electrum-GRS.app'
-PYPKG='electrum_grs'
-MAIN_SCRIPT='run_electrum_grs'
+PACKAGE_NAME='Electrum-CAT.app'
+PYPKG='electrum_cat'
+MAIN_SCRIPT='run_electrum_cat'
 PROJECT_ROOT = os.path.abspath(".")
-ICONS_FILE=f"{PROJECT_ROOT}/{PYPKG}/gui/icons/electrum-grs.icns"
+ICONS_FILE=f"{PROJECT_ROOT}/{PYPKG}/gui/icons/electrum-cat.icns"
 
 
 VERSION = os.environ.get("ELECTRUM_VERSION")
@@ -132,10 +132,10 @@ app = BUNDLE(
         'NSSupportsAutomaticGraphicsSwitching': 'True',
         'CFBundleURLTypes':
             [{
-                'CFBundleURLName': 'groestlcoin',
-                'CFBundleURLSchemes': ['groestlcoin', 'lightning', ],
+                'CFBundleURLName': 'catcoin',
+                'CFBundleURLSchemes': ['catcoin', 'lightning', ],
             }],
         'LSMinimumSystemVersion': '11',
-        'NSCameraUsageDescription': 'Electrum-GRS would like to access the camera to scan for QR codes',
+        'NSCameraUsageDescription': 'Electrum-CAT would like to access the camera to scan for QR codes',
     },
 )
