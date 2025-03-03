@@ -70,7 +70,7 @@ info "Building $pkgname..."
     if [ -n "$DLL_TARGET_DIR" ] ; then
         cp -fpv "$here/$pkgname/dist/lib/$dlname" "$DLL_TARGET_DIR/" || fail "Could not copy the $pkgname binary to DLL_TARGET_DIR"
     else
-        cp -fpv "$here/$pkgname/dist/lib/$dlname" "$PROJECT_ROOT/electrum_grs" || fail "Could not copy the $pkgname binary to its destination"
-        info "$dlname has been placed in the 'electrum_grs' folder."
+        cp -fpv "$here/$pkgname/dist/lib/$dlname" "$PROJECT_ROOT/electrum_cat" || fail "Could not copy the $pkgname binary to its destination"
+        info "$dlname has been placed in the 'electrum_cat' folder."
     fi
 )

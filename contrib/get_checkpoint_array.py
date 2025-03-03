@@ -8,7 +8,7 @@ if len(argv) < 3:
     print('Arguments: <rpc_username> <rpc_password> [<rpc_port>]')
     sys.exit(1)
 
-# From electrum-grs.
+# From electrum-cat.
 def bits_to_target(bits):
     bitsN = (bits >> 24) & 0xff
     if not (bitsN >= 0x03 and bitsN <= 0x1e):
@@ -43,7 +43,7 @@ def rpc(method, params):
 
     return loads(json_response)
 
-# Electrum-GRS checkpoints are blocks 2015, 2015 + 2016, 2015 + 2016*2, ...
+# Electrum-CAT checkpoints are blocks 2015, 2015 + 2016, 2015 + 2016*2, ...
 i = 2015
 INTERVAL = 2016
 

@@ -86,8 +86,8 @@ info "Building $pkgname..."
     make install || fail "Could not install $pkgname"
     . "$here/$pkgname/dist/lib/libzbar.la"
     host_strip "$here/$pkgname/dist/lib/$dlname"
-    cp -fpv "$here/$pkgname/dist/lib/$dlname" "$PROJECT_ROOT/electrum_grs" || fail "Could not copy the $pkgname binary to its destination"
-    info "$dlname has been placed in the inner 'electrum_grs' folder."
+    cp -fpv "$here/$pkgname/dist/lib/$dlname" "$PROJECT_ROOT/electrum_cat" || fail "Could not copy the $pkgname binary to its destination"
+    info "$dlname has been placed in the inner 'electrum_cat' folder."
     if [ -n "$DLL_TARGET_DIR" ] ; then
         cp -fpv "$here/$pkgname/dist/lib/$dlname" "$DLL_TARGET_DIR/" || fail "Could not copy the $pkgname binary to DLL_TARGET_DIR"
     fi
