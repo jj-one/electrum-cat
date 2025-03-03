@@ -53,9 +53,9 @@ $WINE_PYTHON -m pip install --no-build-isolation --no-dependencies --no-binary :
 
 
 # copy already built DLLs
-cp "$DLL_TARGET_DIR"/libsecp256k1-*.dll $WINEPREFIX/drive_c/electrum-grs/electrum_grs/ || fail "Could not copy libsecp to its destination"
-cp "$DLL_TARGET_DIR/libzbar-0.dll" $WINEPREFIX/drive_c/electrum-grs/electrum_grs/ || fail "Could not copy libzbar to its destination"
-cp "$DLL_TARGET_DIR/libusb-1.0.dll" $WINEPREFIX/drive_c/electrum-grs/electrum_grs/ || fail "Could not copy libusb to its destination"
+cp "$DLL_TARGET_DIR"/libsecp256k1-*.dll $WINEPREFIX/drive_c/electrum-cat/electrum_cat/ || fail "Could not copy libsecp to its destination"
+cp "$DLL_TARGET_DIR/libzbar-0.dll" $WINEPREFIX/drive_c/electrum-cat/electrum_cat/ || fail "Could not copy libzbar to its destination"
+cp "$DLL_TARGET_DIR/libusb-1.0.dll" $WINEPREFIX/drive_c/electrum-cat/electrum_cat/ || fail "Could not copy libusb to its destination"
 
 
 info "Building PyInstaller."
@@ -73,7 +73,7 @@ info "Building PyInstaller."
         info "pyinstaller already built, skipping"
         exit 0
     fi
-    cd "$WINEPREFIX/drive_c/electrum-grs"
+    cd "$WINEPREFIX/drive_c/electrum-cat"
     ELECTRUM_COMMIT_HASH=$(git rev-parse HEAD)
     cd "$CACHEDIR"
     rm -rf pyinstaller
@@ -87,7 +87,7 @@ info "Building PyInstaller."
     rm -fv PyInstaller/bootloader/Windows-*/run*.exe || true
     # add reproducible randomness. this ensures we build a different bootloader for each commit.
     # if we built the same one for all releases, that might also get anti-virus false positives
-    echo "const char *electrum_tag = \"tagged by Electrum-GRS@$ELECTRUM_COMMIT_HASH\";" >> ./bootloader/src/pyi_main.c
+    echo "const char *electrum_tag = \"tagged by Electrum-CAT@$ELECTRUM_COMMIT_HASH\";" >> ./bootloader/src/pyi_main.c
     pushd bootloader
     # cross-compile to Windows using host python
     python3 ./waf all CC="${GCC_TRIPLET_HOST}-gcc" \

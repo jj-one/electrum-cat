@@ -72,4 +72,4 @@ RUN git config --global --add safe.directory '*'
 #RUN chown ${USER} /opt
 #USER ${USER}
 
-RUN mkdir --parents "/opt/wine64/drive_c/electrum-grs"
+RUN mkdir --parents "/opt/wine64/drive_c/electrum-cat"

@@ -4,10 +4,10 @@ from PyInstaller.utils.hooks import collect_data_files, collect_submodules, coll
 
 import sys, os
 
-PYPKG="electrum_grs"
-MAIN_SCRIPT="run_electrum_grs"
-PROJECT_ROOT = "C:/electrum-grs"
-ICONS_FILE=f"{PROJECT_ROOT}/{PYPKG}/gui/icons/electrum-grs.ico"
+PYPKG="electrum_cat"
+MAIN_SCRIPT="run_electrum_cat"
+PROJECT_ROOT = "C:/electrum-cat"
+ICONS_FILE=f"{PROJECT_ROOT}/{PYPKG}/gui/icons/electrum-cat.ico"
 
 cmdline_name = os.environ.get("ELECTRUM_CMDLINE_NAME")
 if not cmdline_name:
@@ -129,7 +129,7 @@ exe_standalone = EXE(
     upx=False,
     icon=ICONS_FILE,
     console=False)
-    # console=True makes an annoying black box pop up, but it does make Electrum-GRS output command line commands, with this turned off no output will be given but commands can still be used
+    # console=True makes an annoying black box pop up, but it does make Electrum-CAT output command line commands, with this turned off no output will be given but commands can still be used
 
 exe_portable = EXE(
     pyz,

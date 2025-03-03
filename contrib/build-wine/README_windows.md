@@ -1,4 +1,4 @@
-# Running Electrum-GRS from source on Windows (development version)
+# Running Electrum-CAT from source on Windows (development version)
 
 ## Prerequisites
 
@@ -9,8 +9,8 @@
 
 ### 1. Check out the code from GitHub:
 ```
-> git clone https://github.com/Groestlcoin/electrum-grs.git
-> cd electrum-grs
+> git clone https://github.com/jj-one/electrum-cat.git
+> cd electrum-cat
 > git submodule update --init
 ```
 
@@ -22,13 +22,13 @@ Run install (this should install most dependencies):
 ### 2. Install `libsecp256k1`
 
 [comment]: # (technically the dll should be put into site-packages/electrum_ecc/,
-but putting it into electrum_grs/ also works because of the `os.add_dll_directory` call in
-electrum_grs/__init__.py)
+but putting it into electrum_cat/ also works because of the `os.add_dll_directory` call in
+electrum_cat/__init__.py)
 
 [libsecp256k1](https://github.com/bitcoin-core/secp256k1) is a required dependency.
 This is a C library, which you need to compile yourself.
-Electrum-GRS needs a dll, named `libsecp256k1-0.dll` (or newer `libsecp256k1-*.dll`),
-placed into the inner `electrum_grs/` folder.
+Electrum-CAT needs a dll, named `libsecp256k1-0.dll` (or newer `libsecp256k1-*.dll`),
+placed into the inner `electrum_cat/` folder.
 
 For Unix-like systems, the (`contrib/make_libsecp256k1.sh`) script does this for you,
 however it does not work on Windows.
@@ -49,17 +49,17 @@ Alternatively, MSYS2 and MinGW-w64 can be used directly on Windows, as follows.
   $ pacman -S --needed git base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-autotools
   $ export PATH="$PATH:/mingw64/bin"
   ```
-  `cd` into the git clone, e.g. `C:\wspace\electrum-grs` (auto-mounted at `/c/wspace/electrum-grs`)
+  `cd` into the git clone, e.g. `C:\wspace\electrum-cat` (auto-mounted at `/c/wspace/electrum-cat`)
   ```
-  $ cd /c/wspace/electrum-grs
+  $ cd /c/wspace/electrum-cat
   $ GCC_TRIPLET_HOST="x86_64-w64-mingw32" ./contrib/make_libsecp256k1.sh
   ```
 
 (note: this is a bit cumbersome, see [issue #5976](https://github.com/spesmilo/electrum/issues/5976)
 for discussion)
 
-### 3. Run electrum-grs:
+### 3. Run electrum-cat:
 
 ```
-> python3 ./run_electrum_grs
+> python3 ./run_electrum_cat
 ```
