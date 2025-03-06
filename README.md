@@ -1,20 +1,20 @@
-# Electrum-GRS - Lightweight Groestlcoin client
+# Electrum-CAT - Lightweight Catcoin client
 
 ```
 Licence: MIT Licence
-Author: Groestlcoin Developers
+Author: CatcoinCore Developers
 Language: Python (>= 3.10)
-Homepage: https://groestlcoin.org/
+Homepage: https://electrum-cat.org/
 ```
 
-[![Build Status](https://api.cirrus-ci.com/github/Groestlcoin/electrum-grs.svg?branch=master)](https://cirrus-ci.com/github/Groestlcoin/electrum-grs)
+[![Build Status](https://api.cirrus-ci.com/github/jj-one/electrum-cat.svg?branch=master)](https://cirrus-ci.com/github/jj-one/electrum-cat)
 
 ## Getting started
 
-_(If you've come here looking to simply run Electrum-GRS,
-[you may download it here](https://www.groestlcoin.org/groestlcoin-electrum-wallet/).)_
+_(If you've come here looking to simply run Electrum-CAT,
+[you may download it here](https://electrum-cat.org/catcoin-electrum-wallet/).)_
 
-Electrum-GRS itself is pure Python, and so are most of the required dependencies,
+Electrum-CAT itself is pure Python, and so are most of the required dependencies,
 but not everything. The following sections describe how to run from source, but here
 is a TL;DR:
 
@@ -38,7 +38,7 @@ For elliptic curve operations,
 [libsecp256k1](https://github.com/bitcoin-core/secp256k1)
 is a required dependency.
 
-If you "pip install" Electrum-GRS, by default libsecp will get compiled locally,
+If you "pip install" Electrum-CAT, by default libsecp will get compiled locally,
 as part of the `electrum-ecc` dependency. This can be opted-out of,
 by setting the `ELECTRUM_ECC_DONT_COMPILE=1` environment variable.
 For the compilation to work, besides a C compiler, you need at least:
@@ -68,22 +68,22 @@ If you would like hardware wallet support,
 ### Running from tar.gz
 
 If you downloaded the official package (tar.gz), you can run
-Electrum-GRS from its root directory without installing it on your
+Electrum-CAT from its root directory without installing it on your
 system; all the pure python dependencies are included in the 'packages'
 directory. To run Electrum from its root directory, just do:
 ```
-$ ./run_electrum_grs
+$ ./run_electrum_cat
 ```
 
-You can also install Electrum-GRS on your system, by running this command:
+You can also install Electrum-CAT on your system, by running this command:
 ```
 $ sudo apt-get install python3-setuptools python3-pip
 $ python3 -m pip install --user .
 ```
 
 This will download and install the Python dependencies used by
-Electrum-GRS instead of using the 'packages' directory.
-It will also place an executable named `electrum-grs` in `~/.local/bin`,
+Electrum-CAT instead of using the 'packages' directory.
+It will also place an executable named `electrum-cat` in `~/.local/bin`,
 so make sure that is on your `PATH` variable.
 
 
@@ -94,8 +94,8 @@ and [for macOS](contrib/osx/README_macos.md))_
 
 Check out the code from GitHub:
 ```
-$ git clone https://github.com/Groestlcoin/electrum-grs.git
-$ cd electrum-grs
+$ git clone https://github.com/jj-one/electrum-cat.git
+$ cd electrum-cat
 $ git submodule update --init
 ```
 
@@ -110,9 +110,9 @@ $ sudo apt-get install python3-requests gettext qttools5-dev-tools
 $ ./contrib/pull_locale
 ```
 
-Finally, to start Electrum-GRS:
+Finally, to start Electrum-CAT:
 ```
-$ ./run_electrum_grs
+$ ./run_electrum_cat
 ```
 
 ### Run tests
@@ -144,7 +144,7 @@ Implementing new features, or improving/refactoring the codebase, is of course
 also welcome, but to avoid wasted effort, especially for larger changes,
 we encourage discussing these on the issue tracker or IRC first.
 
-Besides [GitHub](https://github.com/Groestlcoin/electrum-grs),
-most communication about Electrum-GRS development happens on IRC, in the
-`#groestlcoin` channel on Libera Chat. The easiest way to participate on IRC is
-with the web client, [web.libera.chat](https://web.libera.chat/#groestlcoin).
+Besides [GitHub](https://github.com/CatcoinCore/electrum-cat),
+most communication about Electrum-CAT development happens on Discord, in the
+`#General` channel on Catcoin Team 3 (Unofficial) Discord server. The easiest way to participate 
+with the web client, [https://discord.gg/4HDPB5DE](https://discord.gg/4HDPB5DE).
