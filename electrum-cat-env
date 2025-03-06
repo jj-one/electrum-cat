@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
 # This script creates a virtualenv named 'env' and installs all
-# python dependencies before activating the env and running Electrum-GRS.
-# If 'env' already exists, it is activated and Electrum-GRS is started
+# python dependencies before activating the env and running Electrum-CAT.
+# If 'env' already exists, it is activated and Electrum-CAT is started
 # without any installations. Additionally, the PYTHONPATH environment
 # variable is set so that system packages such as e.g. apt installed
 # PyQt will also be visible.
@@ -35,4 +35,4 @@ export PYTHONPATH="$PYTHONPATH:"\
 "/usr/lib/python${PYTHON_VER}/site-packages:"
 
 
-./run_electrum_grs "$@"
+./run_electrum_cat "$@"
