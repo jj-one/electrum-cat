@@ -2,9 +2,9 @@ import asyncio
 
 import electrum_ecc as ecc
 
-from electrum_grs import util
-from electrum_grs.lntransport import LNPeerAddr, LNResponderTransport, LNTransport, extract_nodeid, split_host_port, ConnStringFormatError
-from electrum_grs.util import OldTaskGroup
+from electrum_cat import util
+from electrum_cat.lntransport import LNPeerAddr, LNResponderTransport, LNTransport, extract_nodeid, split_host_port, ConnStringFormatError
+from electrum_cat.util import OldTaskGroup
 
 from . import ElectrumTestCase
 from .test_bitcoin import needs_test_with_all_chacha20_implementations

@@ -6,21 +6,21 @@ from typing import Sequence
 import asyncio
 import copy
 
-from electrum_grs import storage, bitcoin, keystore, bip32, slip39, wallet
-from electrum_grs import Transaction
-from electrum_grs import SimpleConfig
-from electrum_grs import util
-from electrum_grs.address_synchronizer import TX_HEIGHT_UNCONFIRMED, TX_HEIGHT_UNCONF_PARENT, TX_HEIGHT_LOCAL
-from electrum_grs.wallet import (sweep, Multisig_Wallet, Standard_Wallet, Imported_Wallet,
+from electrum_cat import storage, bitcoin, keystore, bip32, slip39, wallet
+from electrum_cat import Transaction
+from electrum_cat import SimpleConfig
+from electrum_cat import util
+from electrum_cat.address_synchronizer import TX_HEIGHT_UNCONFIRMED, TX_HEIGHT_UNCONF_PARENT, TX_HEIGHT_LOCAL
+from electrum_cat.wallet import (sweep, Multisig_Wallet, Standard_Wallet, Imported_Wallet,
                              restore_wallet_from_text, Abstract_Wallet, CannotBumpFee, BumpFeeStrategy,
                              TransactionPotentiallyDangerousException, TransactionDangerousException,
                              TxSighashRiskLevel)
-from electrum_grs.util import bfh, NotEnoughFunds, UnrelatedTransactionException, UserFacingException, TxMinedInfo
-from electrum_grs.transaction import Transaction, PartialTxOutput, tx_from_any, Sighash
-from electrum_grs.mnemonic import calc_seed_type
-from electrum_grs.network import Network
+from electrum_cat.util import bfh, NotEnoughFunds, UnrelatedTransactionException, UserFacingException, TxMinedInfo
+from electrum_cat.transaction import Transaction, PartialTxOutput, tx_from_any, Sighash
+from electrum_cat.mnemonic import calc_seed_type
+from electrum_cat.network import Network
 
-from electrum_grs.plugins.trustedcoin import trustedcoin
+from electrum_cat.plugins.trustedcoin import trustedcoin
 
 from . import ElectrumTestCase
 
@@ -398,7 +398,7 @@ class TestWalletKeystoreAddressIntegrityForMainnet(ElectrumTestCase):
         self.assertEqual(ks1.xprv, 'xprv9s21ZrQH143K3t9vo23J3hajRbzvkRLJ6Y1zFrUFAfU3t8oooMPfb7f87cn5KntgqZs5nipZkCiBFo5ZtaSD2eDo7j7CMuFV8Zu6GYLTpY6')
         self.assertEqual(ks1.xpub, 'xpub661MyMwAqRbcGNEPu3aJQqXTydqR9t49Tkwb4Esrj112kw8xLthv8uybxvaki4Ygt9xiwZUQGeFTG7T2TUzR3eA4Zp3aq5RXsABHFBUrq4c')
 
-        # electrum-grs seed: ghost into match ivory badge robot record tackle radar elbow traffic loud
+        # electrum-cat seed: ghost into match ivory badge robot record tackle radar elbow traffic loud
         ks2 = keystore.from_xpub('xpub661MyMwAqRbcGfCPEkkyo5WmcrhTq8mi3xuBS7VEZ3LYvsgY1cCFDbenT33bdD12axvrmXhuX3xkAbKci3yZY9ZEk8vhLic7KNhLjqdh5ec')
         WalletIntegrityHelper.check_xpub_keystore_sanity(self, ks2)
         self.assertTrue(isinstance(ks2, keystore.BIP32_KeyStore))
@@ -420,7 +420,7 @@ class TestWalletKeystoreAddressIntegrityForMainnet(ElectrumTestCase):
         self.assertEqual(ks1.xprv, 'ZprvAjxLRqPiDfPDxXrm8JvcoCGRAW6xUtktucG6AMtdzaEbTEJN8qcECvujfhtDU3jLJ9g3Dr3Gz5m1ypfMs8iSUh62gWyHZ73bYLRWyeHf6y4')
         self.assertEqual(ks1.xpub, 'Zpub6xwgqLvc42wXB1wEELTdALD9iXwStMUkGqBgxkJFYumaL2dWgNvUkjEDWyDFZD3fZuDWDzd1KQJ4NwVHS7hs6H6QkpNYSShfNiUZsgMdtNg')
 
-        # electrum-grs seed: hedgehog sunset update estate number jungle amount piano friend donate upper wool
+        # electrum-cat seed: hedgehog sunset update estate number jungle amount piano friend donate upper wool
         ks2 = keystore.from_xpub('Zpub6y4oYeETXAbzLNg45wcFDGwEG3vpgsyMJybiAfi2pJtNF3i3fJVxK2BeZJaw7VeKZm192QHvXP3uHDNpNmNDbQft9FiMzkKUhNXQafUMYUY')
         WalletIntegrityHelper.check_xpub_keystore_sanity(self, ks2)
         self.assertTrue(isinstance(ks2, keystore.BIP32_KeyStore))

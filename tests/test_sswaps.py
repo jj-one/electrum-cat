@@ -1,7 +1,7 @@
-from electrum_grs import SimpleConfig
-from electrum_grs.util import bfh
-from electrum_grs.transaction import PartialTxInput, TxOutpoint
-from electrum_grs.submarine_swaps import SwapData, create_claim_tx
+from electrum_cat import SimpleConfig
+from electrum_cat.util import bfh
+from electrum_cat.transaction import PartialTxInput, TxOutpoint
+from electrum_cat.submarine_swaps import SwapData, create_claim_tx
 
 from . import ElectrumTestCase
 

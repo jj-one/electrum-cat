@@ -8,21 +8,21 @@ import logging
 import electrum_ecc as ecc
 from electrum_ecc import ECPrivkey
 
-from electrum_grs import SimpleConfig
-from electrum_grs.lnmsg import decode_msg, OnionWireSerializer
-from electrum_grs.lnonion import (
+from electrum_cat import SimpleConfig
+from electrum_cat.lnmsg import decode_msg, OnionWireSerializer
+from electrum_cat.lnonion import (
     OnionHopsDataSingle, OnionPacket,
     process_onion_packet, get_bolt04_onion_key, encrypt_onionmsg_data_tlv,
     get_shared_secrets_along_route, new_onion_packet, ONION_MESSAGE_LARGE_SIZE,
     HOPS_DATA_SIZE, InvalidPayloadSize)
-from electrum_grs.crypto import get_ecdh, privkey_to_pubkey
-from electrum_grs.lnutil import LnFeatures, Keypair
-from electrum_grs.onion_message import (
+from electrum_cat.crypto import get_ecdh, privkey_to_pubkey
+from electrum_cat.lnutil import LnFeatures, Keypair
+from electrum_cat.onion_message import (
     blinding_privkey, create_blinded_path, encrypt_onionmsg_tlv_hops_data,
     OnionMessageManager, NoRouteFound, Timeout
 )
-from electrum_grs.util import bfh, read_json_file, OldTaskGroup, get_asyncio_loop
-from electrum_grs.logging import console_stderr_handler
+from electrum_cat.util import bfh, read_json_file, OldTaskGroup, get_asyncio_loop
+from electrum_cat.logging import console_stderr_handler
 
 from . import ElectrumTestCase, test_lnpeer
 from .test_lnpeer import PutIntoOthersQueueTransport, PeerInTests, keypair

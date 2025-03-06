@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 export HOME=~
 set -eux pipefail
-mkdir -p ~/.groestlcoin
-cat > ~/.groestlcoin/groestlcoin.conf <<EOF
+mkdir -p ~/.catcoin
+cat > ~/.catcoin/catcoin.conf <<EOF
 regtest=1
 txindex=1
 printtoconsole=1
@@ -16,10 +16,10 @@ fallbackfee=0.0002
 rpcbind=0.0.0.0
 rpcport=18554
 EOF
-rm -rf ~/.groestlcoin/regtest
-screen -S groestlcoind -X quit || true
-screen -S groestlcoind -m -d groestlcoind -regtest
+rm -rf ~/.catcoin/regtest
+screen -S catcoind -X quit || true
+screen -S catcoind -m -d catcoind -regtest
 sleep 6
-groestlcoin-cli createwallet test_wallet
-addr=$(groestlcoin-cli getnewaddress)
-groestlcoin-cli generatetoaddress 150 $addr > /dev/null
+catcoin-cli createwallet test_wallet
+addr=$(catcoin-cli getnewaddress)
+catcoin-cli generatetoaddress 150 $addr > /dev/null

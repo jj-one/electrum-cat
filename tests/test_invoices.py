@@ -3,12 +3,12 @@ import time
 
 from . import ElectrumTestCase
 
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs.wallet import restore_wallet_from_text, Standard_Wallet, Abstract_Wallet
-from electrum_grs.invoices import PR_UNPAID, PR_PAID, PR_UNCONFIRMED, BaseInvoice, Invoice, LN_EXPIRY_NEVER
-from electrum_grs.address_synchronizer import TX_HEIGHT_UNCONFIRMED
-from electrum_grs.transaction import Transaction, PartialTxOutput
-from electrum_grs.util import TxMinedInfo, InvoiceError
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat.wallet import restore_wallet_from_text, Standard_Wallet, Abstract_Wallet
+from electrum_cat.invoices import PR_UNPAID, PR_PAID, PR_UNCONFIRMED, BaseInvoice, Invoice, LN_EXPIRY_NEVER
+from electrum_cat.address_synchronizer import TX_HEIGHT_UNCONFIRMED
+from electrum_cat.transaction import Transaction, PartialTxOutput
+from electrum_cat.util import TxMinedInfo, InvoiceError
 
 
 class TestWalletPaymentRequests(ElectrumTestCase):

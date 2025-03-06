@@ -2,13 +2,13 @@ import unittest
 from unittest import mock
 from decimal import Decimal
 
-from electrum_grs.commands import Commands, eval_bool
-from electrum_grs import storage, wallet
-from electrum_grs.wallet import restore_wallet_from_text, Abstract_Wallet
-from electrum_grs.address_synchronizer import TX_HEIGHT_UNCONFIRMED
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs.transaction import Transaction, TxOutput, tx_from_any
-from electrum_grs.util import UserFacingException, NotEnoughFunds
+from electrum_cat.commands import Commands, eval_bool
+from electrum_cat import storage, wallet
+from electrum_cat.wallet import restore_wallet_from_text, Abstract_Wallet
+from electrum_cat.address_synchronizer import TX_HEIGHT_UNCONFIRMED
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat.transaction import Transaction, TxOutput, tx_from_any
+from electrum_cat.util import UserFacingException, NotEnoughFunds
 
 from . import ElectrumTestCase
 from .test_wallet_vertical import WalletIntegrityHelper
@@ -33,18 +33,18 @@ class TestCommands(ElectrumTestCase):
         self.assertEqual(True, Commands._setconfig_normalize_value('show_console_tab', "True"))
 
     def test_setconfig_non_auth_list(self):
-        self.assertEqual(['file:///var/www/', 'https://groestlcoin.org'],
-            Commands._setconfig_normalize_value('url_rewrite', "['file:///var/www/','https://groestlcoin.org']"))
-        self.assertEqual(['file:///var/www/', 'https://groestlcoin.org'],
-            Commands._setconfig_normalize_value('url_rewrite', '["file:///var/www/","https://groestlcoin.org"]'))
+        self.assertEqual(['file:///var/www/', 'https://electrum-cat.org'],
+            Commands._setconfig_normalize_value('url_rewrite', "['file:///var/www/','https://electrum-cat.org']"))
+        self.assertEqual(['file:///var/www/', 'https://electrum-cat.org'],
+            Commands._setconfig_normalize_value('url_rewrite', '["file:///var/www/","https://electrum-cat.org"]'))
 
     def test_setconfig_auth(self):
         self.assertEqual("7777", Commands._setconfig_normalize_value('rpcuser', "7777"))
         self.assertEqual("7777", Commands._setconfig_normalize_value('rpcuser', '7777'))
         self.assertEqual("7777", Commands._setconfig_normalize_value('rpcpassword', '7777'))
         self.assertEqual("2asd", Commands._setconfig_normalize_value('rpcpassword', '2asd'))
-        self.assertEqual("['file:///var/www/','https://groestlcoin.org']",
-            Commands._setconfig_normalize_value('rpcpassword', "['file:///var/www/','https://groestlcoin.org']"))
+        self.assertEqual("['file:///var/www/','https://electrum-cat.org']",
+            Commands._setconfig_normalize_value('rpcpassword', "['file:///var/www/','https://electrum-cat.org']"))
 
     def test_eval_bool(self):
         self.assertFalse(eval_bool("False"))

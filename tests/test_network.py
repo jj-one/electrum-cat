@@ -2,13 +2,13 @@ import asyncio
 import tempfile
 import unittest
 
-from electrum_grs import constants
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs import blockchain
-from electrum_grs.interface import Interface, ServerAddr
-from electrum_grs.crypto import sha256
-from electrum_grs.util import OldTaskGroup
-from electrum_grs import util
+from electrum_cat import constants
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat import blockchain
+from electrum_cat.interface import Interface, ServerAddr
+from electrum_cat.crypto import sha256
+from electrum_cat.util import OldTaskGroup
+from electrum_cat import util
 
 from . import ElectrumTestCase
 

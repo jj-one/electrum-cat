@@ -5,9 +5,9 @@ from typing import Dict, List
 
 import electrum_ecc as ecc
 
-from electrum_grs import bitcoin
-from electrum_grs.json_db import StoredDict
-from electrum_grs.lnutil import (RevocationStore, get_per_commitment_secret_from_seed,
+from electrum_cat import bitcoin
+from electrum_cat.json_db import StoredDict
+from electrum_cat.lnutil import (RevocationStore, get_per_commitment_secret_from_seed,
                              make_offered_htlc,
                              make_received_htlc, make_commitment, make_htlc_tx_witness,
                              make_htlc_tx_output,
@@ -19,11 +19,11 @@ from electrum_grs.lnutil import (RevocationStore, get_per_commitment_secret_from
                              ln_compare_features, IncompatibleLightningFeatures, ChannelType,
                              offered_htlc_trim_threshold_sat, received_htlc_trim_threshold_sat,
                              ImportedChannelBackupStorage, list_enabled_ln_feature_bits)
-from electrum_grs.util import bfh, MyEncoder
-from electrum_grs.transaction import Transaction, PartialTransaction, Sighash
-from electrum_grs.lnworker import LNWallet
-from electrum_grs.wallet import restore_wallet_from_text, Standard_Wallet
-from electrum_grs.simple_config import SimpleConfig
+from electrum_cat.util import bfh, MyEncoder
+from electrum_cat.transaction import Transaction, PartialTransaction, Sighash
+from electrum_cat.lnworker import LNWallet
+from electrum_cat.wallet import restore_wallet_from_text, Standard_Wallet
+from electrum_cat.simple_config import SimpleConfig
 
 from . import ElectrumTestCase, as_testnet
 from .test_bitcoin import disable_ecdsa_r_value_grinding

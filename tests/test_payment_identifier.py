@@ -1,13 +1,13 @@
 import os
 
-from electrum_grs import SimpleConfig
-from electrum_grs.invoices import Invoice
-from electrum_grs.payment_identifier import (maybe_extract_lightning_payment_identifier, PaymentIdentifier,
+from electrum_cat import SimpleConfig
+from electrum_cat.invoices import Invoice
+from electrum_cat.payment_identifier import (maybe_extract_lightning_payment_identifier, PaymentIdentifier,
                                          PaymentIdentifierType, invoice_from_payment_identifier)
-from electrum_grs.wallet import restore_wallet_from_text
+from electrum_cat.wallet import restore_wallet_from_text
 
 from . import ElectrumTestCase
-from electrum_grs.transaction import PartialTxOutput
+from electrum_cat.transaction import PartialTxOutput
 
 
 class WalletMock:

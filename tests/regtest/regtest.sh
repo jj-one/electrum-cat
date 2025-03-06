@@ -6,21 +6,21 @@ TEST_ANCHOR_CHANNELS=True
 
 # alice -> bob -> carol
 
-alice="./run_electrum_grs --regtest -D /tmp/alice"
-bob="./run_electrum_grs --regtest -D /tmp/bob"
-carol="./run_electrum_grs --regtest -D /tmp/carol"
+alice="./run_electrum_cat --regtest -D /tmp/alice"
+bob="./run_electrum_cat --regtest -D /tmp/bob"
+carol="./run_electrum_cat --regtest -D /tmp/carol"
 
-groestlcoin_cli="groestlcoin-cli -rpcuser=doggman -rpcpassword=donkey -rpcport=18554 -regtest"
+catcoin_cli="catcoin-cli -rpcuser=doggman -rpcpassword=donkey -rpcport=18554 -regtest"
 
 function new_blocks()
 {
-    $groestlcoin_cli generatetoaddress $1 $($groestlcoin_cli getnewaddress) > /dev/null
+    $catcoin_cli generatetoaddress $1 $($catcoin_cli getnewaddress) > /dev/null
 }
 
 function wait_until_htlcs_settled()
 {
     msg="wait until $1's local_unsettled_sent is zero"
-    cmd="./run_electrum_grs --regtest -D /tmp/$1"
+    cmd="./run_electrum_cat --regtest -D /tmp/$1"
     while unsettled=$($cmd list_channels | jq '.[] | .local_unsettled_sent') && [ $unsettled != "0" ]; do
         sleep 1
         msg="$msg."
@@ -33,7 +33,7 @@ function wait_until_htlcs_settled()
 function wait_for_balance()
 {
     msg="wait until $1's balance reaches $2"
-    cmd="./run_electrum_grs --regtest -D /tmp/$1"
+    cmd="./run_electrum_cat --regtest -D /tmp/$1"
     while balance=$($cmd getbalance | jq '[.confirmed, .unconfirmed] | to_entries | map(select(.value != null).value) | map(tonumber) | add ') && (( $(echo "$balance < $2" | bc -l) )); do
         sleep 1
 	msg="$msg."
@@ -45,7 +45,7 @@ function wait_for_balance()
 function wait_until_channel_open()
 {
     msg="wait until $1 sees channel open"
-    cmd="./run_electrum_grs --regtest -D /tmp/$1"
+    cmd="./run_electrum_cat --regtest -D /tmp/$1"
     while channel_state=$($cmd list_channels | jq '.[0] | .state' | tr -d '"') && [ $channel_state != "OPEN" ]; do
         sleep 1
 	msg="$msg."
@@ -57,7 +57,7 @@ function wait_until_channel_open()
 function wait_until_channel_closed()
 {
     msg="wait until $1 sees channel closed"
-    cmd="./run_electrum_grs --regtest -D /tmp/$1"
+    cmd="./run_electrum_cat --regtest -D /tmp/$1"
     while [[ $($cmd list_channels | jq '.[0].state' | tr -d '"') != "CLOSED" ]]; do
         sleep 1
 	msg="$msg."
@@ -69,7 +69,7 @@ function wait_until_channel_closed()
 function wait_until_spent()
 {
     msg="wait until $1:$2 is spent"
-    while [[ $($groestlcoin_cli gettxout $1 $2) ]]; do
+    while [[ $($catcoin_cli gettxout $1 $2) ]]; do
         sleep 1
 	msg="$msg."
 	printf "$msg\r"
@@ -89,7 +89,7 @@ fi
 if [[ $1 == "init" ]]; then
     echo "initializing $2"
     rm -rf /tmp/$2/
-    agent="./run_electrum_grs --regtest -D /tmp/$2"
+    agent="./run_electrum_cat --regtest -D /tmp/$2"
     $agent create --offline > /dev/null
     $agent setconfig --offline enable_anchor_channels $TEST_ANCHOR_CHANNELS
     $agent setconfig --offline log_to_file True
@@ -99,7 +99,7 @@ if [[ $1 == "init" ]]; then
     $agent setconfig --offline test_force_disable_mpp True
     echo "funding $2"
     # note: changing the funding amount affects all tests, as they rely on "wait_for_balance"
-    $groestlcoin_cli sendtoaddress $($agent getunusedaddress -o) 1
+    $catcoin_cli sendtoaddress $($agent getunusedaddress -o) 1
 fi
 
 if [[ $1 == "setconfig" ]]; then
@@ -110,14 +110,14 @@ fi
 
 # start daemons. Bob is started first because he is listening
 if [[ $1 == "start" ]]; then
-    agent="./run_electrum_grs --regtest -D /tmp/$2"
+    agent="./run_electrum_cat --regtest -D /tmp/$2"
     $agent daemon -d
     $agent load_wallet
     sleep 1 # give time to synchronize
 fi
 
 if [[ $1 == "stop" ]]; then
-    agent="./run_electrum_grs --regtest -D /tmp/$2"
+    agent="./run_electrum_cat --regtest -D /tmp/$2"
     $agent stop || true
 fi
 
@@ -142,7 +142,7 @@ if [[ $1 == "breach" ]]; then
     echo "alice pays again"
     $alice lnpay $request
     echo "alice broadcasts old ctx"
-    $groestlcoin_cli sendrawtransaction $ctx
+    $catcoin_cli sendrawtransaction $ctx
     new_blocks 1
     wait_until_channel_closed bob
     new_blocks 1
@@ -376,7 +376,7 @@ if [[ $1 == "breach_with_unspent_htlc" ]]; then
         exit 1
     fi
     echo "alice breaches with old ctx"
-    $groestlcoin_cli sendrawtransaction $ctx
+    $catcoin_cli sendrawtransaction $ctx
     wait_for_balance bob 1.14
 fi
 
@@ -408,10 +408,10 @@ if [[ $1 == "breach_with_spent_htlc" ]]; then
     echo $($bob getbalance)
     echo "bob goes offline"
     $bob stop
-    ctx_id=$($groestlcoin_cli sendrawtransaction $ctx)
+    ctx_id=$($catcoin_cli sendrawtransaction $ctx)
     echo "alice breaches with old ctx:" $ctx_id
     new_blocks 1
-    if [[ $($groestlcoin_cli gettxout $ctx_id 0 | jq '.confirmations') != "1" ]]; then
+    if [[ $($catcoin_cli gettxout $ctx_id 0 | jq '.confirmations') != "1" ]]; then
         echo "breach tx not confirmed"
         exit 1
     fi
@@ -470,7 +470,7 @@ if [[ $1 == "watchtower" ]]; then
     echo "stopping alice and bob"
     $bob stop
     $alice stop
-    ctx_id=$($groestlcoin_cli sendrawtransaction $ctx)
+    ctx_id=$($catcoin_cli sendrawtransaction $ctx)
     echo "alice breaches with old ctx:" $ctx_id
     echo "watchtower publishes justice transaction"
     if [ $TEST_ANCHOR_CHANNELS = True ] ; then
@@ -499,15 +499,15 @@ fi
 if [[ $1 == "unixsockets" ]]; then
     # This looks different because it has to run the entire daemon
     # Test domain socket behavior
-    ./run_electrum_grs --regtest daemon -d --rpcsock=unix # Start daemon with unix domain socket
-    ./run_electrum_grs --regtest stop # Errors if it can't connect
+    ./run_electrum_cat --regtest daemon -d --rpcsock=unix # Start daemon with unix domain socket
+    ./run_electrum_cat --regtest stop # Errors if it can't connect
     # Test custom socket path
     f=$(mktemp --dry-run)
-    ./run_electrum_grs --regtest daemon -d --rpcsock=unix --rpcsockpath=$f
+    ./run_electrum_cat --regtest daemon -d --rpcsock=unix --rpcsockpath=$f
     [ -S $f ] # filename exists and is socket
-    ./run_electrum_grs --regtest stop
+    ./run_electrum_cat --regtest stop
     rm $f # clean up
     # Test for regressions in the ordinary TCP functionality.
-    ./run_electrum_grs --regtest daemon -d --rpcsock=tcp
-    ./run_electrum_grs --regtest stop
+    ./run_electrum_cat --regtest daemon -d --rpcsock=tcp
+    ./run_electrum_cat --regtest stop
 fi
