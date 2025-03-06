@@ -3,33 +3,33 @@
 <!--
   Copyright 2023-2024 Soren Stoutner <soren@debian.org>.
 
-  This file can be validated using `appstreamcli validate org.groestlcoin.electrum-grs.metainfo.xml`.
+  This file can be validated using `appstreamcli validate org.catcoin.electrum-cat.metainfo.xml`.
 
   Distributed under the MIT software license, see the accompanying file LICENCE or http://www.opensource.org/licenses/mit-license.php.
 -->
 
 <component type="desktop-application">
-  <id>org.groestlcoin.electrum-grs</id>
+  <id>org.catcoin.electrum-cat</id>
 
-  <name>Electrum-GRS</name>
-  <summary>Groestlcoin Wallet</summary>
+  <name>Electrum-CAT</name>
+  <summary>Catcoin Wallet</summary>
 
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
 
   <description>
     <p>
-      Electrum-GRS is a lightweight Groestlcoin wallet focused on speed, with low resource usage and simplifying Groestlcoin.
-      Startup times are instant because it operates in conjunction with high-performance servers that handle the most complicated parts of the Groestlcoin system.
+      Electrum-CAT is a lightweight Catcoin wallet focused on speed, with low resource usage and simplifying Catcoin.
+      Startup times are instant because it operates in conjunction with high-performance servers that handle the most complicated parts of the Catcoin system.
     </p>
   </description>
 
-  <url type="homepage">https://www.groestlcoin.org/</url>
-  <developer id="org.groestlcoin">
-      <name>The Groestlcoin developers</name>
+  <url type="homepage">https://www.electrum-cat.org/</url>
+  <developer id="org.electrum-cat">
+      <name>The CatcoinCore developers</name>
   </developer>
 
-  <launchable type="desktop-id">electrum-grs.desktop</launchable>
+  <launchable type="desktop-id">electrum-cat.desktop</launchable>
 
   <content_rating type="oars-1.1" />
 </component>
