@@ -2,7 +2,7 @@ import sys
 
 from PyQt6.QtCore import pyqtSignal, pyqtProperty, QObject
 
-from electrum_grs.logging import get_logger
+from electrum_cat.logging import get_logger
 
 
 class PluginQObject(QObject):

@@ -5,7 +5,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QPen, QPaintDevice
 import qrcode
 
-from electrum_grs.i18n import _
+from electrum_cat.i18n import _
 
 
 def draw_qr(
