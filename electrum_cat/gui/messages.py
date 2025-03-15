@@ -1,5 +1,5 @@
-from electrum_grs.i18n import _
-from electrum_grs.submarine_swaps import MIN_FINAL_CLTV_DELTA_FOR_CLIENT
+from electrum_cat.i18n import _
+from electrum_cat.submarine_swaps import MIN_FINAL_CLTV_DELTA_FOR_CLIENT
 
 
 def to_rtf(msg):

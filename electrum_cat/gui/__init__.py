@@ -8,9 +8,9 @@ from typing import TYPE_CHECKING, Mapping, Optional
 
 if TYPE_CHECKING:
     from . import qt
-    from electrum_grs.simple_config import SimpleConfig
-    from electrum_grs.daemon import Daemon
-    from electrum_grs.plugin import Plugins
+    from electrum_cat.simple_config import SimpleConfig
+    from electrum_cat.daemon import Daemon
+    from electrum_cat.plugin import Plugins
 
 
 class BaseElectrumGui:

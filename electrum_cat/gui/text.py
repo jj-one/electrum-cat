@@ -11,26 +11,26 @@ from typing import TYPE_CHECKING, Optional
 try:
     import pyperclip
 except ImportError:  # only use vendored lib as fallback, to allow Linux distros to bring their own
-    from electrum_grs._vendor import pyperclip
+    from electrum_cat._vendor import pyperclip
 
-import electrum_grs
-from electrum_grs.gui import BaseElectrumGui
-from electrum_grs.bip21 import parse_bip21_URI
-from electrum_grs.util import format_satoshis, format_time
-from electrum_grs.util import EventListener, event_listener
-from electrum_grs.bitcoin import is_address, address_to_script, COIN
-from electrum_grs.transaction import PartialTxOutput
-from electrum_grs.wallet import Wallet, Abstract_Wallet
-from electrum_grs.wallet_db import WalletDB
-from electrum_grs.storage import WalletStorage
-from electrum_grs.network import NetworkParameters, TxBroadcastError, BestEffortRequestFailed
-from electrum_grs.interface import ServerAddr
-from electrum_grs.invoices import Invoice
+import electrum_cat
+from electrum_cat.gui import BaseElectrumGui
+from electrum_cat.bip21 import parse_bip21_URI
+from electrum_cat.util import format_satoshis, format_time
+from electrum_cat.util import EventListener, event_listener
+from electrum_cat.bitcoin import is_address, address_to_script, COIN
+from electrum_cat.transaction import PartialTxOutput
+from electrum_cat.wallet import Wallet, Abstract_Wallet
+from electrum_cat.wallet_db import WalletDB
+from electrum_cat.storage import WalletStorage
+from electrum_cat.network import NetworkParameters, TxBroadcastError, BestEffortRequestFailed
+from electrum_cat.interface import ServerAddr
+from electrum_cat.invoices import Invoice
 
 if TYPE_CHECKING:
-    from electrum_grs.daemon import Daemon
-    from electrum_grs.simple_config import SimpleConfig
-    from electrum_grs.plugin import Plugins
+    from electrum_cat.daemon import Daemon
+    from electrum_cat.simple_config import SimpleConfig
+    from electrum_cat.plugin import Plugins
 
 
 _ = lambda x:x  # i18n
@@ -50,7 +50,7 @@ def parse_bip21(text):
 
 
 def parse_bolt11(text):
-    from electrum_grs.lnaddr import lndecode
+    from electrum_cat.lnaddr import lndecode
     try:
         return lndecode(text)
     except Exception:
@@ -64,7 +64,7 @@ class ElectrumGui(BaseElectrumGui, EventListener):
         self.network = daemon.network
         storage = WalletStorage(config.get_wallet_path(use_gui_last_wallet=True))
         if not storage.file_exists():
-            print("Wallet not found. try 'electrum-grs create'")
+            print("Wallet not found. try 'electrum-cat create'")
             exit()
         if storage.is_encrypted():
             password = getpass.getpass('Password:', stream=None)
@@ -636,7 +636,7 @@ class ElectrumGui(BaseElectrumGui, EventListener):
                 pr=None,
                 URI=None)
         else:
-            self.show_message(_('Invalid Groestlcoin address'))
+            self.show_message(_('Invalid Catcoin address'))
             return
         return invoice
 
@@ -753,7 +753,7 @@ class ElectrumGui(BaseElectrumGui, EventListener):
                         self.show_message("Error:" + server_str + "\nIn doubt, type \"auto-connect\"")
                         return False
             if out.get('server') or out.get('proxy') or out.get('proxy user') or out.get('proxy pass'):
-                new_proxy_config = electrum_grs.network.deserialize_proxy(out.get('proxy')) if out.get('proxy') else proxy_config
+                new_proxy_config = electrum_cat.network.deserialize_proxy(out.get('proxy')) if out.get('proxy') else proxy_config
                 if new_proxy_config:
                     new_proxy_config['user'] = out.get('proxy user') if 'proxy user' in out else proxy_config['user']
                     new_proxy_config['pass'] = out.get('proxy pass') if 'proxy pass' in out else proxy_config['pass']

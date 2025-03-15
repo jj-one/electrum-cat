@@ -4,15 +4,15 @@ import datetime
 import logging
 from typing import Optional
 
-from electrum_grs.gui import BaseElectrumGui
-from electrum_grs import util
-from electrum_grs import WalletStorage, Wallet
-from electrum_grs.wallet import Abstract_Wallet
-from electrum_grs.wallet_db import WalletDB
-from electrum_grs.util import format_satoshis, EventListener, event_listener
-from electrum_grs.bitcoin import is_address, COIN
-from electrum_grs.transaction import PartialTxOutput
-from electrum_grs.network import TxBroadcastError, BestEffortRequestFailed
+from electrum_cat.gui import BaseElectrumGui
+from electrum_cat import util
+from electrum_cat import WalletStorage, Wallet
+from electrum_cat.wallet import Abstract_Wallet
+from electrum_cat.wallet_db import WalletDB
+from electrum_cat.util import format_satoshis, EventListener, event_listener
+from electrum_cat.bitcoin import is_address, COIN
+from electrum_cat.transaction import PartialTxOutput
+from electrum_cat.network import TxBroadcastError, BestEffortRequestFailed
 
 _ = lambda x:x  # i18n
 
@@ -27,7 +27,7 @@ class ElectrumGui(BaseElectrumGui, EventListener):
         self.network = daemon.network
         storage = WalletStorage(config.get_wallet_path(use_gui_last_wallet=True))
         if not storage.file_exists():
-            print("Wallet not found. try 'electrum-grs create'")
+            print("Wallet not found. try 'electrum-cat create'")
             exit()
         if storage.is_encrypted():
             password = getpass.getpass('Password:', stream=None)
@@ -185,7 +185,7 @@ class ElectrumGui(BaseElectrumGui, EventListener):
 
     def do_send(self):
         if not is_address(self.str_recipient):
-            print(_('Invalid Groestlcoin address'))
+            print(_('Invalid Catcoin address'))
             return
         try:
             amount = int(Decimal(self.str_amount) * COIN)
@@ -238,12 +238,12 @@ class ElectrumGui(BaseElectrumGui, EventListener):
             #self.update_contacts_tab()
 
     def network_dialog(self):
-        print("use 'electrum-grs setconfig server/proxy' to change your network settings")
+        print("use 'electrum-cat setconfig server/proxy' to change your network settings")
         return True
 
 
     def settings_dialog(self):
-        print("use 'electrum-grs setconfig' to change your settings")
+        print("use 'electrum-cat setconfig' to change your settings")
         return True
 
     def password_dialog(self):
