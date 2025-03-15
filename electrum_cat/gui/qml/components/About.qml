@@ -81,7 +81,7 @@ Pane {
                 Layout.alignment: Qt.AlignRight
             }
             Label {
-                text: 'Catcoin Core Developers'
+                text: 'CatcoinCore Developers'
             }
             Item {
                 width: 1
