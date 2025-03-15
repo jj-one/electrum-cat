@@ -6,13 +6,13 @@ import electrum_ecc as ecc
 
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject
 
-from electrum_grs.i18n import _
-from electrum_grs.gui import messages
-from electrum_grs.util import bfh, NotEnoughFunds, NoDynamicFeeEstimates
-from electrum_grs.lntransport import extract_nodeid, ConnStringFormatError
-from electrum_grs.bitcoin import DummyAddress
-from electrum_grs.lnworker import hardcoded_trampoline_nodes
-from electrum_grs.logging import get_logger
+from electrum_cat.i18n import _
+from electrum_cat.gui import messages
+from electrum_cat.util import bfh, NotEnoughFunds, NoDynamicFeeEstimates
+from electrum_cat.lntransport import extract_nodeid, ConnStringFormatError
+from electrum_cat.bitcoin import DummyAddress
+from electrum_cat.lnworker import hardcoded_trampoline_nodes
+from electrum_cat.logging import get_logger
 
 from .auth import AuthMixin, auth_protect
 from .qetxfinalizer import QETxFinalizer

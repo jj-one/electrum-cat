@@ -2,16 +2,16 @@ import asyncio
 
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject
 
-from electrum_grs import mnemonic
-from electrum_grs import keystore
-from electrum_grs.i18n import _
-from electrum_grs.bip32 import is_bip32_derivation, xpub_type
-from electrum_grs.logging import get_logger
-from electrum_grs.util import get_asyncio_loop
-from electrum_grs.transaction import tx_from_any
-from electrum_grs.mnemonic import Mnemonic
-from electrum_grs.old_mnemonic import wordlist as old_wordlist
-from electrum_grs.bitcoin import is_address
+from electrum_cat import mnemonic
+from electrum_cat import keystore
+from electrum_cat.i18n import _
+from electrum_cat.bip32 import is_bip32_derivation, xpub_type
+from electrum_cat.logging import get_logger
+from electrum_cat.util import get_asyncio_loop
+from electrum_cat.transaction import tx_from_any
+from electrum_cat.mnemonic import Mnemonic
+from electrum_cat.old_mnemonic import wordlist as old_wordlist
+from electrum_cat.bitcoin import is_address
 
 
 class QEBitcoin(QObject):

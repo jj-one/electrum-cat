@@ -2,17 +2,17 @@ from typing import TYPE_CHECKING
 
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, QObject
 
-from electrum_grs.logging import get_logger
-from electrum_grs import constants
-from electrum_grs.interface import ServerAddr
-from electrum_grs.simple_config import FEERATE_DEFAULT_RELAY
+from electrum_cat.logging import get_logger
+from electrum_cat import constants
+from electrum_cat.interface import ServerAddr
+from electrum_cat.simple_config import FEERATE_DEFAULT_RELAY
 
 from .util import QtEventListener, event_listener
 from .qeserverlistmodel import QEServerListModel
 
 if TYPE_CHECKING:
     from .qeconfig import QEConfig
-    from electrum_grs.network import Network
+    from electrum_cat.network import Network
 
 
 class QENetwork(QObject, QtEventListener):

@@ -1,7 +1,7 @@
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject
 
-from electrum_grs.logging import get_logger
-from electrum_grs.i18n import _
+from electrum_cat.logging import get_logger
+from electrum_cat.i18n import _
 
 # container for satoshi amounts that can be passed around more
 # easily between python, QML-property and QML-javascript contexts

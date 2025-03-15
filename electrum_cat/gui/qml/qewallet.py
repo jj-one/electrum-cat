@@ -8,16 +8,16 @@ from functools import partial
 
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject, QTimer
 
-from electrum_grs.i18n import _
-from electrum_grs.invoices import InvoiceError, PR_PAID, PR_BROADCASTING, PR_BROADCAST
-from electrum_grs.logging import get_logger
-from electrum_grs.network import TxBroadcastError, BestEffortRequestFailed
-from electrum_grs.transaction import PartialTransaction, Transaction
-from electrum_grs.util import InvalidPassword, event_listener, AddTransactionException, get_asyncio_loop, NotEnoughFunds, \
+from electrum_cat.i18n import _
+from electrum_cat.invoices import InvoiceError, PR_PAID, PR_BROADCASTING, PR_BROADCAST
+from electrum_cat.logging import get_logger
+from electrum_cat.network import TxBroadcastError, BestEffortRequestFailed
+from electrum_cat.transaction import PartialTransaction, Transaction
+from electrum_cat.util import InvalidPassword, event_listener, AddTransactionException, get_asyncio_loop, NotEnoughFunds, \
     NoDynamicFeeEstimates
-from electrum_grs.plugin import run_hook
-from electrum_grs.wallet import Multisig_Wallet
-from electrum_grs.crypto import pw_decode_with_version_and_mac
+from electrum_cat.plugin import run_hook
+from electrum_cat.wallet import Multisig_Wallet
+from electrum_cat.crypto import pw_decode_with_version_and_mac
 
 from .auth import AuthMixin, auth_protect
 from .qeaddresslistmodel import QEAddressCoinListModel
@@ -28,7 +28,7 @@ from .qetypes import QEAmount
 from .util import QtEventListener, qt_event_listener
 
 if TYPE_CHECKING:
-    from electrum_grs.wallet import Abstract_Wallet
+    from electrum_cat.wallet import Abstract_Wallet
     from .qeinvoice import QEInvoice
 
 

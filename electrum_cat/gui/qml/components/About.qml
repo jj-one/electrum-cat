@@ -72,7 +72,7 @@ Pane {
                 Layout.alignment: Qt.AlignRight
             }
             Label {
-                text: qsTr('<a href="https://groestlcoin.org">https://groestlcoin.org</a>')
+                text: qsTr('<a href="https://electrum-cat.org">https://electrum-cat.org</a>')
                 textFormat: Text.RichText
                 onLinkActivated: Qt.openUrlExternally(link)
             }
@@ -81,7 +81,7 @@ Pane {
                 Layout.alignment: Qt.AlignRight
             }
             Label {
-                text: 'Groestlcoin Developers'
+                text: 'Catcoin Core Developers'
             }
             Item {
                 width: 1

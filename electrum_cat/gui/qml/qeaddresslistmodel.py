@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING, List
 from PyQt6.QtCore import pyqtSlot, QSortFilterProxyModel, pyqtSignal, pyqtProperty
 from PyQt6.QtCore import Qt, QAbstractListModel, QModelIndex
 
-from electrum_grs.logging import get_logger
-from electrum_grs.util import Satoshis
+from electrum_cat.logging import get_logger
+from electrum_cat.util import Satoshis
 
 from .qetypes import QEAmount
 from .util import qt_event_listener, QtEventListener
 
 if TYPE_CHECKING:
-    from electrum_grs.wallet import Abstract_Wallet
-    from electrum_grs.transaction import PartialTxInput
+    from electrum_cat.wallet import Abstract_Wallet
+    from electrum_cat.transaction import PartialTxInput
 
 
 class QEAddressCoinFilterProxyModel(QSortFilterProxyModel):

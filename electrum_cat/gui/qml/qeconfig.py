@@ -4,16 +4,16 @@ from typing import TYPE_CHECKING
 
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject, QRegularExpression
 
-from electrum_grs.bitcoin import TOTAL_COIN_SUPPLY_LIMIT_IN_BTC
-from electrum_grs.i18n import set_language, languages
-from electrum_grs.logging import get_logger
-from electrum_grs.util import base_unit_name_to_decimal_point
+from electrum_cat.bitcoin import TOTAL_COIN_SUPPLY_LIMIT_IN_BTC
+from electrum_cat.i18n import set_language, languages
+from electrum_cat.logging import get_logger
+from electrum_cat.util import base_unit_name_to_decimal_point
 
 from .qetypes import QEAmount
 from .auth import AuthMixin, auth_protect
 
 if TYPE_CHECKING:
-    from electrum_grs.simple_config import SimpleConfig
+    from electrum_cat.simple_config import SimpleConfig
 
 
 class QEConfig(AuthMixin, QObject):
@@ -87,7 +87,7 @@ class QEConfig(AuthMixin, QObject):
         decimal_point = base_unit_name_to_decimal_point(self.config.get_base_unit())
         max_digits_before_dp = (
             len(str(TOTAL_COIN_SUPPLY_LIMIT_IN_BTC))
-            + (base_unit_name_to_decimal_point("GRS") - decimal_point))
+            + (base_unit_name_to_decimal_point("CAT") - decimal_point))
         exp = '[0-9]{0,%d}' % max_digits_before_dp
         if decimal_point > 0:
             exp += '\\.'

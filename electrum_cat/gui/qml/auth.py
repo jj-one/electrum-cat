@@ -2,7 +2,7 @@ from functools import wraps, partial
 
 from PyQt6.QtCore import pyqtSignal, pyqtSlot
 
-from electrum_grs.logging import get_logger
+from electrum_cat.logging import get_logger
 
 
 def auth_protect(func=None, reject=None, method='pin', message=''):

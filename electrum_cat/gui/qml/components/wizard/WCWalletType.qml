@@ -45,7 +45,7 @@ WizardComponent {
             Layout.fillWidth: true
             ButtonGroup.group: wallettypegroup
             property string wallettype: 'imported'
-            text: qsTr('Import Groestlcoin addresses or private keys')
+            text: qsTr('Import Catcoin addresses or private keys')
         }
     }
 }

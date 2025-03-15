@@ -4,12 +4,12 @@ from typing import Optional, TYPE_CHECKING
 
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject, pyqtEnum
 
-from electrum_grs.i18n import _
-from electrum_grs.gui import messages
-from electrum_grs.logging import get_logger
-from electrum_grs.lnutil import LOCAL, REMOTE
-from electrum_grs.lnchannel import ChanCloseOption, ChannelState, AbstractChannel, Channel, ChannelBackup
-from electrum_grs.util import format_short_id
+from electrum_cat.i18n import _
+from electrum_cat.gui import messages
+from electrum_cat.logging import get_logger
+from electrum_cat.lnutil import LOCAL, REMOTE
+from electrum_cat.lnchannel import ChanCloseOption, ChannelState, AbstractChannel, Channel, ChannelBackup
+from electrum_cat.util import format_short_id
 
 from .auth import AuthMixin, auth_protect
 from .qewallet import QEWallet
@@ -17,7 +17,7 @@ from .qetypes import QEAmount
 from .util import QtEventListener, event_listener
 
 if TYPE_CHECKING:
-    from electrum_grs.wallet import Abstract_Wallet
+    from electrum_cat.wallet import Abstract_Wallet
 
 
 class QEChannelDetails(AuthMixin, QObject, QtEventListener):

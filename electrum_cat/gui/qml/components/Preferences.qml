@@ -15,7 +15,7 @@ Pane {
 
     padding: 0
 
-    property var _baseunits: ['GRS','mGRS','groestls','gro']
+    property var _baseunits: ['CAT','mCAT','μCAT','catoshi']
 
     ColumnLayout {
         anchors.fill: parent
@@ -89,7 +89,7 @@ Pane {
                         }
                         Label {
                             Layout.fillWidth: true
-                            text: qsTr('Add thousands separators to groestlcoin amounts')
+                            text: qsTr('Add thousands separators to catcoin amounts')
                             wrapMode: Text.Wrap
                         }
                     }

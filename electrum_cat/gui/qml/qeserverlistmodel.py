@@ -1,10 +1,10 @@
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot
 from PyQt6.QtCore import Qt, QAbstractListModel, QModelIndex
 
-from electrum_grs.logging import get_logger
-from electrum_grs.util import Satoshis
-from electrum_grs.interface import ServerAddr, PREFERRED_NETWORK_PROTOCOL
-from electrum_grs import blockchain
+from electrum_cat.logging import get_logger
+from electrum_cat.util import Satoshis
+from electrum_cat.interface import ServerAddr, PREFERRED_NETWORK_PROTOCOL
+from electrum_cat import blockchain
 
 from .util import QtEventListener, qt_event_listener
 

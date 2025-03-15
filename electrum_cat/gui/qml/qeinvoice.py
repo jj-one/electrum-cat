@@ -5,16 +5,16 @@ from urllib.parse import urlparse
 
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject, pyqtEnum, QTimer
 
-from electrum_grs.i18n import _
-from electrum_grs.logging import get_logger
-from electrum_grs.invoices import (Invoice, PR_UNPAID, PR_EXPIRED, PR_UNKNOWN, PR_PAID, PR_INFLIGHT,
+from electrum_cat.i18n import _
+from electrum_cat.logging import get_logger
+from electrum_cat.invoices import (Invoice, PR_UNPAID, PR_EXPIRED, PR_UNKNOWN, PR_PAID, PR_INFLIGHT,
                                PR_FAILED, PR_ROUTING, PR_UNCONFIRMED, PR_BROADCASTING, PR_BROADCAST, LN_EXPIRY_NEVER)
-from electrum_grs.transaction import PartialTxOutput, TxOutput
-from electrum_grs.util import NotEnoughFunds, NoDynamicFeeEstimates
-from electrum_grs.lnutil import format_short_channel_id
-from electrum_grs.bitcoin import COIN, address_to_script
-from electrum_grs.paymentrequest import PaymentRequest
-from electrum_grs.payment_identifier import (PaymentIdentifier, PaymentIdentifierState, PaymentIdentifierType)
+from electrum_cat.transaction import PartialTxOutput, TxOutput
+from electrum_cat.util import NotEnoughFunds, NoDynamicFeeEstimates
+from electrum_cat.lnutil import format_short_channel_id
+from electrum_cat.bitcoin import COIN, address_to_script
+from electrum_cat.paymentrequest import PaymentRequest
+from electrum_cat.payment_identifier import (PaymentIdentifier, PaymentIdentifierState, PaymentIdentifierType)
 
 from .qetypes import QEAmount
 from .qewallet import QEWallet

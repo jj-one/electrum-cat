@@ -3,10 +3,10 @@ import os
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject, Qt
 from PyQt6.QtGui import QGuiApplication
 
-from electrum_grs.util import send_exception_to_crash_reporter, UserFacingException
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs.logging import get_logger
-from electrum_grs.i18n import _
+from electrum_cat.util import send_exception_to_crash_reporter, UserFacingException
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat.logging import get_logger
+from electrum_cat.i18n import _
 
 
 if 'ANDROID_DATA' in os.environ:

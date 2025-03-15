@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING
 
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject
 
-from electrum_grs.logging import get_logger
-from electrum_grs import mnemonic
-from electrum_grs.wizard import NewWalletWizard, ServerConnectWizard
-from electrum_grs.storage import WalletStorage, StorageReadWriteError
-from electrum_grs.util import WalletFileException
+from electrum_cat.logging import get_logger
+from electrum_cat import mnemonic
+from electrum_cat.wizard import NewWalletWizard, ServerConnectWizard
+from electrum_cat.storage import WalletStorage, StorageReadWriteError
+from electrum_cat.util import WalletFileException
 
 if TYPE_CHECKING:
-    from electrum_grs.gui.qml.qedaemon import QEDaemon
-    from electrum_grs.plugin import Plugins
+    from electrum_cat.gui.qml.qedaemon import QEDaemon
+    from electrum_cat.plugin import Plugins
 
 
 class QEAbstractWizard(QObject):

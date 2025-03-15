@@ -12,14 +12,14 @@ from PyQt6.QtCore import (pyqtSlot, pyqtSignal, pyqtProperty, QObject, QT_VERSIO
 from PyQt6.QtGui import QGuiApplication, QFontDatabase
 from PyQt6.QtQml import qmlRegisterType, QQmlApplicationEngine
 
-import electrum_grs
-from electrum_grs import version, constants
-from electrum_grs.i18n import _
-from electrum_grs.logging import Logger, get_logger
-from electrum_grs.bip21 import BITCOIN_BIP21_URI_SCHEME, LIGHTNING_URI_SCHEME
-from electrum_grs.base_crash_reporter import BaseCrashReporter, EarlyExceptionsQueue
-from electrum_grs.network import Network
-from electrum_grs.plugin import run_hook
+import electrum_cat
+from electrum_cat import version, constants
+from electrum_cat.i18n import _
+from electrum_cat.logging import Logger, get_logger
+from electrum_cat.bip21 import BITCOIN_BIP21_URI_SCHEME, LIGHTNING_URI_SCHEME
+from electrum_cat.base_crash_reporter import BaseCrashReporter, EarlyExceptionsQueue
+from electrum_cat.network import Network
+from electrum_cat.plugin import run_hook
 
 from .qeconfig import QEConfig
 from .qedaemon import QEDaemon
@@ -44,10 +44,10 @@ from .qemodelfilter import QEFilterProxyModel
 from .qebip39recovery import QEBip39RecoveryListModel
 
 if TYPE_CHECKING:
-    from electrum_grs.simple_config import SimpleConfig
-    from electrum_grs.wallet import Abstract_Wallet
-    from electrum_grs.daemon import Daemon
-    from electrum_grs.plugin import Plugins
+    from electrum_cat.simple_config import SimpleConfig
+    from electrum_cat.wallet import Abstract_Wallet
+    from electrum_cat.daemon import Daemon
+    from electrum_cat.plugin import Plugins
 
 if 'ANDROID_DATA' in os.environ:
     from jnius import autoclass, cast
@@ -157,7 +157,7 @@ class QEAppController(BaseCrashReporter, QObject):
             icon = os.path.join(
                 os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "icons", "electrum.png",
             )
-            notification.notify('Electrum-GRS', message, app_icon=icon, app_name='Electrum-GRS')
+            notification.notify('Electrum-CAT', message, app_icon=icon, app_name='Electrum-CAT')
         except ImportError:
             self.logger.warning('Notification: needs plyer; `sudo python3 -m pip install plyer`')
         except Exception as e:
@@ -426,8 +426,8 @@ class ElectrumQmlApplication(QGuiApplication):
 
         # add a monospace font as we can't rely on device having one
         self.fixedFont = 'PT Mono'
-        not_loaded = QFontDatabase.addApplicationFont('electrum_grs/gui/qml/fonts/PTMono-Regular.ttf') < 0
-        not_loaded = QFontDatabase.addApplicationFont('electrum_grs/gui/qml/fonts/PTMono-Bold.ttf') < 0 and not_loaded
+        not_loaded = QFontDatabase.addApplicationFont('electrum_cat/gui/qml/fonts/PTMono-Regular.ttf') < 0
+        not_loaded = QFontDatabase.addApplicationFont('electrum_cat/gui/qml/fonts/PTMono-Bold.ttf') < 0 and not_loaded
         if not_loaded:
             self.logger.warning('Could not load font PT Mono')
             self.fixedFont = 'Monospace' # hope for the best
@@ -453,10 +453,10 @@ class ElectrumQmlApplication(QGuiApplication):
             'pyqt_version': PYQT_VERSION_STR
         })
         self.context.setContextProperty('UI_UNIT_NAME', {
-            "FEERATE_SAT_PER_VBYTE": electrum_grs.util.UI_UNIT_NAME_FEERATE_SAT_PER_VBYTE,
-            "FEERATE_SAT_PER_VB":    electrum_grs.util.UI_UNIT_NAME_FEERATE_SAT_PER_VB,
-            "TXSIZE_VBYTES":         electrum_grs.util.UI_UNIT_NAME_TXSIZE_VBYTES,
-            "MEMPOOL_MB":            electrum_grs.util.UI_UNIT_NAME_MEMPOOL_MB,
+            "FEERATE_SAT_PER_VBYTE": electrum_cat.util.UI_UNIT_NAME_FEERATE_SAT_PER_VBYTE,
+            "FEERATE_SAT_PER_VB":    electrum_cat.util.UI_UNIT_NAME_FEERATE_SAT_PER_VB,
+            "TXSIZE_VBYTES":         electrum_cat.util.UI_UNIT_NAME_TXSIZE_VBYTES,
+            "MEMPOOL_MB":            electrum_cat.util.UI_UNIT_NAME_MEMPOOL_MB,
         })
 
         self.plugins.load_internal_plugin('trustedcoin')

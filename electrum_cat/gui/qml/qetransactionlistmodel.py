@@ -4,15 +4,15 @@ from typing import TYPE_CHECKING, Dict, Any
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot
 from PyQt6.QtCore import Qt, QAbstractListModel, QModelIndex
 
-from electrum_grs.logging import get_logger
-from electrum_grs.util import Satoshis, TxMinedInfo
-from electrum_grs.address_synchronizer import TX_HEIGHT_FUTURE, TX_HEIGHT_LOCAL
+from electrum_cat.logging import get_logger
+from electrum_cat.util import Satoshis, TxMinedInfo
+from electrum_cat.address_synchronizer import TX_HEIGHT_FUTURE, TX_HEIGHT_LOCAL
 
 from .qetypes import QEAmount
 from .util import QtEventListener, qt_event_listener
 
 if TYPE_CHECKING:
-    from electrum_grs.wallet import Abstract_Wallet
+    from electrum_cat.wallet import Abstract_Wallet
 
 
 class QETransactionListModel(QAbstractListModel, QtEventListener):

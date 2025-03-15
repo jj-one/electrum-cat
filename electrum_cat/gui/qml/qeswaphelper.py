@@ -7,14 +7,14 @@ from typing import Union, Optional
 from PyQt6.QtCore import (pyqtProperty, pyqtSignal, pyqtSlot, QObject, QTimer, pyqtEnum, QAbstractListModel, Qt,
                           QModelIndex)
 
-from electrum_grs.i18n import _
-from electrum_grs.bitcoin import DummyAddress
-from electrum_grs.logging import get_logger
-from electrum_grs.transaction import PartialTxOutput, PartialTransaction
-from electrum_grs.util import NotEnoughFunds, NoDynamicFeeEstimates, profiler, get_asyncio_loop, age
-from electrum_grs.submarine_swaps import NostrTransport, SwapServerTransport
+from electrum_cat.i18n import _
+from electrum_cat.bitcoin import DummyAddress
+from electrum_cat.logging import get_logger
+from electrum_cat.transaction import PartialTxOutput, PartialTransaction
+from electrum_cat.util import NotEnoughFunds, NoDynamicFeeEstimates, profiler, get_asyncio_loop, age
+from electrum_cat.submarine_swaps import NostrTransport, SwapServerTransport
 
-from electrum_grs.gui import messages
+from electrum_cat.gui import messages
 
 from .auth import AuthMixin, auth_protect
 from .qetypes import QEAmount

@@ -9,9 +9,9 @@ from typing import Callable, Optional, NamedTuple, Tuple
 
 from PyQt6.QtCore import pyqtSignal, QThread
 
-from electrum_grs.i18n import _
-from electrum_grs.logging import Logger
-from electrum_grs.util import EventListener, event_listener
+from electrum_cat.i18n import _
+from electrum_cat.logging import Logger
+from electrum_cat.util import EventListener, event_listener
 
 
 class QtEventListener(EventListener):

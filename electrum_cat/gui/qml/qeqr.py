@@ -16,11 +16,11 @@ except ImportError:
     # Note: missing QtMultimedia will lead to errors when using QR scanner on desktop
     from PyQt6.QtCore import QObject as QVideoSink
 
-from electrum_grs.logging import get_logger
-from electrum_grs.qrreader import get_qr_reader
-from electrum_grs.i18n import _
-from electrum_grs.util import profiler, get_asyncio_loop
-from electrum_grs.gui.common_qt.util import draw_qr
+from electrum_cat.logging import get_logger
+from electrum_cat.qrreader import get_qr_reader
+from electrum_cat.i18n import _
+from electrum_cat.util import profiler, get_asyncio_loop
+from electrum_cat.gui.common_qt.util import draw_qr
 
 
 class QEQRParser(QObject):
@@ -144,7 +144,7 @@ class QEQRImageProvider(QQuickImageProvider):
         # (unknown schemes might be found when a colon is in a serialized TX, which
         # leads to mangling of the tx, so we check for supported schemes.)
         uri = urllib.parse.urlparse(qstr)
-        if uri.scheme and uri.scheme in ['groestlcoin', 'lightning']:
+        if uri.scheme and uri.scheme in ['catcoin', 'lightning']:
             # urlencode request parameters
             query = urllib.parse.parse_qs(uri.query)
             query = urllib.parse.urlencode(query, doseq=True, quote_via=urllib.parse.quote)

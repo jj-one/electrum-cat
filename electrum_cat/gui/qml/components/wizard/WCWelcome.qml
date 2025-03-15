@@ -6,7 +6,7 @@ import "../controls"
 
 WizardComponent {
     valid: true
-    wizard_title: qsTr('Electrum Groestlcoin Wallet')
+    wizard_title: qsTr('Electrum Catcoin Wallet')
 
     function apply() {
         wizard_data['use_defaults'] = !config_advanced.checked

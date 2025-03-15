@@ -1,7 +1,7 @@
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject
 
-from electrum_grs.logging import get_logger
-from electrum_grs.util import UserFacingException
+from electrum_cat.logging import get_logger
+from electrum_cat.util import UserFacingException
 
 from .auth import auth_protect, AuthMixin
 from .qetransactionlistmodel import QETransactionListModel

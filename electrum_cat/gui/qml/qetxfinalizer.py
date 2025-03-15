@@ -6,21 +6,21 @@ from functools import partial
 
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject
 
-from electrum_grs.logging import get_logger
-from electrum_grs.i18n import _
-from electrum_grs.bitcoin import DummyAddress
-from electrum_grs.transaction import PartialTxOutput, PartialTransaction, Transaction, TxOutpoint
-from electrum_grs.util import NotEnoughFunds, profiler, quantize_feerate, UserFacingException
-from electrum_grs.wallet import CannotBumpFee, CannotDoubleSpendTx, CannotCPFP, BumpFeeStrategy, sweep_preparations
-from electrum_grs import keystore
-from electrum_grs.plugin import run_hook
+from electrum_cat.logging import get_logger
+from electrum_cat.i18n import _
+from electrum_cat.bitcoin import DummyAddress
+from electrum_cat.transaction import PartialTxOutput, PartialTransaction, Transaction, TxOutpoint
+from electrum_cat.util import NotEnoughFunds, profiler, quantize_feerate, UserFacingException
+from electrum_cat.wallet import CannotBumpFee, CannotDoubleSpendTx, CannotCPFP, BumpFeeStrategy, sweep_preparations
+from electrum_cat import keystore
+from electrum_cat.plugin import run_hook
 
 from .qewallet import QEWallet
 from .qetypes import QEAmount
 from .util import QtEventListener, event_listener
 
 if TYPE_CHECKING:
-    from electrum_grs.simple_config import SimpleConfig
+    from electrum_cat.simple_config import SimpleConfig
 
 
 class FeeSlider(QObject):

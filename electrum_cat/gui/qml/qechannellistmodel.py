@@ -1,11 +1,11 @@
 from PyQt6.QtCore import Qt, QAbstractListModel, QModelIndex
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot
 
-from electrum_grs.lnchannel import ChannelState
-from electrum_grs.lnutil import LOCAL, REMOTE
-from electrum_grs.logging import get_logger
-from electrum_grs.util import Satoshis
-from electrum_grs.gui import messages
+from electrum_cat.lnchannel import ChannelState
+from electrum_cat.lnutil import LOCAL, REMOTE
+from electrum_cat.logging import get_logger
+from electrum_cat.util import Satoshis
+from electrum_cat.gui import messages
 
 from .qetypes import QEAmount
 from .util import QtEventListener, qt_event_listener

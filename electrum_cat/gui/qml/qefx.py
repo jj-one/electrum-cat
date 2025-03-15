@@ -3,10 +3,10 @@ from decimal import Decimal
 
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject, QRegularExpression
 
-from electrum_grs.bitcoin import COIN
-from electrum_grs.exchange_rate import FxThread
-from electrum_grs.logging import get_logger
-from electrum_grs.simple_config import SimpleConfig
+from electrum_cat.bitcoin import COIN
+from electrum_cat.exchange_rate import FxThread
+from electrum_cat.logging import get_logger
+from electrum_cat.simple_config import SimpleConfig
 
 from .qetypes import QEAmount
 from .util import QtEventListener, event_listener
