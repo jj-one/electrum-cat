@@ -9,27 +9,27 @@ from typing import Optional
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtWidgets import QVBoxLayout, QLabel, QProgressBar, QHBoxLayout, QPushButton, QDialog
 
-from electrum_grs import version
-from electrum_grs import constants
-from electrum_grs.bitcoin import verify_usermessage_with_address
-from electrum_grs.i18n import _
-from electrum_grs.util import make_aiohttp_session
-from electrum_grs.logging import Logger
-from electrum_grs.network import Network
-from electrum_grs._vendor.distutils.version import StrictVersion
+from electrum_cat import version
+from electrum_cat import constants
+from electrum_cat.bitcoin import verify_usermessage_with_address
+from electrum_cat.i18n import _
+from electrum_cat.util import make_aiohttp_session
+from electrum_cat.logging import Logger
+from electrum_cat.network import Network
+from electrum_cat._vendor.distutils.version import StrictVersion
 
 
 class UpdateCheck(QDialog, Logger):
-    url = "https://groestlcoin.org/version"
-    download_url = "https://www.groestlcoin.org/groestlcoin-electrum-wallet/"
+    url = "https://electrum-cat.org/version"
+    download_url = "https://electrum-cat.org/#download"
 
     VERSION_ANNOUNCEMENT_SIGNING_KEYS = (
-        "FWN1qdiRrymSR6jbpbanLYqZpjkEaZouHN",
+        "13xjmVAB1EATPP8RshTE8S8sNwwSUM9p1P",  # ThomasV (since 3.3.4)
     )
 
     def __init__(self, *, latest_version=None):
         QDialog.__init__(self)
-        self.setWindowTitle('Electrum-GRS - ' + _('Update Check'))
+        self.setWindowTitle('Electrum-CAT - ' + _('Update Check'))
         self.content = QVBoxLayout()
         self.content.setContentsMargins(*[10]*4)
 

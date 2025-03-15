@@ -32,20 +32,20 @@ from PyQt6.QtGui import QIcon
 
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QGridLayout, QPushButton, QToolButton, QMenu
 
-from electrum_grs.i18n import _
-from electrum_grs.util import NotEnoughFunds, NoDynamicFeeEstimates
-from electrum_grs.util import quantize_feerate
-from electrum_grs.plugin import run_hook
-from electrum_grs.transaction import Transaction, PartialTransaction
-from electrum_grs.wallet import InternalAddressCorruption
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs.bitcoin import DummyAddress
+from electrum_cat.i18n import _
+from electrum_cat.util import NotEnoughFunds, NoDynamicFeeEstimates
+from electrum_cat.util import quantize_feerate
+from electrum_cat.plugin import run_hook
+from electrum_cat.transaction import Transaction, PartialTransaction
+from electrum_cat.wallet import InternalAddressCorruption
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat.bitcoin import DummyAddress
 
 from .util import (WindowModalDialog, ColorScheme, HelpLabel, Buttons, CancelButton,
                    WWLabel, read_QIcon)
 
 if TYPE_CHECKING:
-    from electrum_grs.simple_config import ConfigVarWithConfig
+    from electrum_cat.simple_config import ConfigVarWithConfig
     from .main_window import ElectrumWindow
 
 from .transaction_dialog import TxSizeLabel, TxFiatLabel, TxInOutWidget
@@ -686,7 +686,7 @@ class ConfirmTxDialog(TxEditor):
         grid.addWidget(HelpLabel(_("Amount to be sent") + ": ", msg), 0, 0)
         grid.addWidget(self.amount_label, 0, 1)
 
-        msg = _('Groestlcoin transactions are in general not free. A transaction fee is paid by the sender of the funds.') + '\n\n'\
+        msg = _('Catcoin transactions are in general not free. A transaction fee is paid by the sender of the funds.') + '\n\n'\
               + _('The amount of fee can be decided freely by the sender. However, transactions with low fees take more time to be processed.') + '\n\n'\
               + _('A suggested fee is automatically added to this field. You may override it. The suggested fee increases with the size of the transaction.')
 

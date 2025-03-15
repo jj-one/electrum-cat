@@ -7,9 +7,9 @@ import PyQt6.QtGui as QtGui
 from PyQt6.QtCore import QRect
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout, QPushButton, QWidget
 
-from electrum_grs.i18n import _
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs.gui.common_qt.util import draw_qr
+from electrum_cat.i18n import _
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat.gui.common_qt.util import draw_qr
 
 from .util import WindowModalDialog, WWLabel, getSaveFileName
 

@@ -9,8 +9,8 @@ import traceback
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 
-from electrum_grs import util
-from electrum_grs.i18n import _
+from electrum_cat import util
+from electrum_cat.i18n import _
 
 from .util import MONOSPACE_FONT, font_height
 

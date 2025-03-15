@@ -30,10 +30,10 @@ from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from PyQt6.QtCore import Qt, QPersistentModelIndex, QModelIndex
 from PyQt6.QtWidgets import (QAbstractItemView, QMenu)
 
-from electrum_grs.i18n import _
-from electrum_grs.bitcoin import is_address
-from electrum_grs.util import block_explorer_URL
-from electrum_grs.plugin import run_hook
+from electrum_cat.i18n import _
+from electrum_cat.bitcoin import is_address
+from electrum_cat.util import block_explorer_URL
+from electrum_cat.plugin import run_hook
 
 from .util import webopen
 from .my_treeview import MyTreeView

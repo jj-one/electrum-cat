@@ -31,8 +31,8 @@ from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtGui import QFontMetrics, QFont
 from PyQt6.QtWidgets import QTextEdit, QWidget, QLineEdit, QStackedLayout
 
-from electrum_grs.payment_identifier import PaymentIdentifier
-from electrum_grs.logging import Logger
+from electrum_cat.payment_identifier import PaymentIdentifier
+from electrum_cat.logging import Logger
 
 from . import util
 from .util import MONOSPACE_FONT, GenericInputHandler, editor_contextMenuEvent, ColorScheme

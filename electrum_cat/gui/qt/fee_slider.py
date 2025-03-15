@@ -4,7 +4,7 @@ from PyQt6.QtGui import QCursor
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QSlider, QToolTip, QComboBox
 
-from electrum_grs.i18n import _
+from electrum_cat.i18n import _
 
 
 class FeeComboBox(QComboBox):

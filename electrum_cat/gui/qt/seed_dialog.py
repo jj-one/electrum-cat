@@ -31,10 +31,10 @@ from PyQt6.QtWidgets import (QVBoxLayout, QCheckBox, QHBoxLayout, QLineEdit,
                              QLabel, QCompleter, QDialog, QStyledItemDelegate,
                              QWidget, QPushButton)
 
-from electrum_grs.i18n import _
-from electrum_grs.mnemonic import Mnemonic, calc_seed_type, is_any_2fa_seed_type
-from electrum_grs import old_mnemonic
-from electrum_grs import slip39
+from electrum_cat.i18n import _
+from electrum_cat.mnemonic import Mnemonic, calc_seed_type, is_any_2fa_seed_type
+from electrum_cat import old_mnemonic
+from electrum_cat import slip39
 
 from .util import (Buttons, OkButton, WWLabel, ButtonsTextEdit, icon_path,
                    EnterButton, CloseButton, WindowModalDialog, ColorScheme, font_height, ChoiceWidget)
@@ -42,7 +42,7 @@ from .qrtextedit import ShowQRTextEdit, ScanQRTextEdit
 from .completion_text_edit import CompletionTextEdit
 
 if TYPE_CHECKING:
-    from electrum_grs.simple_config import SimpleConfig
+    from electrum_cat.simple_config import SimpleConfig
 
 
 MSG_PASSPHRASE_WARN_ISSUE4566 = _("Warning") + ": "\
@@ -286,7 +286,7 @@ class SeedWidget(QWidget):
     def on_edit(self):
         s = ' '.join(self.get_seed_words())
         if self.seed_type == 'bip39':
-            from electrum_grs.keystore import bip39_is_checksum_valid
+            from electrum_cat.keystore import bip39_is_checksum_valid
             is_checksum, is_wordlist = bip39_is_checksum_valid(s)
             label = ''
             valid = bool(s)
@@ -416,7 +416,7 @@ class KeysWidget(QWidget):
 class SeedDialog(WindowModalDialog):
 
     def __init__(self, parent, seed, passphrase, *, config: 'SimpleConfig'):
-        WindowModalDialog.__init__(self, parent, ('Electrum-GRS - ' + _('Seed')))
+        WindowModalDialog.__init__(self, parent, ('Electrum-CAT - ' + _('Seed')))
         self.setMinimumWidth(400)
         vbox = QVBoxLayout(self)
         title = _("Your wallet generation seed is:")

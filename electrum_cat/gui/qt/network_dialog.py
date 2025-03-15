@@ -32,13 +32,13 @@ from PyQt6.QtWidgets import (QTreeWidget, QTreeWidgetItem, QMenu, QGridLayout, Q
                              QTabWidget, QWidget, QLabel)
 from PyQt6.QtGui import QIntValidator
 
-from electrum_grs.i18n import _
-from electrum_grs import blockchain
-from electrum_grs.interface import ServerAddr, PREFERRED_NETWORK_PROTOCOL
-from electrum_grs.network import Network
-from electrum_grs.logging import get_logger
-from electrum_grs.util import detect_tor_socks_proxy
-from electrum_grs.simple_config import SimpleConfig
+from electrum_cat.i18n import _
+from electrum_cat import blockchain
+from electrum_cat.interface import ServerAddr, PREFERRED_NETWORK_PROTOCOL
+from electrum_cat.network import Network
+from electrum_cat.logging import get_logger
+from electrum_cat.util import detect_tor_socks_proxy
+from electrum_cat.simple_config import SimpleConfig
 
 from .util import (Buttons, CloseButton, HelpButton, read_QIcon, char_width_in_lineedit,
                    PasswordLineEdit)

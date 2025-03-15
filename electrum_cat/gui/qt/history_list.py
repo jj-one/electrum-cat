@@ -38,14 +38,14 @@ from PyQt6.QtCore import (Qt, QPersistentModelIndex, QModelIndex,
 from PyQt6.QtWidgets import (QMenu, QHeaderView, QLabel, QPushButton, QComboBox, QVBoxLayout, QCalendarWidget,
                              QGridLayout)
 
-from electrum_grs.gui import messages
-from electrum_grs.address_synchronizer import TX_HEIGHT_LOCAL
-from electrum_grs.i18n import _
-from electrum_grs.util import (block_explorer_URL, profiler, TxMinedInfo,
+from electrum_cat.gui import messages
+from electrum_cat.address_synchronizer import TX_HEIGHT_LOCAL
+from electrum_cat.i18n import _
+from electrum_cat.util import (block_explorer_URL, profiler, TxMinedInfo,
                            OrderedDictWithIndex, timestamp_to_datetime,
                            Satoshis, format_time)
-from electrum_grs.logging import get_logger, Logger
-from electrum_grs.simple_config import SimpleConfig
+from electrum_cat.logging import get_logger, Logger
+from electrum_cat.simple_config import SimpleConfig
 
 from .custom_model import CustomNode, CustomModel
 from .util import (read_QIcon, MONOSPACE_FONT, Buttons, CancelButton, OkButton,
@@ -54,7 +54,7 @@ from .util import (read_QIcon, MONOSPACE_FONT, Buttons, CancelButton, OkButton,
 from .my_treeview import MyTreeView
 
 if TYPE_CHECKING:
-    from electrum_grs.wallet import Abstract_Wallet
+    from electrum_cat.wallet import Abstract_Wallet
     from .main_window import ElectrumWindow
 
 
@@ -629,13 +629,13 @@ class HistoryList(MyTreeView, AcceptFileDragDrop):
         grid.addWidget(QLabel(self.format_date(start_date)), 1, 1)
         grid.addWidget(QLabel(self.format_date(end_date)), 1, 2)
         #
-        grid.addWidget(QLabel(_("GRS balance")), 2, 0)
-        grid.addWidget(QLabel(format_amount(start['GRS_balance'])), 2, 1)
-        grid.addWidget(QLabel(format_amount(end['GRS_balance'])), 2, 2)
+        grid.addWidget(QLabel(_("CAT balance")), 2, 0)
+        grid.addWidget(QLabel(format_amount(start['CAT_balance'])), 2, 1)
+        grid.addWidget(QLabel(format_amount(end['CAT_balance'])), 2, 2)
         #
-        grid.addWidget(QLabel(_("GRS Fiat price")), 3, 0)
-        grid.addWidget(QLabel(format_fiat(start.get('GRS_fiat_price'))), 3, 1)
-        grid.addWidget(QLabel(format_fiat(end.get('GRS_fiat_price'))), 3, 2)
+        grid.addWidget(QLabel(_("CAT Fiat price")), 3, 0)
+        grid.addWidget(QLabel(format_fiat(start.get('CAT_fiat_price'))), 3, 1)
+        grid.addWidget(QLabel(format_fiat(end.get('CAT_fiat_price'))), 3, 2)
         #
         grid.addWidget(QLabel(_("Fiat balance")), 4, 0)
         grid.addWidget(QLabel(format_fiat(start.get('fiat_balance'))), 4, 1)
@@ -650,12 +650,12 @@ class HistoryList(MyTreeView, AcceptFileDragDrop):
         grid.addWidget(QLabel(format_fiat(end.get('unrealized_gains', ''))), 6, 2)
         #
         grid2 = QGridLayout()
-        grid2.addWidget(QLabel(_("GRS incoming")), 0, 0)
-        grid2.addWidget(QLabel(format_amount(flow['GRS_incoming'])), 0, 1)
+        grid2.addWidget(QLabel(_("CAT incoming")), 0, 0)
+        grid2.addWidget(QLabel(format_amount(flow['CAT_incoming'])), 0, 1)
         grid2.addWidget(QLabel(_("Fiat incoming")), 1, 0)
         grid2.addWidget(QLabel(format_fiat(flow.get('fiat_incoming'))), 1, 1)
-        grid2.addWidget(QLabel(_("GRS outgoing")), 2, 0)
-        grid2.addWidget(QLabel(format_amount(flow['GRS_outgoing'])), 2, 1)
+        grid2.addWidget(QLabel(_("CAT outgoing")), 2, 0)
+        grid2.addWidget(QLabel(format_amount(flow['CAT_outgoing'])), 2, 1)
         grid2.addWidget(QLabel(_("Fiat outgoing")), 3, 0)
         grid2.addWidget(QLabel(format_fiat(flow.get('fiat_outgoing'))), 3, 1)
         #
@@ -670,7 +670,7 @@ class HistoryList(MyTreeView, AcceptFileDragDrop):
 
     def plot_history_dialog(self):
         try:
-            from electrum_grs.plot import plot_history, NothingToPlotException
+            from electrum_cat.plot import plot_history, NothingToPlotException
         except Exception as e:
             _logger.error(f"could not import electrum.plot. This feature needs matplotlib to be installed. exc={e!r}")
             self.main_window.show_message(
@@ -820,7 +820,7 @@ class HistoryList(MyTreeView, AcceptFileDragDrop):
         d = WindowModalDialog(self, _('Export History'))
         d.setMinimumSize(400, 200)
         vbox = QVBoxLayout(d)
-        defaultname = f'electrum-grs-history-{self.wallet.basename()}.csv'
+        defaultname = f'electrum-cat-history-{self.wallet.basename()}.csv'
         select_msg = _('Select file to export your wallet transactions to')
         hbox, filename_e, csv_button = filename_field(self, self.config, defaultname, select_msg)
         vbox.addLayout(hbox)
@@ -837,7 +837,7 @@ class HistoryList(MyTreeView, AcceptFileDragDrop):
         try:
             self.do_export_history(filename, csv_button.isChecked())
         except (IOError, os.error) as reason:
-            export_error_label = _("Electrum-GRS was unable to produce a transaction export.")
+            export_error_label = _("Electrum-CAT was unable to produce a transaction export.")
             self.main_window.show_critical(export_error_label + "\n" + str(reason), title=_("Unable to export history"))
             return
         self.main_window.show_message(_("Your wallet history has been successfully exported."))
@@ -871,7 +871,7 @@ class HistoryList(MyTreeView, AcceptFileDragDrop):
                 for line in lines:
                     transaction.writerow(line)
             else:
-                from electrum_grs.util import json_encode
+                from electrum_cat.util import json_encode
                 f.write(json_encode(txns))
 
     def get_text_from_coordinate(self, row, col):

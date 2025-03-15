@@ -1,9 +1,9 @@
 from functools import partial
 from typing import Callable
 
-from electrum_grs.i18n import _
-from electrum_grs.plugin import run_hook
-from electrum_grs.simple_config import SimpleConfig
+from electrum_cat.i18n import _
+from electrum_cat.plugin import run_hook
+from electrum_cat.simple_config import SimpleConfig
 
 from .util import ButtonsTextEdit, MessageBoxMixin, ColorScheme, read_QIcon
 from .util import get_iconname_camera, get_iconname_qrcode

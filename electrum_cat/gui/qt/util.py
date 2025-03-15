@@ -19,20 +19,20 @@ from PyQt6.QtWidgets import (QPushButton, QLabel, QMessageBox, QHBoxLayout, QVBo
                              QGraphicsEffect, QGraphicsScene, QGraphicsPixmapItem, QLayoutItem, QLayout, QMenu,
                              QFrame)
 
-from electrum_grs.i18n import _
-from electrum_grs.util import (FileImportFailed, FileExportFailed, resource_path, EventListener, event_listener,
+from electrum_cat.i18n import _
+from electrum_cat.util import (FileImportFailed, FileExportFailed, resource_path, EventListener, event_listener,
                            get_logger, UserCancelled, UserFacingException)
-from electrum_grs.invoices import (PR_UNPAID, PR_PAID, PR_EXPIRED, PR_INFLIGHT, PR_UNKNOWN, PR_FAILED, PR_ROUTING,
+from electrum_cat.invoices import (PR_UNPAID, PR_PAID, PR_EXPIRED, PR_INFLIGHT, PR_UNKNOWN, PR_FAILED, PR_ROUTING,
                                PR_UNCONFIRMED, PR_BROADCASTING, PR_BROADCAST)
-from electrum_grs.logging import Logger
-from electrum_grs.qrreader import MissingQrDetectionLib, QrCodeResult
+from electrum_cat.logging import Logger
+from electrum_cat.qrreader import MissingQrDetectionLib, QrCodeResult
 
 if TYPE_CHECKING:
     from .main_window import ElectrumWindow
     from .paytoedit import PayToEdit
 
-    from electrum_grs.simple_config import SimpleConfig
-    from electrum_grs.simple_config import ConfigVarWithConfig
+    from electrum_cat.simple_config import SimpleConfig
+    from electrum_cat.simple_config import ConfigVarWithConfig
 
 
 if platform.system() == 'Windows':

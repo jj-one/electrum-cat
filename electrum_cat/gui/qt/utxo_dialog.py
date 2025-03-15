@@ -30,13 +30,13 @@ from PyQt6.QtCore import Qt, QUrl
 from PyQt6.QtGui import QTextCharFormat, QFont
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel
 
-from electrum_grs.i18n import _
+from electrum_cat.i18n import _
 
 from .util import WindowModalDialog, ColorScheme, Buttons, CloseButton, MONOSPACE_FONT, WWLabel
 from .transaction_dialog import TxOutputColoring, QTextBrowserWithDefaultSize
 
 if TYPE_CHECKING:
-    from electrum_grs.transaction import PartialTxInput
+    from electrum_cat.transaction import PartialTxInput
     from .main_window import ElectrumWindow
 
 

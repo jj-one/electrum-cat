@@ -9,9 +9,9 @@ from PyQt6.QtWidgets import (QLineEdit, QStyle, QStyleOptionFrame, QSizePolicy)
 
 from .util import char_width_in_lineedit, ColorScheme
 
-from electrum_grs.util import (format_satoshis_plain, decimal_point_to_base_unit_name,
+from electrum_cat.util import (format_satoshis_plain, decimal_point_to_base_unit_name,
                            FEERATE_PRECISION, quantize_feerate, DECIMAL_POINT, UI_UNIT_NAME_FEERATE_SAT_PER_VBYTE)
-from electrum_grs.bitcoin import COIN, TOTAL_COIN_SUPPLY_LIMIT_IN_BTC
+from electrum_cat.bitcoin import COIN, TOTAL_COIN_SUPPLY_LIMIT_IN_BTC
 
 _NOT_GIVEN = object()  # sentinel value
 

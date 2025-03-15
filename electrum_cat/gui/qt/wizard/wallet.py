@@ -10,38 +10,38 @@ from PyQt6.QtGui import QPen, QPainter, QPalette, QPixmap
 from PyQt6.QtWidgets import (QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QWidget,
                              QFileDialog, QSlider, QGridLayout, QDialog, QApplication)
 
-from electrum_grs.bip32 import is_bip32_derivation, BIP32Node, normalize_bip32_derivation, xpub_type
-from electrum_grs.daemon import Daemon
-from electrum_grs.i18n import _
-from electrum_grs.keystore import bip44_derivation, bip39_to_seed, purpose48_derivation, ScriptTypeNotSupported
-from electrum_grs.plugin import run_hook, HardwarePluginLibraryUnavailable
-from electrum_grs.storage import StorageReadWriteError
-from electrum_grs.util import WalletFileException, get_new_wallet_name, UserFacingException, InvalidPassword
-from electrum_grs.util import is_subpath
-from electrum_grs.wallet import wallet_types
+from electrum_cat.bip32 import is_bip32_derivation, BIP32Node, normalize_bip32_derivation, xpub_type
+from electrum_cat.daemon import Daemon
+from electrum_cat.i18n import _
+from electrum_cat.keystore import bip44_derivation, bip39_to_seed, purpose48_derivation, ScriptTypeNotSupported
+from electrum_cat.plugin import run_hook, HardwarePluginLibraryUnavailable
+from electrum_cat.storage import StorageReadWriteError
+from electrum_cat.util import WalletFileException, get_new_wallet_name, UserFacingException, InvalidPassword
+from electrum_cat.util import is_subpath
+from electrum_cat.wallet import wallet_types
 from .wizard import QEAbstractWizard, WizardComponent
-from electrum_grs.logging import get_logger, Logger
-from electrum_grs import WalletStorage, mnemonic, keystore
-from electrum_grs.wallet_db import WalletDB
-from electrum_grs.wizard import NewWalletWizard
+from electrum_cat.logging import get_logger, Logger
+from electrum_cat import WalletStorage, mnemonic, keystore
+from electrum_cat.wallet_db import WalletDB
+from electrum_cat.wizard import NewWalletWizard
 
-from electrum_grs.gui.qt.bip39_recovery_dialog import Bip39RecoveryDialog
-from electrum_grs.gui.qt.password_dialog import PasswordLayout, PW_NEW, MSG_ENTER_PASSWORD, PasswordLayoutForHW
-from electrum_grs.gui.qt.seed_dialog import SeedWidget, MSG_PASSPHRASE_WARN_ISSUE4566, KeysWidget
-from electrum_grs.gui.qt.util import (PasswordLineEdit, char_width_in_lineedit, WWLabel, InfoButton, font_height,
+from electrum_cat.gui.qt.bip39_recovery_dialog import Bip39RecoveryDialog
+from electrum_cat.gui.qt.password_dialog import PasswordLayout, PW_NEW, MSG_ENTER_PASSWORD, PasswordLayoutForHW
+from electrum_cat.gui.qt.seed_dialog import SeedWidget, MSG_PASSPHRASE_WARN_ISSUE4566, KeysWidget
+from electrum_cat.gui.qt.util import (PasswordLineEdit, char_width_in_lineedit, WWLabel, InfoButton, font_height,
                                   ChoiceWidget, MessageBoxMixin, icon_path, IconLabel, read_QIcon)
 
 if TYPE_CHECKING:
-    from electrum_grs.simple_config import SimpleConfig
-    from electrum_grs.plugin import Plugins
-    from electrum_grs.daemon import Daemon
-    from electrum_grs.gui.qt import QElectrumApplication
+    from electrum_cat.simple_config import SimpleConfig
+    from electrum_cat.plugin import Plugins
+    from electrum_cat.daemon import Daemon
+    from electrum_cat.gui.qt import QElectrumApplication
 
 WIF_HELP_TEXT = (_('WIF keys are typed in Electrum, based on script type.') + '\n\n' +
                  _('A few examples') + ':\n' +
-                 'p2pkh:KxZcY47uGp9a...       \t-> FhnUDbQmu...\n' +
-                 'p2wpkh-p2sh:KxZcY47uGp9a... \t-> 3NhNeZQXF...\n' +
-                 'p2wpkh:KxZcY47uGp9a...      \t-> grs1q3fjf...')
+                 'p2pkh:KxZcY47uGp9a...       \t-> 9iLjfSuCo...\n' +
+                 'p2wpkh-p2sh:KxZcY47uGp9a... \t-> cYDMSjvdh...\n' +
+                 'p2wpkh:KxZcY47uGp9a...      \t-> cat1qdq9u...')
 
 MSG_HW_STORAGE_ENCRYPTION = _("Set wallet file encryption.") + '\n'\
                           + _("Your wallet file does not contain secrets, mostly just metadata. ") \
@@ -402,7 +402,7 @@ class WCWalletType(WalletWizardComponent):
             ('standard',  _('Standard wallet')),
             ('2fa',       _('Wallet with two-factor authentication')),
             ('multisig',  _('Multi-signature wallet')),
-            ('imported',  _('Import Groestlcoin addresses or private keys')),
+            ('imported',  _('Import Catcoin addresses or private keys')),
         ]
         choices = [pair for pair in wallet_kinds if pair[0] in wallet_types]
 
@@ -948,9 +948,9 @@ class WCMultisig(WalletWizardComponent):
 
 class WCImport(WalletWizardComponent):
     def __init__(self, parent, wizard):
-        WalletWizardComponent.__init__(self, parent, wizard, title=_('Import Groestlcoin Addresses or Private Keys'))
+        WalletWizardComponent.__init__(self, parent, wizard, title=_('Import Catcoin Addresses or Private Keys'))
         message = _(
-            'Enter a list of Groestlcoin addresses (this will create a watching-only wallet), or a list of private keys.')
+            'Enter a list of Catcoin addresses (this will create a watching-only wallet), or a list of private keys.')
         header_layout = QHBoxLayout()
         label = WWLabel(message)
         label.setMinimumWidth(400)

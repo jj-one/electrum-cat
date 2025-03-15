@@ -9,9 +9,9 @@ from PyQt6.QtWidgets import QLabel, QGridLayout, QHBoxLayout, QComboBox
 
 from .util import ColorScheme
 
-from electrum_grs.i18n import _
-from electrum_grs.transaction import PartialTransaction
-from electrum_grs.wallet import CannotRBFTx, BumpFeeStrategy
+from electrum_cat.i18n import _
+from electrum_cat.transaction import PartialTransaction
+from electrum_cat.wallet import CannotRBFTx, BumpFeeStrategy
 
 if TYPE_CHECKING:
     from .main_window import ElectrumWindow
@@ -35,7 +35,7 @@ class _BaseRBFDialog(TxEditor):
 
         self.old_fee = self.old_tx.get_fee()
         self.old_tx_size = tx.estimated_size()
-        self.old_fee_rate = old_fee_rate = self.old_fee / self.old_tx_size  # gro/vbyte
+        self.old_fee_rate = old_fee_rate = self.old_fee / self.old_tx_size  # catoshi/vbyte
 
         output_value = sum([txo.value for txo in tx.outputs() if not txo.is_mine])
         if output_value == 0:

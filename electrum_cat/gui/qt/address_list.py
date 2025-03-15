@@ -31,12 +31,12 @@ from PyQt6.QtCore import Qt, QPersistentModelIndex, QModelIndex
 from PyQt6.QtGui import QStandardItemModel, QStandardItem, QFont
 from PyQt6.QtWidgets import QAbstractItemView, QComboBox, QMenu
 
-from electrum_grs.i18n import _
-from electrum_grs.util import block_explorer_URL, profiler
-from electrum_grs.plugin import run_hook
-from electrum_grs.bitcoin import is_address
-from electrum_grs.wallet import InternalAddressCorruption
-from electrum_grs.simple_config import SimpleConfig
+from electrum_cat.i18n import _
+from electrum_cat.util import block_explorer_URL, profiler
+from electrum_cat.plugin import run_hook
+from electrum_cat.bitcoin import is_address
+from electrum_cat.wallet import InternalAddressCorruption
+from electrum_cat.simple_config import SimpleConfig
 
 from .util import MONOSPACE_FONT, ColorScheme, webopen
 from .my_treeview import MyTreeView, MySortModel
@@ -276,7 +276,7 @@ class AddressList(MyTreeView):
             address_item[self.Columns.ADDRESS].setBackground(ColorScheme.RED.as_color(True))
 
     def create_menu(self, position):
-        from electrum_grs.wallet import Multisig_Wallet
+        from electrum_cat.wallet import Multisig_Wallet
         is_multisig = isinstance(self.wallet, Multisig_Wallet)
         can_delete = self.wallet.can_delete_address()
         selected = self.selected_in_column(self.Columns.ADDRESS)

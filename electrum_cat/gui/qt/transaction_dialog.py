@@ -40,16 +40,16 @@ from PyQt6.QtWidgets import (QDialog, QLabel, QPushButton, QHBoxLayout, QVBoxLay
 import qrcode
 from qrcode import exceptions
 
-from electrum_grs import bitcoin
+from electrum_cat import bitcoin
 
-from electrum_grs.bitcoin import NLOCKTIME_BLOCKHEIGHT_MAX, DummyAddress
-from electrum_grs.i18n import _
-from electrum_grs.plugin import run_hook
-from electrum_grs.transaction import SerializationError, Transaction, PartialTransaction, TxOutpoint, TxinDataFetchProgress
-from electrum_grs.logging import get_logger
-from electrum_grs.util import ShortID, get_asyncio_loop, UI_UNIT_NAME_TXSIZE_VBYTES
-from electrum_grs.network import Network
-from electrum_grs.wallet import TxSighashRiskLevel, TxSighashDanger
+from electrum_cat.bitcoin import NLOCKTIME_BLOCKHEIGHT_MAX, DummyAddress
+from electrum_cat.i18n import _
+from electrum_cat.plugin import run_hook
+from electrum_cat.transaction import SerializationError, Transaction, PartialTransaction, TxOutpoint, TxinDataFetchProgress
+from electrum_cat.logging import get_logger
+from electrum_cat.util import ShortID, get_asyncio_loop, UI_UNIT_NAME_TXSIZE_VBYTES
+from electrum_cat.network import Network
+from electrum_cat.wallet import TxSighashRiskLevel, TxSighashDanger
 
 from .util import (MessageBoxMixin, read_QIcon, Buttons, icon_path,
                    MONOSPACE_FONT, ColorScheme, ButtonsLineEdit, ShowQRLineEdit, text_dialog,
@@ -63,8 +63,8 @@ from .my_treeview import create_toolbar_with_menu, QMenuWithConfig
 
 if TYPE_CHECKING:
     from .main_window import ElectrumWindow
-    from electrum_grs.wallet import Abstract_Wallet
-    from electrum_grs.payment_identifier import PaymentIdentifier
+    from electrum_cat.wallet import Abstract_Wallet
+    from electrum_cat.payment_identifier import PaymentIdentifier
 
 
 _logger = get_logger(__name__)
@@ -421,7 +421,7 @@ def show_transaction(
         )
     except SerializationError as e:
         _logger.exception('unable to deserialize the transaction')
-        parent.show_critical(_("Electrum-GRS was unable to deserialize the transaction:") + "\n" + str(e))
+        parent.show_critical(_("Electrum-CAT was unable to deserialize the transaction:") + "\n" + str(e))
     else:
         d.show()
 

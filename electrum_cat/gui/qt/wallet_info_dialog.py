@@ -9,9 +9,9 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (QLabel, QVBoxLayout, QGridLayout,
                              QHBoxLayout, QPushButton, QWidget, QStackedWidget)
 
-from electrum_grs.plugin import run_hook
-from electrum_grs.i18n import _
-from electrum_grs.wallet import Multisig_Wallet
+from electrum_cat.plugin import run_hook
+from electrum_cat.i18n import _
+from electrum_cat.wallet import Multisig_Wallet
 
 from .qrtextedit import ShowQRTextEdit
 from .util import (read_QIcon, WindowModalDialog, Buttons,

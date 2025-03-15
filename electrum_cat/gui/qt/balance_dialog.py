@@ -29,13 +29,13 @@ from PyQt6.QtWidgets import QVBoxLayout, QLabel, QWidget, QGridLayout, QToolButt
 from PyQt6.QtCore import QRect, Qt
 from PyQt6.QtGui import QPen, QPainter
 
-from electrum_grs.i18n import _
+from electrum_cat.i18n import _
 
 from .util import Buttons, CloseButton, WindowModalDialog, ColorScheme, font_height, AmountLabel
 
 if TYPE_CHECKING:
     from .main_window import ElectrumWindow
-    from electrum_grs.wallet import Abstract_Wallet
+    from electrum_cat.wallet import Abstract_Wallet
 
 
 # Todo:

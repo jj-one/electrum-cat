@@ -10,17 +10,17 @@ from PyQt6.QtWidgets import (QLabel, QVBoxLayout, QGridLayout, QHBoxLayout,
                              QWidget, QToolTip, QPushButton, QApplication)
 from PyQt6.QtGui import QMovie, QColor
 
-from electrum_grs.i18n import _
-from electrum_grs.logging import Logger
-from electrum_grs.bitcoin import DummyAddress
-from electrum_grs.plugin import run_hook
-from electrum_grs.util import NotEnoughFunds, NoDynamicFeeEstimates, parse_max_spend, UserCancelled
-from electrum_grs.invoices import PR_PAID, Invoice, PR_BROADCASTING, PR_BROADCAST
-from electrum_grs.transaction import Transaction, PartialTxInput, PartialTxOutput
-from electrum_grs.network import TxBroadcastError, BestEffortRequestFailed
-from electrum_grs.payment_identifier import (PaymentIdentifierType, PaymentIdentifier, invoice_from_payment_identifier,
+from electrum_cat.i18n import _
+from electrum_cat.logging import Logger
+from electrum_cat.bitcoin import DummyAddress
+from electrum_cat.plugin import run_hook
+from electrum_cat.util import NotEnoughFunds, NoDynamicFeeEstimates, parse_max_spend, UserCancelled
+from electrum_cat.invoices import PR_PAID, Invoice, PR_BROADCASTING, PR_BROADCAST
+from electrum_cat.transaction import Transaction, PartialTxInput, PartialTxOutput
+from electrum_cat.network import TxBroadcastError, BestEffortRequestFailed
+from electrum_cat.payment_identifier import (PaymentIdentifierType, PaymentIdentifier, invoice_from_payment_identifier,
                                          payment_identifier_from_invoice)
-from electrum_grs.submarine_swaps import SwapServerError
+from electrum_cat.submarine_swaps import SwapServerError
 
 from .amountedit import AmountEdit, BTCAmountEdit, SizedFreezableLineEdit
 from .paytoedit import InvalidPaymentIdentifier
@@ -617,7 +617,7 @@ class SendTab(QWidget, MessageBoxMixin, Logger):
 
         for o in outputs:
             if o.scriptpubkey is None:
-                self.show_error(_('Groestlcoin Address is None'))
+                self.show_error(_('Catcoin Address is None'))
                 return True
             if o.value is None:
                 self.show_error(_('Invalid Amount'))

@@ -3,10 +3,10 @@ from PyQt6.QtWidgets import QLabel, QVBoxLayout, QGridLayout, QPushButton, QComb
 
 import electrum_ecc as ecc
 
-from electrum_grs.i18n import _
-from electrum_grs.lnutil import MIN_FUNDING_SAT
-from electrum_grs.lnworker import hardcoded_trampoline_nodes
-from electrum_grs.util import NotEnoughFunds, NoDynamicFeeEstimates
+from electrum_cat.i18n import _
+from electrum_cat.lnutil import MIN_FUNDING_SAT
+from electrum_cat.lnworker import hardcoded_trampoline_nodes
+from electrum_cat.util import NotEnoughFunds, NoDynamicFeeEstimates
 
 from .util import (WindowModalDialog, Buttons, OkButton, CancelButton,
                    EnterButton, WWLabel, char_width_in_lineedit)

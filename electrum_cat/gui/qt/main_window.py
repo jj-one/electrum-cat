@@ -46,32 +46,32 @@ from PyQt6.QtWidgets import (QMessageBox, QTabWidget, QMenuBar, QFileDialog, QCh
 
 import electrum_ecc as ecc
 
-import electrum_grs
-from electrum_grs.gui import messages
-from electrum_grs import (keystore, constants, util, bitcoin, commands,
+import electrum_cat
+from electrum_cat.gui import messages
+from electrum_cat import (keystore, constants, util, bitcoin, commands,
                       paymentrequest, lnutil)
-from electrum_grs.bitcoin import COIN, is_address, DummyAddress
-from electrum_grs.plugin import run_hook
-from electrum_grs.i18n import _
-from electrum_grs.util import (format_time, UserCancelled, profiler, bfh, InvalidPassword,
+from electrum_cat.bitcoin import COIN, is_address, DummyAddress
+from electrum_cat.plugin import run_hook
+from electrum_cat.i18n import _
+from electrum_cat.util import (format_time, UserCancelled, profiler, bfh, InvalidPassword,
                            UserFacingException, get_new_wallet_name, send_exception_to_crash_reporter,
                            AddTransactionException, os_chmod, UI_UNIT_NAME_TXSIZE_VBYTES)
-from electrum_grs.bip21 import BITCOIN_BIP21_URI_SCHEME
-from electrum_grs.payment_identifier import PaymentIdentifier
-from electrum_grs.invoices import PR_PAID, Invoice
-from electrum_grs.transaction import (Transaction, PartialTxInput,
+from electrum_cat.bip21 import BITCOIN_BIP21_URI_SCHEME
+from electrum_cat.payment_identifier import PaymentIdentifier
+from electrum_cat.invoices import PR_PAID, Invoice
+from electrum_cat.transaction import (Transaction, PartialTxInput,
                                   PartialTransaction, PartialTxOutput)
-from electrum_grs.wallet import (Multisig_Wallet, Abstract_Wallet,
+from electrum_cat.wallet import (Multisig_Wallet, Abstract_Wallet,
                              sweep_preparations, InternalAddressCorruption,
                              CannotCPFP)
-from electrum_grs.version import ELECTRUM_VERSION
-from electrum_grs.network import Network, UntrustedServerReturnedError
-from electrum_grs.exchange_rate import FxThread
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs.logging import Logger
-from electrum_grs.lntransport import extract_nodeid, ConnStringFormatError
-from electrum_grs.lnaddr import lndecode
-from electrum_grs.submarine_swaps import SwapServerTransport, NostrTransport
+from electrum_cat.version import ELECTRUM_VERSION
+from electrum_cat.network import Network, UntrustedServerReturnedError
+from electrum_cat.exchange_rate import FxThread
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat.logging import Logger
+from electrum_cat.lntransport import extract_nodeid, ConnStringFormatError
+from electrum_cat.lnaddr import lndecode
+from electrum_cat.submarine_swaps import SwapServerTransport, NostrTransport
 
 from .rate_limiter import rate_limited
 from .exception_window import Exception_Hook
@@ -278,7 +278,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
 
         # If the option hasn't been set yet
         if not config.cv.AUTOMATIC_CENTRALIZED_UPDATE_CHECKS.is_set():
-            choice = self.question(title="Electrum-GRS - " + _("Enable update check"),
+            choice = self.question(title="Electrum-CAT - " + _("Enable update check"),
                                    msg=_("For security reasons we advise that you always use the latest version of Electrum.") + " " +
                                        _("Would you like to be notified when there is a newer version of Electrum available?"))
             config.AUTOMATIC_CENTRALIZED_UPDATE_CHECKS = bool(choice)
@@ -536,7 +536,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
 
     @classmethod
     def get_app_name_and_version_str(cls) -> str:
-        name = "Electrum-GRS"
+        name = "Electrum-CAT"
         if constants.net.TESTNET:
             name += " " + constants.net.NET_NAME.capitalize()
         return f"{name} {ELECTRUM_VERSION}"
@@ -773,9 +773,9 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
             about_action.setMenuRole(QAction.MenuRole.AboutRole)  # make sure OS recognizes it as "About"
             help_menu.addAction(about_action)
         help_menu.addAction(_("&Check for updates"), self.show_update_check)
-        help_menu.addAction(_("&Official website"), lambda: webopen("https://groestlcoin.org"))
+        help_menu.addAction(_("&Official website"), lambda: webopen("https://electrum-cat.org"))
         help_menu.addSeparator()
-        help_menu.addAction(_("&Documentation"), lambda: webopen("https://www.groestlcoin.org/forum/")).setShortcut(QKeySequence.StandardKey.HelpContents)
+        help_menu.addAction(_("&Documentation"), lambda: webopen("https://docs.electrum-cat.org/")).setShortcut(QKeySequence.StandardKey.HelpContents)
         # if not constants.net.TESTNET:
         #    help_menu.addAction(_("&Bitcoin Paper"), self.show_bitcoin_paper)
         help_menu.addAction(_("&Report Bug"), self.show_report_bug)
@@ -789,12 +789,12 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         if d:
             self.show_send_tab()
             host = self.network.get_parameters().server.host
-            self.handle_payment_identifier('groestlcoin:%s?message=donation for %s' % (d, host))
+            self.handle_payment_identifier('catcoin:%s?message=donation for %s' % (d, host))
         else:
             self.show_error(_('No donation address for this server'))
 
     def show_about(self):
-        QMessageBox.about(self, "Electrum-GRS",
+        QMessageBox.about(self, "Electrum-CAT",
                           (_("Version")+" %s" % ELECTRUM_VERSION + "\n\n" +
                            _("Electrum's focus is speed, with low resource usage and simplifying Bitcoin.") + " " +
                            _("You do not need to perform regular backups, because your wallet can be "
@@ -825,7 +825,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
             _("Before reporting a bug, upgrade to the most recent version of Electrum (latest release or git HEAD), and include the version number in your report."),
             _("Try to explain not only what the bug is, but how it occurs.")
          ])
-        self.show_message(msg, title="Electrum-GRS - " + _("Reporting Bugs"), rich_text=True)
+        self.show_message(msg, title="Electrum-CAT - " + _("Reporting Bugs"), rich_text=True)
 
     def notify_transactions(self):
         if self.tx_notification_queue.qsize() == 0:
@@ -863,7 +863,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
 
     def notify(self, message):
         if self.tray:
-            self.tray.showMessage("Electrum-GRS", message, read_QIcon("electrum_dark_icon"), 20000)
+            self.tray.showMessage("Electrum-CAT", message, read_QIcon("electrum_dark_icon"), 20000)
 
     def timer_actions(self):
         # refresh invoices and requests because they show ETA
@@ -900,8 +900,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         )
 
     def format_amount_and_units(self, amount_sat, *, timestamp: int = None) -> str:
-        """Returns string with both groestlcoin and fiat amounts, in desired units.
-        E.g. 500_000 -> '0.005 GRS (0.00042 EUR)'
+        """Returns string with both catcoin and fiat amounts, in desired units.
+        E.g. 500_000 -> '0.005 CAT (0.00021 EUR)'
         """
         text = self.config.format_amount_and_units(amount_sat)
         fiat = self.fx.format_amount_and_units(amount_sat, timestamp=timestamp) if self.fx else None
@@ -911,12 +911,12 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
 
     def format_fiat_and_units(self, amount_sat) -> str:
         """Returns string of FX fiat amount, in desired units.
-        E.g. 500_000 -> '0.00042 EUR'
+        E.g. 500_000 -> '0.00021 EUR'
         """
         return self.fx.format_amount_and_units(amount_sat) if self.fx else ''
 
     def format_fee_rate(self, fee_rate) -> str:
-        """fee_rate is in gro/kvByte."""
+        """fee_rate is in catoshi/kvByte."""
         return self.config.format_fee_rate(fee_rate)
 
     def get_decimal_point(self):
@@ -1601,7 +1601,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         d.exec()
 
     def show_lightning_invoice(self, invoice: Invoice):
-        from electrum_grs.util import format_short_id
+        from electrum_cat.util import format_short_id
         lnaddr = lndecode(invoice.lightning_invoice)
         d = WindowModalDialog(self, _("Lightning Invoice"))
         vbox = QVBoxLayout(d)
@@ -1681,7 +1681,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
             'plugins': self.gui_object.plugins,
             'window': self,
             'config': self.config,
-            'electrum': electrum_grs,
+            'electrum': electrum_cat,
             'daemon': self.gui_object.daemon,
             'util': util,
             'bitcoin': bitcoin,
@@ -1837,7 +1837,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         self.password_button.setVisible(self.wallet.may_have_password())
 
     def change_password_dialog(self):
-        from electrum_grs.storage import StorageEncryptionVersion
+        from electrum_cat.storage import StorageEncryptionVersion
         if self.wallet.get_available_storage_encryption_version() == StorageEncryptionVersion.XPUB_PASSWORD:
             from .password_dialog import ChangePasswordDialogForHW
             d = ChangePasswordDialogForHW(self, self.wallet)
@@ -1890,7 +1890,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
             tab.searchable_list.filter(t)
 
     def new_channel_dialog(self, *, amount_sat=None, min_amount_sat=None):
-        from electrum_grs.lnutil import MIN_FUNDING_SAT
+        from electrum_cat.lnutil import MIN_FUNDING_SAT
         from .new_channel_dialog import NewChannelDialog
         confirmed, unconfirmed, unmatured, frozen, lightning, f_lightning = self.wallet.get_balances_for_piechart()
         min_amount_sat = min_amount_sat or MIN_FUNDING_SAT
@@ -2132,7 +2132,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         self.thread.add(task, on_success=setText)
 
     def do_encrypt(self, message_e, pubkey_e, encrypted_e):
-        from electrum_grs import crypto
+        from electrum_cat import crypto
         message = message_e.toPlainText()
         message = message.encode('utf-8')
         try:
@@ -2192,7 +2192,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         return d.run()
 
     def tx_from_text(self, data: Union[str, bytes]) -> Union[None, 'PartialTransaction', 'Transaction']:
-        from electrum_grs.transaction import tx_from_any
+        from electrum_cat.transaction import tx_from_any
         try:
             return tx_from_any(data)
         except BaseException as e:
@@ -2287,7 +2287,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
     def do_process_from_txid(self, *, parent: QWidget = None, txid: str = None):
         if parent is None:
             parent = self
-        from electrum_grs import transaction
+        from electrum_cat import transaction
         if txid is None:
             txid, ok = QInputDialog.getText(parent, _('Lookup transaction'), _('Transaction ID') + ':')
             if not ok:
@@ -2348,7 +2348,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         e.setReadOnly(True)
         vbox.addWidget(e)
 
-        defaultname = f'electrum-grs-private-keys-{self.wallet.basename()}.csv'
+        defaultname = f'electrum-cat-private-keys-{self.wallet.basename()}.csv'
         select_msg = _('Select file to export your private keys to')
         hbox, filename_e, csv_button = filename_field(self, self.config, defaultname, select_msg)
         vbox.addLayout(hbox)

@@ -36,20 +36,20 @@ from PyQt6.QtWidgets import (QLabel, QHBoxLayout, QAbstractItemView, QLineEdit,
                              QWidget, QToolButton, QTreeView, QHeaderView, QStyledItemDelegate,
                              QMenu, QStyleOptionViewItem)
 
-from electrum_grs.i18n import _, languages
-from electrum_grs.util import FileImportFailed, FileExportFailed, make_aiohttp_session, resource_path
-from electrum_grs.util import EventListener, event_listener
-from electrum_grs.invoices import PR_UNPAID, PR_PAID, PR_EXPIRED, PR_INFLIGHT, PR_UNKNOWN, PR_FAILED, PR_ROUTING, PR_UNCONFIRMED
-from electrum_grs.logging import Logger
-from electrum_grs.qrreader import MissingQrDetectionLib
-from electrum_grs.simple_config import ConfigVarWithConfig
+from electrum_cat.i18n import _, languages
+from electrum_cat.util import FileImportFailed, FileExportFailed, make_aiohttp_session, resource_path
+from electrum_cat.util import EventListener, event_listener
+from electrum_cat.invoices import PR_UNPAID, PR_PAID, PR_EXPIRED, PR_INFLIGHT, PR_UNKNOWN, PR_FAILED, PR_ROUTING, PR_UNCONFIRMED
+from electrum_cat.logging import Logger
+from electrum_cat.qrreader import MissingQrDetectionLib
+from electrum_cat.simple_config import ConfigVarWithConfig
 
-from electrum_grs.gui import messages
+from electrum_cat.gui import messages
 
 from .util import read_QIcon
 
 if TYPE_CHECKING:
-    from electrum_grs import SimpleConfig
+    from electrum_cat import SimpleConfig
     from .main_window import ElectrumWindow
 
 

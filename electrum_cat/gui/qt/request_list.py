@@ -30,9 +30,9 @@ from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from PyQt6.QtWidgets import QMenu, QAbstractItemView
 from PyQt6.QtCore import Qt, QItemSelectionModel, QModelIndex
 
-from electrum_grs.i18n import _
-from electrum_grs.util import format_time
-from electrum_grs.plugin import run_hook
+from electrum_cat.i18n import _
+from electrum_cat.util import format_time
+from electrum_cat.plugin import run_hook
 
 from .util import pr_icons, read_QIcon
 from .my_treeview import MyTreeView, MySortModel
@@ -198,9 +198,9 @@ class RequestList(MyTreeView):
         menu = QMenu(self)
         copy_menu = self.add_copy_menu(menu, idx)
         if req.get_address():
-            copy_menu.addAction(_("Address"), lambda: self.main_window.do_copy(req.get_address(), title='Groestlcoin Address'))
+            copy_menu.addAction(_("Address"), lambda: self.main_window.do_copy(req.get_address(), title='Catcoin Address'))
         if URI := self.wallet.get_request_URI(req):
-            copy_menu.addAction(_("Groestlcoin URI"), lambda: self.main_window.do_copy(URI, title='Groestlcoin URI'))
+            copy_menu.addAction(_("Catcoin URI"), lambda: self.main_window.do_copy(URI, title='Catcoin URI'))
         if req.is_lightning():
             copy_menu.addAction(_("Lightning Request"), lambda: self.main_window.do_copy(self.wallet.get_bolt11_invoice(req), title='Lightning Request'))
         #if 'view_url' in req:

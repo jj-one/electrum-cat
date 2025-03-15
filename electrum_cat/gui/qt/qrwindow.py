@@ -28,7 +28,7 @@ from PyQt6.QtWidgets import QHBoxLayout, QWidget
 
 from .qrcodewidget import QRCodeWidget
 
-from electrum_grs.i18n import _
+from electrum_cat.i18n import _
 
 
 class QR_Window(QWidget):
@@ -36,7 +36,7 @@ class QR_Window(QWidget):
     def __init__(self, win):
         QWidget.__init__(self)
         self.main_window = win
-        self.setWindowTitle('Electrum-GRS - '+_('Payment Request'))
+        self.setWindowTitle('Electrum-CAT - '+_('Payment Request'))
         self.setMinimumSize(800, 800)
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         main_box = QHBoxLayout()

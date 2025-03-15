@@ -9,10 +9,10 @@ from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtWidgets import (QLabel, QVBoxLayout, QGridLayout, QTextEdit,
                              QHBoxLayout, QPushButton, QWidget, QSizePolicy, QFrame)
 
-from electrum_grs.i18n import _
-from electrum_grs.util import InvoiceError
-from electrum_grs.invoices import pr_expiration_values
-from electrum_grs.logging import Logger
+from electrum_cat.i18n import _
+from electrum_cat.util import InvoiceError
+from electrum_cat.invoices import pr_expiration_values
+from electrum_cat.logging import Logger
 
 from .amountedit import AmountEdit, BTCAmountEdit, SizedFreezableLineEdit
 from .qrcodewidget import QRCodeWidget
@@ -71,7 +71,7 @@ class ReceiveTab(QWidget, MessageBoxMixin, Logger):
         self.clear_invoice_button.clicked.connect(self.do_clear)
         text = _('Onchain') if self.wallet.has_lightning() else _('Request')
         self.create_onchain_invoice_button = QPushButton(text)
-        self.create_onchain_invoice_button.setIcon(read_QIcon("groestlcoin.png"))
+        self.create_onchain_invoice_button.setIcon(read_QIcon("catcoin.png"))
         self.create_onchain_invoice_button.clicked.connect(lambda: self.create_invoice(False))
         self.create_lightning_invoice_button = QPushButton(_('Lightning'))
         self.create_lightning_invoice_button.setIcon(read_QIcon("lightning.png"))
@@ -266,7 +266,7 @@ class ReceiveTab(QWidget, MessageBoxMixin, Logger):
 
     def get_tab_data(self):
         if self.URI:
-            out = self.URI, self.URI, self.URI_help, _('Groestlcoin URI')
+            out = self.URI, self.URI, self.URI_help, _('Catcoin URI')
         elif self.addr:
             out = self.addr, self.addr, self.address_help, _('Address')
         else:

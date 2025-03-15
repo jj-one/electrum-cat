@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING, Optional, Union
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QLabel, QVBoxLayout, QGridLayout, QPushButton
 
-from electrum_grs.i18n import _
-from electrum_grs.util import NotEnoughFunds, NoDynamicFeeEstimates, UserCancelled
-from electrum_grs.bitcoin import DummyAddress
-from electrum_grs.transaction import PartialTxOutput, PartialTransaction
+from electrum_cat.i18n import _
+from electrum_cat.util import NotEnoughFunds, NoDynamicFeeEstimates, UserCancelled
+from electrum_cat.bitcoin import DummyAddress
+from electrum_cat.transaction import PartialTxOutput, PartialTransaction
 
-from electrum_grs.gui import messages
+from electrum_cat.gui import messages
 from . import util
 from .util import (WindowModalDialog, Buttons, OkButton, CancelButton,
                    EnterButton, ColorScheme, WWLabel, read_QIcon, IconLabel, char_width_in_lineedit)
@@ -19,7 +19,7 @@ from .my_treeview import create_toolbar_with_menu
 
 if TYPE_CHECKING:
     from .main_window import ElectrumWindow
-    from electrum_grs.submarine_swaps import SwapServerTransport
+    from electrum_cat.submarine_swaps import SwapServerTransport
 
 CANNOT_RECEIVE_WARNING = _(
 """The requested amount is higher than what you can receive in your currently open channels.

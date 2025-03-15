@@ -4,17 +4,17 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QCheckBox, QLabel, QHBoxLayout, QVBoxLayout, QWidget
 
-from electrum_grs.i18n import _
-from electrum_grs.wizard import ServerConnectWizard
-from electrum_grs.gui.qt.network_dialog import ProxyWidget, ServerWidget
-from electrum_grs.gui.qt.util import icon_path
+from electrum_cat.i18n import _
+from electrum_cat.wizard import ServerConnectWizard
+from electrum_cat.gui.qt.network_dialog import ProxyWidget, ServerWidget
+from electrum_cat.gui.qt.util import icon_path
 from .wizard import QEAbstractWizard, WizardComponent
 
 if TYPE_CHECKING:
-    from electrum_grs.simple_config import SimpleConfig
-    from electrum_grs.plugin import Plugins
-    from electrum_grs.daemon import Daemon
-    from electrum_grs.gui.qt import QElectrumApplication
+    from electrum_cat.simple_config import SimpleConfig
+    from electrum_cat.plugin import Plugins
+    from electrum_cat.daemon import Daemon
+    from electrum_cat.gui.qt import QElectrumApplication
 
 
 class QEServerConnectWizard(ServerConnectWizard, QEAbstractWizard):
@@ -36,7 +36,7 @@ class QEServerConnectWizard(ServerConnectWizard, QEAbstractWizard):
 class WCWelcome(WizardComponent):
     def __init__(self, parent, wizard):
         WizardComponent.__init__(self, parent, wizard, title='')
-        self.wizard_title = _('Electrum Groestlcoin Wallet')
+        self.wizard_title = _('Electrum Catcoin Wallet')
         self.use_advanced_w = QCheckBox(_('Advanced network settings'))
         self.use_advanced_w.setChecked(False)
         self.use_advanced_w.stateChanged.connect(self.on_advanced_changed)

@@ -29,8 +29,8 @@ from PyQt6.QtMultimedia import (QVideoFrame, QVideoFrameFormat, QVideoSink)
 from PyQt6.QtGui import QImage
 from PyQt6.QtCore import QObject, pyqtSignal
 
-from electrum_grs.i18n import _
-from electrum_grs.logging import get_logger
+from electrum_cat.i18n import _
+from electrum_cat.logging import get_logger
 
 
 _logger = get_logger(__name__)

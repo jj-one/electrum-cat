@@ -27,7 +27,7 @@ from typing import TYPE_CHECKING
 
 from PyQt6.QtWidgets import (QDialog, QLabel, QVBoxLayout, QPushButton)
 
-from electrum_grs.i18n import _
+from electrum_cat.i18n import _
 
 from .util import Buttons
 from .util import QtEventListener, qt_event_listener

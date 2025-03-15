@@ -9,12 +9,12 @@ from PyQt6.QtCore import Qt, QRect, QSize
 from PyQt6.QtWidgets import QMenu, QLabel, QVBoxLayout, QGridLayout, QAbstractItemView, QCheckBox, QToolTip
 from PyQt6.QtGui import QFont, QStandardItem, QBrush, QPainter, QIcon, QHelpEvent
 
-from electrum_grs.i18n import _
-from electrum_grs.lnchannel import AbstractChannel, ChannelBackup, Channel, ChanCloseOption
-from electrum_grs.wallet import Abstract_Wallet
-from electrum_grs.lnutil import LOCAL, REMOTE
-from electrum_grs.lnworker import LNWallet
-from electrum_grs.gui import messages
+from electrum_cat.i18n import _
+from electrum_cat.lnchannel import AbstractChannel, ChannelBackup, Channel, ChanCloseOption
+from electrum_cat.wallet import Abstract_Wallet
+from electrum_cat.lnutil import LOCAL, REMOTE
+from electrum_cat.lnworker import LNWallet
+from electrum_cat.gui import messages
 
 from .util import WindowModalDialog, Buttons, OkButton, EnterButton, WaitingDialog, MONOSPACE_FONT, ColorScheme
 from .util import read_QIcon, font_height

@@ -30,17 +30,17 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (QComboBox,  QTabWidget, QDialog, QSpinBox,  QCheckBox, QLabel,
                              QVBoxLayout, QGridLayout, QLineEdit, QWidget, QHBoxLayout, QSlider)
 
-from electrum_grs.i18n import _, languages
-from electrum_grs import util
-from electrum_grs.util import base_units_list, event_listener
+from electrum_cat.i18n import _, languages
+from electrum_cat import util
+from electrum_cat.util import base_units_list, event_listener
 
-from electrum_grs.gui import messages
+from electrum_cat.gui import messages
 
 from .util import ColorScheme, HelpLabel, Buttons, CloseButton, QtEventListener
 
 
 if TYPE_CHECKING:
-    from electrum_grs.simple_config import SimpleConfig, ConfigVarWithConfig
+    from electrum_cat.simple_config import SimpleConfig, ConfigVarWithConfig
     from .main_window import ElectrumWindow
 
 
@@ -224,7 +224,7 @@ class SettingsDialog(QDialog, QtEventListener):
         # units
         units = base_units_list
         msg = (_('Base unit of your wallet.')
-               + '\n1 GRS = 1000 mGRS. 1 mGRS = 1000 groestl. 1 groestl = 100 gro.\n'
+               + '\n1 CAT = 1000 mCAT. 1 mCAT = 1000 μCAT. 1 μCAT = 100 catoshi.\n'
                + _('This setting affects the Send tab, and all balance related fields.'))
         unit_label = HelpLabel(_('Base unit') + ':', msg)
         unit_combo = QComboBox()

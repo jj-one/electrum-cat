@@ -33,7 +33,7 @@ try:
     import PyQt6
     import PyQt6.QtGui
 except Exception as e:
-    from electrum_grs import GuiImportError
+    from electrum_cat import GuiImportError
     raise GuiImportError(
         "Error: Could not import PyQt6. On Linux systems, "
         "you may try 'sudo apt-get install python3-pyqt6'") from e
@@ -60,20 +60,20 @@ if sys.platform == "linux" and os.environ.get("APPIMAGE"):
     # see https://bugreports.qt.io/browse/QTBUG-114635
     os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
 
-from electrum_grs.i18n import _, set_language
-from electrum_grs.plugin import run_hook
-from electrum_grs.util import (UserCancelled, profiler, send_exception_to_crash_reporter,
+from electrum_cat.i18n import _, set_language
+from electrum_cat.plugin import run_hook
+from electrum_cat.util import (UserCancelled, profiler, send_exception_to_crash_reporter,
                            WalletFileException, get_new_wallet_name, InvalidPassword)
-from electrum_grs.wallet import Wallet, Abstract_Wallet
-from electrum_grs.wallet_db import WalletRequiresSplit, WalletRequiresUpgrade, WalletUnfinished
-from electrum_grs.logging import Logger
-from electrum_grs.gui import BaseElectrumGui
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs.wizard import WizardViewState
-from electrum_grs.keystore import load_keystore
-from electrum_grs.bip32 import is_xprv
+from electrum_cat.wallet import Wallet, Abstract_Wallet
+from electrum_cat.wallet_db import WalletRequiresSplit, WalletRequiresUpgrade, WalletUnfinished
+from electrum_cat.logging import Logger
+from electrum_cat.gui import BaseElectrumGui
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat.wizard import WizardViewState
+from electrum_cat.keystore import load_keystore
+from electrum_cat.bip32 import is_xprv
 
-from electrum_grs.gui.common_qt.i18n import ElectrumTranslator
+from electrum_cat.gui.common_qt.i18n import ElectrumTranslator
 
 from .util import read_QIcon, ColorScheme, custom_message_box, MessageBoxMixin, WWLabel
 from .main_window import ElectrumWindow
@@ -85,8 +85,8 @@ from .wizard.server_connect import QEServerConnectWizard
 from .wizard.wallet import QENewWalletWizard
 
 if TYPE_CHECKING:
-    from electrum_grs.daemon import Daemon
-    from electrum_grs.plugin import Plugins
+    from electrum_cat.daemon import Daemon
+    from electrum_cat.plugin import Plugins
 
 
 class OpenFileEventFilter(QObject):
@@ -129,8 +129,8 @@ class ElectrumGui(BaseElectrumGui, Logger):
         if hasattr(QtCore.Qt, "AA_ShareOpenGLContexts"):
             QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
         if hasattr(QGuiApplication, 'setDesktopFileName'):
-            QGuiApplication.setDesktopFileName('electrum-grs.desktop')
-        QGuiApplication.setApplicationName("Electrum-GRS")
+            QGuiApplication.setDesktopFileName('electrum-cat.desktop')
+        QGuiApplication.setApplicationName("Electrum-CAT")
         self.gui_thread = threading.current_thread()
         self.windows = []  # type: List[ElectrumWindow]
         self.efilter = OpenFileEventFilter(self.windows)
@@ -165,7 +165,7 @@ class ElectrumGui(BaseElectrumGui, Logger):
 
     def _init_tray(self):
         self.tray = QSystemTrayIcon(self.tray_icon(), None)
-        self.tray.setToolTip('Electrum-GRS')
+        self.tray.setToolTip('Electrum-CAT')
         self.tray.activated.connect(self.tray_activated)
         self.build_tray_menu()
         self.tray.show()
@@ -219,7 +219,7 @@ class ElectrumGui(BaseElectrumGui, Logger):
             submenu.addAction(_("Close"), window.close)
         m.addAction(_("Dark/Light"), self.toggle_tray_icon)
         m.addSeparator()
-        m.addAction(_("Exit Electrum-GRS"), self.app.quit)
+        m.addAction(_("Exit Electrum-CAT"), self.app.quit)
 
     def tray_icon(self):
         if self.dark_icon:

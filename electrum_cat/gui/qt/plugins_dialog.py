@@ -3,8 +3,8 @@ from functools import partial
 
 from PyQt6.QtWidgets import QLabel, QVBoxLayout, QGridLayout, QPushButton, QWidget, QScrollArea, QCheckBox, QFormLayout
 
-from electrum_grs.i18n import _
-from electrum_grs.plugin import run_hook
+from electrum_cat.i18n import _
+from electrum_cat.plugin import run_hook
 
 from .util import WindowModalDialog, Buttons, CloseButton, WWLabel, insert_spaces
 
