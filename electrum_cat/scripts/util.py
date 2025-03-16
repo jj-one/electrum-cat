@@ -1,11 +1,11 @@
 import select, time, queue
-# import electrum_grs
+# import electrum_cat
 from .. import Connection, Interface, SimpleConfig
 
-from electrum_grs.network import parse_servers
+from electrum_cat.network import parse_servers
 from collections import defaultdict
 
-# electrum_grs.util.set_verbosity(1)
+# electrum_cat.util.set_verbosity(1)
 def get_interfaces(servers, timeout=10):
     '''Returns a map of servers to connected interfaces.  If any
     connections fail or timeout, they will be missing from the map.
@@ -53,7 +53,7 @@ def get_peers():
     # 1. get connected interfaces
     server = config.get('server')
     if server is None:
-        print("You need to set a secure server, for example (for mainnet): 'electrum-grs setconfig server helicarrier.bauerj.eu:50002:s'")
+        print("You need to set a secure server, for example (for mainnet): 'electrum-cat setconfig server cat1.electrum-cat.org:8101:s'")
         return []
     interfaces = get_interfaces([server])
     if not interfaces:

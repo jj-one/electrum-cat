@@ -4,9 +4,9 @@ import asyncio
 from statistics import median
 from numbers import Number
 
-from electrum_grs.network import filter_protocol, Network
-from electrum_grs.util import create_and_start_event_loop, log_exceptions
-from electrum_grs.simple_config import SimpleConfig
+from electrum_cat.network import filter_protocol, Network
+from electrum_cat.util import create_and_start_event_loop, log_exceptions
+from electrum_cat.simple_config import SimpleConfig
 
 
 config = SimpleConfig()

@@ -3,16 +3,16 @@
 # It prunes the offline servers from the existing list (note: run with Tor proxy to keep .onions),
 # and adds new servers from provided file(s) of candidate servers.
 # A file of new candidate servers can be created via e.g.:
-# $ ./electrum_grs/scripts/servers.py > reply.txt
+# $ ./electrum_cat/scripts/servers.py > reply.txt
 
 import asyncio
 import sys
 import json
 
-from electrum_grs.network import Network
-from electrum_grs.util import create_and_start_event_loop, log_exceptions
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs import constants
+from electrum_cat.network import Network
+from electrum_cat.util import create_and_start_event_loop, log_exceptions
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat import constants
 
 try:
     fname1 = sys.argv[1]

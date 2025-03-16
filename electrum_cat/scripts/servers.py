@@ -2,10 +2,10 @@
 import json
 import asyncio
 
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs.network import filter_version, Network
-from electrum_grs.util import create_and_start_event_loop, log_exceptions
-from electrum_grs import constants
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat.network import filter_version, Network
+from electrum_cat.util import create_and_start_event_loop, log_exceptions
+from electrum_cat import constants
 
 # testnet?
 #constants.BitcoinTestnet.set_as_network()

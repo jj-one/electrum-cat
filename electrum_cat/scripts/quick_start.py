@@ -3,19 +3,19 @@
 import os
 import asyncio
 
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs import constants
-from electrum_grs.daemon import Daemon
-from electrum_grs.storage import WalletStorage
-from electrum_grs.wallet import Wallet, create_new_wallet
-from electrum_grs.wallet_db import WalletDB
-from electrum_grs.commands import Commands
-from electrum_grs.util import create_and_start_event_loop, log_exceptions
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat import constants
+from electrum_cat.daemon import Daemon
+from electrum_cat.storage import WalletStorage
+from electrum_cat.wallet import Wallet, create_new_wallet
+from electrum_cat.wallet_db import WalletDB
+from electrum_cat.commands import Commands
+from electrum_cat.util import create_and_start_event_loop, log_exceptions
 
 
 loop, stopping_fut, loop_thread = create_and_start_event_loop()
 
-config = SimpleConfig({"testnet": True})  # to use ~/.electrum-grs/testnet as datadir
+config = SimpleConfig({"testnet": True})  # to use ~/.electrum-cat/testnet as datadir
 constants.BitcoinTestnet.set_as_network()  # to set testnet magic bytes
 daemon = Daemon(config, listen_jsonrpc=False)
 network = daemon.network

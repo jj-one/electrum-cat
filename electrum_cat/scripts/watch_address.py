@@ -3,16 +3,16 @@
 import sys
 import asyncio
 
-from electrum_grs.network import Network
-from electrum_grs.util import print_msg, create_and_start_event_loop
-from electrum_grs.synchronizer import SynchronizerBase
-from electrum_grs.simple_config import SimpleConfig
+from electrum_cat.network import Network
+from electrum_cat.util import print_msg, create_and_start_event_loop
+from electrum_cat.synchronizer import SynchronizerBase
+from electrum_cat.simple_config import SimpleConfig
 
 
 try:
     addr = sys.argv[1]
 except Exception:
-    print("usage: watch_address <groestlcoin_address>")
+    print("usage: watch_address <catcoin_address>")
     sys.exit(1)
 
 config = SimpleConfig()
