@@ -34,20 +34,20 @@ from aiohttp import ClientResponse
 
 import electrum_ecc as ecc
 
-from electrum_grs import constants, keystore, version, bip32, bitcoin
-from electrum_grs.bip32 import BIP32Node, xpub_type, is_xprv
-from electrum_grs.crypto import sha256
-from electrum_grs.transaction import PartialTxOutput, PartialTxInput, PartialTransaction, Transaction
-from electrum_grs.mnemonic import Mnemonic, calc_seed_type, is_any_2fa_seed_type
-from electrum_grs.wallet import Multisig_Wallet, Deterministic_Wallet
-from electrum_grs.i18n import _
-from electrum_grs.plugin import BasePlugin, hook
-from electrum_grs.util import NotEnoughFunds, UserFacingException, error_text_str_to_safe_str
-from electrum_grs.network import Network
-from electrum_grs.logging import Logger
+from electrum_cat import constants, keystore, version, bip32, bitcoin
+from electrum_cat.bip32 import BIP32Node, xpub_type, is_xprv
+from electrum_cat.crypto import sha256
+from electrum_cat.transaction import PartialTxOutput, PartialTxInput, PartialTransaction, Transaction
+from electrum_cat.mnemonic import Mnemonic, calc_seed_type, is_any_2fa_seed_type
+from electrum_cat.wallet import Multisig_Wallet, Deterministic_Wallet
+from electrum_cat.i18n import _
+from electrum_cat.plugin import BasePlugin, hook
+from electrum_cat.util import NotEnoughFunds, UserFacingException, error_text_str_to_safe_str
+from electrum_cat.network import Network
+from electrum_cat.logging import Logger
 
 if TYPE_CHECKING:
-    from electrum_grs.wizard import NewWalletWizard
+    from electrum_cat.wizard import NewWalletWizard
 
 
 def get_signing_xpub(xtype):
@@ -243,7 +243,7 @@ class TrustedCoinCosignerClient(Logger):
                                  timeout=60)
 
 
-server = TrustedCoinCosignerClient(user_agent="Electrum-GRS/" + version.ELECTRUM_VERSION)
+server = TrustedCoinCosignerClient(user_agent="Electrum-CAT/" + version.ELECTRUM_VERSION)
 
 
 class Wallet_2fa(Multisig_Wallet):
@@ -442,7 +442,7 @@ class TrustedCoinPlugin(BasePlugin):
         return True
 
     def is_enabled(self):
-        # Not available for GRS.
+        # Not available for CAT.
         return False
 
     def can_user_disable(self):

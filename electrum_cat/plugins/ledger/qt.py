@@ -4,17 +4,17 @@ from typing import TYPE_CHECKING
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QInputDialog, QLineEdit
 
-from electrum_grs.i18n import _
-from electrum_grs.plugin import hook
-from electrum_grs.wallet import Standard_Wallet
+from electrum_cat.i18n import _
+from electrum_cat.plugin import hook
+from electrum_cat.wallet import Standard_Wallet
 
 from .ledger import LedgerPlugin, Ledger_Client
 from ..hw_wallet.qt import QtHandlerBase, QtPluginBase
 from ..hw_wallet.plugin import only_hook_if_libraries_available
-from electrum_grs.gui.qt.wizard.wallet import WCScriptAndDerivation, WCHWUninitialized, WCHWUnlock, WCHWXPub
+from electrum_cat.gui.qt.wizard.wallet import WCScriptAndDerivation, WCHWUninitialized, WCHWUnlock, WCHWXPub
 
 if TYPE_CHECKING:
-    from electrum_grs.gui.qt.wizard.wallet import QENewWalletWizard
+    from electrum_cat.gui.qt.wizard.wallet import QENewWalletWizard
 
 
 class Plugin(LedgerPlugin, QtPluginBase):

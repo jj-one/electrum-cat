@@ -6,11 +6,11 @@ from PyQt6.QtWidgets import (QDialog, QLineEdit, QTextEdit, QVBoxLayout, QLabel,
 
 from btchip.btchip import BTChipException
 
-from electrum_grs.gui.qt.util import PasswordLineEdit
+from electrum_cat.gui.qt.util import PasswordLineEdit
 
-from electrum_grs.i18n import _
-from electrum_grs import constants, bitcoin
-from electrum_grs.logging import get_logger
+from electrum_cat.i18n import _
+from electrum_cat import constants, bitcoin
+from electrum_cat.logging import get_logger
 
 if TYPE_CHECKING:
     from .ledger import Ledger_Client

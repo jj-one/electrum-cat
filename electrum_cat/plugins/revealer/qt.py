@@ -2,7 +2,7 @@
 
 Revealer
 Do you have something to hide?
-Secret backup plug-in for the electrum-grs wallet.
+Secret backup plug-in for the electrum-cat wallet.
 
 Copyright:
     2017 Tiago Romagnani Silveira
@@ -29,20 +29,20 @@ from PyQt6.QtGui import (QPixmap, QImage, QBitmap, QPainter, QFontDatabase, QPen
 from PyQt6.QtWidgets import (QGridLayout, QVBoxLayout, QHBoxLayout, QLabel,
                              QPushButton, QLineEdit)
 
-from electrum_grs.plugin import hook
-from electrum_grs.i18n import _
-from electrum_grs.util import make_dir, InvalidPassword, UserCancelled
-from electrum_grs.gui.qt.util import (read_QIcon, EnterButton, WWLabel, icon_path, internal_plugin_icon_path,
+from electrum_cat.plugin import hook
+from electrum_cat.i18n import _
+from electrum_cat.util import make_dir, InvalidPassword, UserCancelled
+from electrum_cat.gui.qt.util import (read_QIcon, EnterButton, WWLabel, icon_path, internal_plugin_icon_path,
                                   WindowModalDialog, Buttons, CloseButton, OkButton)
-from electrum_grs.gui.qt.qrtextedit import ScanQRTextEdit
-from electrum_grs.gui.qt.main_window import StatusBarButton
-from electrum_grs.gui.qt.util import read_QIcon_from_bytes, read_QPixmap_from_bytes
+from electrum_cat.gui.qt.qrtextedit import ScanQRTextEdit
+from electrum_cat.gui.qt.main_window import StatusBarButton
+from electrum_cat.gui.qt.util import read_QIcon_from_bytes, read_QPixmap_from_bytes
 
 from .revealer import RevealerPlugin
 
 
 if TYPE_CHECKING:
-    from electrum_grs.gui.qt import ElectrumGui
+    from electrum_cat.gui.qt import ElectrumGui
 
 
 class Plugin(RevealerPlugin):
@@ -96,7 +96,7 @@ class Plugin(RevealerPlugin):
         return EnterButton(_('Printer Calibration'), partial(self.calibration_dialog, window))
 
     def password_dialog(self, msg=None, parent=None):
-        from electrum_grs.gui.qt.password_dialog import PasswordDialog
+        from electrum_cat.gui.qt.password_dialog import PasswordDialog
         parent = parent or self
         d = PasswordDialog(parent, msg)
         return d.run()

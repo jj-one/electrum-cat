@@ -1,18 +1,18 @@
 from typing import TYPE_CHECKING
 
-from electrum_grs.i18n import _
-from electrum_grs.plugin import hook
-from electrum_grs.util import UserFacingException
+from electrum_cat.i18n import _
+from electrum_cat.plugin import hook
+from electrum_cat.util import UserFacingException
 
-from electrum_grs.gui.qml.qewallet import QEWallet
+from electrum_cat.gui.qml.qewallet import QEWallet
 from .common_qt import TrustedcoinPluginQObject
 
 from .trustedcoin import TrustedCoinPlugin, TrustedCoinException
 
 if TYPE_CHECKING:
-    from electrum_grs.gui.qml import ElectrumQmlApplication
-    from electrum_grs.wallet import Abstract_Wallet
-    from electrum_grs.wizard import NewWalletWizard
+    from electrum_cat.gui.qml import ElectrumQmlApplication
+    from electrum_cat.wallet import Abstract_Wallet
+    from electrum_cat.wizard import NewWalletWizard
 
 
 class Plugin(TrustedCoinPlugin):

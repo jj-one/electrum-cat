@@ -4,20 +4,20 @@ from typing import TYPE_CHECKING
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QPushButton, QLabel, QVBoxLayout, QWidget, QGridLayout
 
-from electrum_grs.gui.qt.util import WindowModalDialog, CloseButton, getOpenFileName, getSaveFileName
-from electrum_grs.gui.qt.main_window import ElectrumWindow
+from electrum_cat.gui.qt.util import WindowModalDialog, CloseButton, getOpenFileName, getSaveFileName
+from electrum_cat.gui.qt.main_window import ElectrumWindow
 
-from electrum_grs.i18n import _
-from electrum_grs.plugin import hook
-from electrum_grs.wallet import Multisig_Wallet
+from electrum_cat.i18n import _
+from electrum_cat.plugin import hook
+from electrum_cat.wallet import Multisig_Wallet
 
 from .coldcard import ColdcardPlugin, xfp2str
 from ..hw_wallet.qt import QtHandlerBase, QtPluginBase
 from ..hw_wallet.plugin import only_hook_if_libraries_available
-from electrum_grs.gui.qt.wizard.wallet import WCScriptAndDerivation, WCHWXPub, WCHWUninitialized, WCHWUnlock
+from electrum_cat.gui.qt.wizard.wallet import WCScriptAndDerivation, WCHWXPub, WCHWUninitialized, WCHWUnlock
 
 if TYPE_CHECKING:
-    from electrum_grs.gui.qt.wizard.wallet import QENewWalletWizard
+    from electrum_cat.gui.qt.wizard.wallet import QENewWalletWizard
 
 CC_DEBUG = False
 

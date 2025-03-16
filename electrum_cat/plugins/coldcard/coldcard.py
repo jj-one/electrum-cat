@@ -1,5 +1,5 @@
 #
-# Coldcard Electrum-GRS plugin main code.
+# Coldcard Electrum-CAT plugin main code.
 #
 #
 import os
@@ -7,22 +7,22 @@ import time
 from typing import TYPE_CHECKING, Optional
 import struct
 
-from electrum_grs import bip32
-from electrum_grs.bip32 import BIP32Node, InvalidMasterKeyVersionBytes
-from electrum_grs.i18n import _
-from electrum_grs.plugin import Device, hook, runs_in_hwd_thread
-from electrum_grs.keystore import Hardware_KeyStore, KeyStoreWithMPK
-from electrum_grs.transaction import PartialTransaction
-from electrum_grs.wallet import Standard_Wallet, Multisig_Wallet, Abstract_Wallet
-from electrum_grs.util import bfh, versiontuple, UserFacingException
-from electrum_grs.logging import get_logger
+from electrum_cat import bip32
+from electrum_cat.bip32 import BIP32Node, InvalidMasterKeyVersionBytes
+from electrum_cat.i18n import _
+from electrum_cat.plugin import Device, hook, runs_in_hwd_thread
+from electrum_cat.keystore import Hardware_KeyStore, KeyStoreWithMPK
+from electrum_cat.transaction import PartialTransaction
+from electrum_cat.wallet import Standard_Wallet, Multisig_Wallet, Abstract_Wallet
+from electrum_cat.util import bfh, versiontuple, UserFacingException
+from electrum_cat.logging import get_logger
 
 from ..hw_wallet import HW_PluginBase, HardwareClientBase
 from ..hw_wallet.plugin import LibraryFoundButUnusable, only_hook_if_libraries_available
 
 if TYPE_CHECKING:
-    from electrum_grs.plugin import DeviceInfo
-    from electrum_grs.wizard import NewWalletWizard
+    from electrum_cat.plugin import DeviceInfo
+    from electrum_cat.wizard import NewWalletWizard
 
 _logger = get_logger(__name__)
 
@@ -189,7 +189,7 @@ class CKCCClient(HardwareClientBase):
     def ping_check(self):
         # check connection is working
         assert self.dev.session_key, 'not encrypted?'
-        req = b'1234 Electrum-GRS Plugin 4321'      # free up to 59 bytes
+        req = b'1234 Electrum-CAT Plugin 4321'      # free up to 59 bytes
         try:
             echo = self.dev.send_recv(CCProtocolPacker.ping(req))
             assert echo == req
@@ -355,7 +355,7 @@ class Coldcard_KeyStore(Hardware_KeyStore):
             assert len(resp) == 2
             addr, raw_sig = resp
 
-            # already encoded in Groestlcoin fashion, binary.
+            # already encoded in Catcoin fashion, binary.
             assert 40 < len(raw_sig) <= 65
 
             return raw_sig
@@ -424,7 +424,7 @@ class Coldcard_KeyStore(Hardware_KeyStore):
 
     @staticmethod
     def _encode_txin_type(txin_type):
-        # Map from Electrum-GRS code names to our code numbers.
+        # Map from Electrum-CAT code names to our code numbers.
         return {'standard': AF_CLASSIC, 'p2pkh': AF_CLASSIC,
                 'p2sh': AF_P2SH,
                 'p2wpkh-p2sh': AF_P2WPKH_P2SH,
@@ -555,7 +555,7 @@ class ColdcardPlugin(HW_PluginBase):
         # it is participating in. All involved Coldcards can share same file.
         assert isinstance(wallet, Multisig_Wallet)
 
-        print('# Exported from Electrum-GRS', file=fp)
+        print('# Exported from Electrum-CAT', file=fp)
         print(f'Name: {name:.20s}', file=fp)
         print(f'Policy: {wallet.m} of {wallet.n}', file=fp)
         print(f'Format: {wallet.txin_type.upper()}', file=fp)

@@ -28,20 +28,20 @@ import asyncio, os
 from typing import TYPE_CHECKING
 from typing import NamedTuple, Dict
 
-from electrum_grs.util import log_exceptions, random_shuffled_copy
-from electrum_grs.plugin import BasePlugin, hook
-from electrum_grs.sql_db import SqlDB, sql
-from electrum_grs.lnwatcher import LNWatcher
-from electrum_grs.transaction import Transaction, match_script_against_template
-from electrum_grs.network import Network
-from electrum_grs.address_synchronizer import AddressSynchronizer, TX_HEIGHT_LOCAL
-from electrum_grs.wallet_db import WalletDB
-from electrum_grs.lnutil import WITNESS_TEMPLATE_RECEIVED_HTLC, WITNESS_TEMPLATE_OFFERED_HTLC
+from electrum_cat.util import log_exceptions, random_shuffled_copy
+from electrum_cat.plugin import BasePlugin, hook
+from electrum_cat.sql_db import SqlDB, sql
+from electrum_cat.lnwatcher import LNWatcher
+from electrum_cat.transaction import Transaction, match_script_against_template
+from electrum_cat.network import Network
+from electrum_cat.address_synchronizer import AddressSynchronizer, TX_HEIGHT_LOCAL
+from electrum_cat.wallet_db import WalletDB
+from electrum_cat.lnutil import WITNESS_TEMPLATE_RECEIVED_HTLC, WITNESS_TEMPLATE_OFFERED_HTLC
 
 from .server import WatchTowerServer
 
 if TYPE_CHECKING:
-    from electrum_grs.simple_config import SimpleConfig
+    from electrum_cat.simple_config import SimpleConfig
 
 
 class WatchtowerPlugin(BasePlugin):

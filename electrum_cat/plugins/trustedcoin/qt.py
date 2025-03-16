@@ -32,29 +32,29 @@ from PyQt6.QtCore import QObject, pyqtSignal, QSize, Qt
 from PyQt6.QtWidgets import (QTextEdit, QVBoxLayout, QLabel, QGridLayout, QHBoxLayout,
                              QRadioButton, QCheckBox, QPushButton, QWidget)
 
-from electrum_grs.i18n import _
-from electrum_grs.plugin import hook
-from electrum_grs.util import InvalidPassword
-from electrum_grs.logging import Logger, get_logger
-from electrum_grs import keystore
+from electrum_cat.i18n import _
+from electrum_cat.plugin import hook
+from electrum_cat.util import InvalidPassword
+from electrum_cat.logging import Logger, get_logger
+from electrum_cat import keystore
 
-from electrum_grs.gui.qt.util import (WindowModalDialog, WaitingDialog, OkButton, CancelButton, Buttons, icon_path,
+from electrum_cat.gui.qt.util import (WindowModalDialog, WaitingDialog, OkButton, CancelButton, Buttons, icon_path,
                                   internal_plugin_icon_path, WWLabel, CloseButton, ColorScheme,
                                   ChoiceWidget, PasswordLineEdit, char_width_in_lineedit)
-from electrum_grs.gui.qt.qrcodewidget import QRCodeWidget
-from electrum_grs.gui.qt.amountedit import AmountEdit
-from electrum_grs.gui.qt.main_window import StatusBarButton
-from electrum_grs.gui.qt.wizard.wallet import (WCCreateSeed, WCConfirmSeed, WCHaveSeed, WCEnterExt, WCConfirmExt,
+from electrum_cat.gui.qt.qrcodewidget import QRCodeWidget
+from electrum_cat.gui.qt.amountedit import AmountEdit
+from electrum_cat.gui.qt.main_window import StatusBarButton
+from electrum_cat.gui.qt.wizard.wallet import (WCCreateSeed, WCConfirmSeed, WCHaveSeed, WCEnterExt, WCConfirmExt,
                                            WalletWizardComponent)
-from electrum_grs.gui.qt.util import read_QIcon_from_bytes
+from electrum_cat.gui.qt.util import read_QIcon_from_bytes
 
 from .common_qt import TrustedcoinPluginQObject
 from .trustedcoin import TrustedCoinPlugin, DISCLAIMER
 
 if TYPE_CHECKING:
-    from electrum_grs.gui.qt.main_window import ElectrumWindow
-    from electrum_grs.wallet import Abstract_Wallet
-    from electrum_grs.gui.qt.wizard.wallet import QENewWalletWizard
+    from electrum_cat.gui.qt.main_window import ElectrumWindow
+    from electrum_cat.wallet import Abstract_Wallet
+    from electrum_cat.gui.qt.wizard.wallet import QENewWalletWizard
 
 
 class TOS(QTextEdit):

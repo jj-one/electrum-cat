@@ -1,13 +1,13 @@
 from typing import Optional, TYPE_CHECKING, Sequence
 
-from electrum_grs.util import UserFacingException
-from electrum_grs.bip32 import BIP32Node
-from electrum_grs import descriptor
-from electrum_grs import constants
-from electrum_grs.i18n import _
-from electrum_grs.transaction import Transaction, PartialTransaction, PartialTxInput, Sighash
-from electrum_grs.keystore import Hardware_KeyStore
-from electrum_grs.plugin import Device, runs_in_hwd_thread
+from electrum_cat.util import UserFacingException
+from electrum_cat.bip32 import BIP32Node
+from electrum_cat import descriptor
+from electrum_cat import constants
+from electrum_cat.i18n import _
+from electrum_cat.transaction import Transaction, PartialTransaction, PartialTxInput, Sighash
+from electrum_cat.keystore import Hardware_KeyStore
+from electrum_cat.plugin import Device, runs_in_hwd_thread
 
 from ..hw_wallet import HW_PluginBase
 from ..hw_wallet.plugin import is_any_tx_output_on_change_branch, trezor_validate_op_return_output_and_get_data
@@ -15,8 +15,8 @@ from ..hw_wallet.plugin import is_any_tx_output_on_change_branch, trezor_validat
 if TYPE_CHECKING:
     import usb1
     from .client import KeepKeyClient
-    from electrum_grs.plugin import DeviceInfo
-    from electrum_grs.wizard import NewWalletWizard
+    from electrum_cat.plugin import DeviceInfo
+    from electrum_cat.wizard import NewWalletWizard
 
 
 # TREZOR initialization methods
@@ -194,7 +194,7 @@ class KeepKeyPlugin(HW_PluginBase):
         return client
 
     def get_coin_name(self):
-        return "GRS Testnet" if constants.net.TESTNET else "Groestlcoin"
+        return "CAT Testnet" if constants.net.TESTNET else "Catcoin"
 
     @runs_in_hwd_thread
     def _initialize_device(self, settings, method, device_id, handler):

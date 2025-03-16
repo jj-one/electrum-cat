@@ -4,20 +4,20 @@ from typing import TYPE_CHECKING
 
 from PyQt6.QtCore import pyqtSignal
 
-from electrum_grs.i18n import _
-from electrum_grs.plugin import hook
-from electrum_grs.wallet import Standard_Wallet, Abstract_Wallet
-from electrum_grs.util import UserCancelled, UserFacingException
+from electrum_cat.i18n import _
+from electrum_cat.plugin import hook
+from electrum_cat.wallet import Standard_Wallet, Abstract_Wallet
+from electrum_cat.util import UserCancelled, UserFacingException
 
-from electrum_grs.plugins.hw_wallet.qt import QtHandlerBase, QtPluginBase
-from electrum_grs.plugins.hw_wallet.plugin import only_hook_if_libraries_available, OperationCancelled
+from electrum_cat.plugins.hw_wallet.qt import QtHandlerBase, QtPluginBase
+from electrum_cat.plugins.hw_wallet.plugin import only_hook_if_libraries_available, OperationCancelled
 
-from electrum_grs.gui.qt.wizard.wallet import WCScriptAndDerivation, WCHWXPub, WCHWUnlock
+from electrum_cat.gui.qt.wizard.wallet import WCScriptAndDerivation, WCHWXPub, WCHWUnlock
 
 from .digitalbitbox import DigitalBitboxPlugin, DeviceErased
 
 if TYPE_CHECKING:
-    from electrum_grs.gui.qt.wizard.wallet import QENewWalletWizard
+    from electrum_cat.gui.qt.wizard.wallet import QENewWalletWizard
 
 
 class Plugin(DigitalBitboxPlugin, QtPluginBase):

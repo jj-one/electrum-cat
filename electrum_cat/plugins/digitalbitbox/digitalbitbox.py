@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------------
-# Electrum-GRS plugin for the Digital Bitbox hardware wallet by Shift Devices AG
+# Electrum-CAT plugin for the Digital Bitbox hardware wallet by Shift Devices AG
 # digitalbitbox.com
 #
 
@@ -19,27 +19,27 @@ from typing import TYPE_CHECKING, Optional
 
 import electrum_ecc as ecc
 
-from electrum_grs.crypto import sha256d, EncodeAES_bytes, DecodeAES_bytes, hmac_oneshot
-from electrum_grs.bitcoin import public_key_to_p2pkh, usermessage_magic, verify_usermessage_with_address
-from electrum_grs.bip32 import BIP32Node, convert_bip32_intpath_to_strpath, is_all_public_derivation
-from electrum_grs.bip32 import normalize_bip32_derivation
-from electrum_grs import descriptor
-from electrum_grs.wallet import Standard_Wallet
-from electrum_grs import constants
-from electrum_grs.transaction import Transaction, PartialTransaction, PartialTxInput, Sighash
-from electrum_grs.i18n import _
-from electrum_grs.keystore import Hardware_KeyStore
-from electrum_grs.util import to_string, UserCancelled, UserFacingException, bfh
-from electrum_grs.network import Network
-from electrum_grs.logging import get_logger
-from electrum_grs.plugin import runs_in_hwd_thread, run_in_hwd_thread
+from electrum_cat.crypto import sha256d, EncodeAES_bytes, DecodeAES_bytes, hmac_oneshot
+from electrum_cat.bitcoin import public_key_to_p2pkh, usermessage_magic, verify_usermessage_with_address
+from electrum_cat.bip32 import BIP32Node, convert_bip32_intpath_to_strpath, is_all_public_derivation
+from electrum_cat.bip32 import normalize_bip32_derivation
+from electrum_cat import descriptor
+from electrum_cat.wallet import Standard_Wallet
+from electrum_cat import constants
+from electrum_cat.transaction import Transaction, PartialTransaction, PartialTxInput, Sighash
+from electrum_cat.i18n import _
+from electrum_cat.keystore import Hardware_KeyStore
+from electrum_cat.util import to_string, UserCancelled, UserFacingException, bfh
+from electrum_cat.network import Network
+from electrum_cat.logging import get_logger
+from electrum_cat.plugin import runs_in_hwd_thread, run_in_hwd_thread
 
 from ..hw_wallet import HW_PluginBase, HardwareClientBase, HardwareHandlerBase
 from ..hw_wallet.plugin import OperationCancelled
 
 if TYPE_CHECKING:
-    from electrum_grs.plugin import DeviceInfo
-    from electrum_grs.wizard import NewWalletWizard
+    from electrum_cat.plugin import DeviceInfo
+    from electrum_cat.wizard import NewWalletWizard
 
 _logger = get_logger(__name__)
 
@@ -226,7 +226,7 @@ class DigitalBitbox_Client(HardwareClientBase):
 
         # Initialize device if not yet initialized
         if not self.setupRunning:
-            self.isInitialized = True # Wallet exists. Electrum-GRS code later checks if the device matches the wallet
+            self.isInitialized = True # Wallet exists. Electrum-CAT code later checks if the device matches the wallet
         elif not self.isInitialized:
             reply = self.hid_send_encrypt(b'{"device":"info"}')
             if reply['device']['id'] != "":
@@ -310,7 +310,7 @@ class DigitalBitbox_Client(HardwareClientBase):
 
     def dbb_generate_wallet(self):
         key = self.stretch_key(self.password)
-        filename = ("Electrum-GRS-" + time.strftime("%Y-%m-%d-%H-%M-%S") + ".pdf")
+        filename = ("Electrum-CAT-" + time.strftime("%Y-%m-%d-%H-%M-%S") + ".pdf")
         msg = ('{"seed":{"source": "create", "key": "%s", "filename": "%s", "entropy": "%s"}}' % (key, filename, to_hexstr(os.urandom(32)))).encode('utf8')
         reply = self.hid_send_encrypt(msg)
         if 'error' in reply:
@@ -681,7 +681,7 @@ class DigitalBitboxPlugin(HW_PluginBase):
         self.digitalbitbox_config = self.config.get('digitalbitbox', {})
 
     def is_enabled(self):
-        # Not available for GRS.
+        # Not available for CAT.
         return False
 
     @runs_in_hwd_thread

@@ -1,4 +1,4 @@
-from electrum_grs.i18n import _
+from electrum_cat.i18n import _
 
 fullname = _('PayServer')
 description = 'run a HTTP server for receiving payments'

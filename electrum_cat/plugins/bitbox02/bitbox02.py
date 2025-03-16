@@ -7,24 +7,24 @@ from typing import TYPE_CHECKING, Dict, Tuple, Optional, List, Any, Callable
 
 import electrum_ecc as ecc
 
-from electrum_grs import bip32, constants
-from electrum_grs.i18n import _
-from electrum_grs.keystore import Hardware_KeyStore
-from electrum_grs.transaction import PartialTransaction, Sighash
-from electrum_grs.wallet import Multisig_Wallet, Deterministic_Wallet
-from electrum_grs.util import UserFacingException
-from electrum_grs.logging import get_logger
-from electrum_grs.plugin import Device, DeviceInfo, runs_in_hwd_thread
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs.storage import get_derivation_used_for_hw_device_encryption
-from electrum_grs.bitcoin import OnchainOutputType
+from electrum_cat import bip32, constants
+from electrum_cat.i18n import _
+from electrum_cat.keystore import Hardware_KeyStore
+from electrum_cat.transaction import PartialTransaction, Sighash
+from electrum_cat.wallet import Multisig_Wallet, Deterministic_Wallet
+from electrum_cat.util import UserFacingException
+from electrum_cat.logging import get_logger
+from electrum_cat.plugin import Device, DeviceInfo, runs_in_hwd_thread
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat.storage import get_derivation_used_for_hw_device_encryption
+from electrum_cat.bitcoin import OnchainOutputType
 
-import electrum_grs.bitcoin as bitcoin
+import electrum_cat.bitcoin as bitcoin
 
 from ..hw_wallet import HW_PluginBase, HardwareClientBase, HardwareHandlerBase
 
 if TYPE_CHECKING:
-    from electrum_grs.wizard import NewWalletWizard
+    from electrum_cat.wizard import NewWalletWizard
 
 _logger = get_logger(__name__)
 

@@ -26,20 +26,20 @@
 from abc import abstractmethod, ABC
 from typing import TYPE_CHECKING, Sequence, Optional, Type, Iterable, Any
 
-from electrum_grs.plugin import (BasePlugin, hook, Device, DeviceMgr,
+from electrum_cat.plugin import (BasePlugin, hook, Device, DeviceMgr,
                              assert_runs_in_hwd_thread, runs_in_hwd_thread)
-from electrum_grs.i18n import _
-from electrum_grs.bitcoin import is_address, opcodes
-from electrum_grs.util import versiontuple, UserFacingException
-from electrum_grs.transaction import TxOutput, PartialTransaction
-from electrum_grs.bip32 import BIP32Node
-from electrum_grs.storage import get_derivation_used_for_hw_device_encryption
-from electrum_grs.keystore import Xpub, Hardware_KeyStore
+from electrum_cat.i18n import _
+from electrum_cat.bitcoin import is_address, opcodes
+from electrum_cat.util import versiontuple, UserFacingException
+from electrum_cat.transaction import TxOutput, PartialTransaction
+from electrum_cat.bip32 import BIP32Node
+from electrum_cat.storage import get_derivation_used_for_hw_device_encryption
+from electrum_cat.keystore import Xpub, Hardware_KeyStore
 
 if TYPE_CHECKING:
     import threading
-    from electrum_grs.plugin import DeviceInfo
-    from electrum_grs.wallet import Abstract_Wallet
+    from electrum_cat.plugin import DeviceInfo
+    from electrum_cat.wallet import Abstract_Wallet
 
 
 class HW_PluginBase(BasePlugin, ABC):
@@ -107,7 +107,7 @@ class HW_PluginBase(BasePlugin, ABC):
         if keystore is None:
             keystore = wallet.get_keystore()
         if not is_address(address):
-            keystore.handler.show_error(_('Invalid Groestlcoin Address'))
+            keystore.handler.show_error(_('Invalid Catcoin Address'))
             return False
         if not wallet.is_mine(address):
             keystore.handler.show_error(_('Address not in wallet.'))

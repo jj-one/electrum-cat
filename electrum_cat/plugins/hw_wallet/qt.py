@@ -31,25 +31,25 @@ from typing import TYPE_CHECKING, Union, Optional, Sequence, Tuple
 from PyQt6.QtCore import QObject, pyqtSignal, Qt
 from PyQt6.QtWidgets import QVBoxLayout, QLineEdit, QHBoxLayout, QLabel
 
-from electrum_grs.gui.qt.password_dialog import PasswordLayout, PW_PASSPHRASE
-from electrum_grs.gui.qt.util import (read_QIcon, WWLabel, OkButton, WindowModalDialog,
+from electrum_cat.gui.qt.password_dialog import PasswordLayout, PW_PASSPHRASE
+from electrum_cat.gui.qt.util import (read_QIcon, WWLabel, OkButton, WindowModalDialog,
                                   Buttons, CancelButton, TaskThread, char_width_in_lineedit,
                                   PasswordLineEdit)
-from electrum_grs.gui.qt.main_window import StatusBarButton
-from electrum_grs.gui.qt.util import read_QIcon_from_bytes
+from electrum_cat.gui.qt.main_window import StatusBarButton
+from electrum_cat.gui.qt.util import read_QIcon_from_bytes
 
-from electrum_grs.i18n import _
-from electrum_grs.logging import Logger
-from electrum_grs.util import UserCancelled, UserFacingException
-from electrum_grs.plugin import hook, DeviceUnpairableError
+from electrum_cat.i18n import _
+from electrum_cat.logging import Logger
+from electrum_cat.util import UserCancelled, UserFacingException
+from electrum_cat.plugin import hook, DeviceUnpairableError
 
 from .plugin import OutdatedHwFirmwareException, HW_PluginBase, HardwareHandlerBase
 
 if TYPE_CHECKING:
-    from electrum_grs.wallet import Abstract_Wallet
-    from electrum_grs.keystore import Hardware_KeyStore
-    from electrum_grs.gui.qt import ElectrumWindow
-    from electrum_grs.gui.qt.wizard.wallet import QENewWalletWizard
+    from electrum_cat.wallet import Abstract_Wallet
+    from electrum_cat.keystore import Hardware_KeyStore
+    from electrum_cat.gui.qt import ElectrumWindow
+    from electrum_cat.gui.qt.wizard.wallet import QENewWalletWizard
 
 
 # The trickiest thing about this handler was getting windows properly

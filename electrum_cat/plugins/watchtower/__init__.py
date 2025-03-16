@@ -1,16 +1,16 @@
-from electrum_grs.i18n import _
+from electrum_cat.i18n import _
 
 fullname = _('Watchtower')
 description = """
-Watchtower for Electrum-GRS.
+Watchtower for Electrum-CAT.
 
 Example setup:
 
-  electrum-grs -o setconfig enable_plugin_watchtower True
-  electrum-grs -o setconfig watchtower_user wtuser
-  electrum-grs -o setconfig watchtower_password wtpassword
-  electrum-grs -o setconfig watchtower_port 12345
-  electrum-grs daemon -v
+  electrum-cat -o setconfig enable_plugin_watchtower True
+  electrum-cat -o setconfig watchtower_user wtuser
+  electrum-cat -o setconfig watchtower_password wtpassword
+  electrum-cat -o setconfig watchtower_port 12345
+  electrum-cat daemon -v
 
 """
 

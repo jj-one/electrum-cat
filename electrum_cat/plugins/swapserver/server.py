@@ -5,14 +5,14 @@ from typing import TYPE_CHECKING
 
 from aiohttp import web
 
-from electrum_grs.util import log_exceptions, ignore_exceptions
-from electrum_grs.logging import Logger
-from electrum_grs.util import EventListener
-from electrum_grs.lnaddr import lndecode
+from electrum_cat.util import log_exceptions, ignore_exceptions
+from electrum_cat.logging import Logger
+from electrum_cat.util import EventListener
+from electrum_cat.lnaddr import lndecode
 
 if TYPE_CHECKING:
-    from electrum_grs.simple_config import SimpleConfig
-    from electrum_grs.wallet import Abstract_Wallet
+    from electrum_cat.simple_config import SimpleConfig
+    from electrum_cat.wallet import Abstract_Wallet
 
 
 class HttpSwapServer(Logger, EventListener):
@@ -63,7 +63,7 @@ class HttpSwapServer(Logger, EventListener):
             "warnings": [],
             "htlcFirst": True,
             "pairs": {
-                "GRS/GRS": {
+                "CAT/CAT": {
                     "rate": 1,
                     "limits": {
                         "maximal": sm._max_amount,

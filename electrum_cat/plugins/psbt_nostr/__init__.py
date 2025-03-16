@@ -1,4 +1,4 @@
-from electrum_grs.i18n import _
+from electrum_cat.i18n import _
 fullname = _('PSBT over Nostr')
 description = ' '.join([
     _("This plugin facilitates the use of multi-signatures wallets."),

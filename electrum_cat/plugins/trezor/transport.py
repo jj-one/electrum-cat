@@ -1,4 +1,4 @@
-from electrum_grs.util import PrintError
+from electrum_cat.util import PrintError
 
 
 class TrezorTransport(PrintError):

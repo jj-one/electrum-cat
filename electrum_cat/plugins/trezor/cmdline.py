@@ -1,6 +1,6 @@
-from electrum_grs.plugin import hook
-from electrum_grs.i18n import _
-from electrum_grs.util import print_stderr
+from electrum_cat.plugin import hook
+from electrum_cat.i18n import _
+from electrum_cat.util import print_stderr
 from .trezor import TrezorPlugin, PASSPHRASE_ON_DEVICE
 from ..hw_wallet import CmdLineHandler
 

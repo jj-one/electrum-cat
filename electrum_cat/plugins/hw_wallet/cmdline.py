@@ -1,5 +1,5 @@
-from electrum_grs.util import print_stderr, raw_input
-from electrum_grs.logging import get_logger
+from electrum_cat.util import print_stderr, raw_input
+from electrum_cat.logging import get_logger
 
 from .plugin import HardwareHandlerBase
 

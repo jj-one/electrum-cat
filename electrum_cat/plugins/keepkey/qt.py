@@ -9,22 +9,22 @@ from PyQt6.QtWidgets import (QVBoxLayout, QLabel, QGridLayout, QPushButton,
                              QTextEdit, QLineEdit, QRadioButton, QCheckBox, QWidget,
                              QMessageBox, QSlider, QTabWidget)
 
-from electrum_grs.gui.qt.util import (WindowModalDialog, WWLabel, Buttons, CancelButton,
+from electrum_cat.gui.qt.util import (WindowModalDialog, WWLabel, Buttons, CancelButton,
                                   OkButton, CloseButton, ChoiceWidget)
-from electrum_grs.i18n import _
-from electrum_grs.plugin import hook
-from electrum_grs.logging import Logger
+from electrum_cat.i18n import _
+from electrum_cat.plugin import hook
+from electrum_cat.logging import Logger
 
-from electrum_grs.plugins.hw_wallet.qt import QtHandlerBase, QtPluginBase
-from electrum_grs.plugins.hw_wallet.trezor_qt_pinmatrix import PinMatrixWidget
-from electrum_grs.plugins.hw_wallet.plugin import only_hook_if_libraries_available
+from electrum_cat.plugins.hw_wallet.qt import QtHandlerBase, QtPluginBase
+from electrum_cat.plugins.hw_wallet.trezor_qt_pinmatrix import PinMatrixWidget
+from electrum_cat.plugins.hw_wallet.plugin import only_hook_if_libraries_available
 
 from .keepkey import KeepKeyPlugin, TIM_NEW, TIM_RECOVER, TIM_MNEMONIC, TIM_PRIVKEY
 
-from electrum_grs.gui.qt.wizard.wallet import WCScriptAndDerivation, WCHWUnlock, WCHWXPub, WalletWizardComponent
+from electrum_cat.gui.qt.wizard.wallet import WCScriptAndDerivation, WCHWUnlock, WCHWXPub, WalletWizardComponent
 
 if TYPE_CHECKING:
-    from electrum_grs.gui.qt.wizard.wallet import QENewWalletWizard
+    from electrum_cat.gui.qt.wizard.wallet import QENewWalletWizard
 
 PASSPHRASE_HELP_SHORT =_(
     "Passphrases allow you to access new wallets, each "
@@ -36,10 +36,10 @@ PASSPHRASE_HELP = PASSPHRASE_HELP_SHORT + "  " + _(
     "accessible behind its own passphrase.")
 RECOMMEND_PIN = _(
     "You should enable PIN protection.  Your PIN is the only protection "
-    "for your groestlcoins if your device is lost or stolen.")
+    "for your catcoins if your device is lost or stolen.")
 PASSPHRASE_NOT_PIN = _(
     "If you forget a passphrase you will be unable to access any "
-    "groestlcoins in the wallet behind it.  A passphrase is not a PIN. "
+    "catcoins in the wallet behind it.  A passphrase is not a PIN. "
     "Only change this if you are sure you understand it.")
 CHARACTER_RECOVERY = (
     "Use the recovery cipher shown on your device to input your seed words.  "
@@ -271,7 +271,7 @@ class KeepkeyInitLayout(QVBoxLayout):
                 msg = _("Enter the master private key beginning with xprv:")
 
                 def set_enabled():
-                    from electrum_grs.bip32 import is_xprv
+                    from electrum_cat.bip32 import is_xprv
                     self.validChanged.emit(is_xprv(clean_text(self.text_e)))
                 self.text_e.textChanged.connect(set_enabled)
 
@@ -438,7 +438,7 @@ class SettingsDialog(WindowModalDialog):
             if wallet and sum(wallet.get_balance()):
                 title = _("Confirm Device Wipe")
                 msg = _("Are you SURE you want to wipe the device?\n"
-                        "Your wallet still has groestlcoins in it!")
+                        "Your wallet still has catcoins in it!")
                 if not self.question(msg, title=title,
                                      icon=QMessageBox.Icon.Critical):
                     return
@@ -513,7 +513,7 @@ class SettingsDialog(WindowModalDialog):
         settings_glayout.addWidget(pin_button, 2, 1)
         pin_msg = QLabel(_("PIN protection is strongly recommended.  "
                            "A PIN is your only protection against someone "
-                           "stealing your groestlcoins if they obtain physical "
+                           "stealing your catcoins if they obtain physical "
                            "access to your {}.").format(plugin.device))
         pin_msg.setWordWrap(True)
         pin_msg.setStyleSheet("color: red")
@@ -555,7 +555,7 @@ class SettingsDialog(WindowModalDialog):
         clear_pin_button.clicked.connect(clear_pin)
         clear_pin_warning = QLabel(
             _("If you disable your PIN, anyone with physical access to your "
-              "{} device can spend your groestlcoins.").format(plugin.device))
+              "{} device can spend your catcoins.").format(plugin.device))
         clear_pin_warning.setWordWrap(True)
         clear_pin_warning.setStyleSheet("color: red")
         advanced_glayout.addWidget(clear_pin_button, 0, 2)
@@ -580,7 +580,7 @@ class SettingsDialog(WindowModalDialog):
         wipe_device_msg.setWordWrap(True)
         wipe_device_warning = QLabel(
             _("Only wipe a device if you have the recovery seed written down "
-              "and the device wallet(s) are empty, otherwise the groestlcoins "
+              "and the device wallet(s) are empty, otherwise the catcoins "
               "will be lost forever."))
         wipe_device_warning.setWordWrap(True)
         wipe_device_warning.setStyleSheet("color: red")

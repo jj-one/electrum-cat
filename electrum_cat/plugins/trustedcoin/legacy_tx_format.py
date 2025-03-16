@@ -5,12 +5,12 @@
 import copy
 from typing import Union
 
-from electrum_grs import bitcoin
-from electrum_grs.bitcoin import push_script, int_to_hex, var_int
-from electrum_grs.transaction import (Transaction, PartialTransaction, PartialTxInput,
+from electrum_cat import bitcoin
+from electrum_cat.bitcoin import push_script, int_to_hex, var_int
+from electrum_cat.transaction import (Transaction, PartialTransaction, PartialTxInput,
                                   multisig_script, construct_witness)
-from electrum_grs.keystore import BIP32_KeyStore
-from electrum_grs.wallet import Multisig_Wallet
+from electrum_cat.keystore import BIP32_KeyStore
+from electrum_cat.wallet import Multisig_Wallet
 
 
 ELECTRUM_PARTIAL_TXN_HEADER_MAGIC = b'EPTF\xff'

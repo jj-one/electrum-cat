@@ -5,15 +5,15 @@ from typing import TYPE_CHECKING
 
 from PyQt6.QtCore import pyqtSignal, pyqtProperty, pyqtSlot
 
-from electrum_grs.i18n import _
-from electrum_grs.bip32 import BIP32Node
-from electrum_grs import bitcoin
+from electrum_cat.i18n import _
+from electrum_cat.bip32 import BIP32Node
+from electrum_cat import bitcoin
 
 from .trustedcoin import (server, ErrorConnectingServer, MOBILE_DISCLAIMER, TrustedCoinException)
-from electrum_grs.gui.common_qt.plugins import PluginQObject
+from electrum_cat.gui.common_qt.plugins import PluginQObject
 
 if TYPE_CHECKING:
-    from electrum_grs.wizard import NewWalletWizard
+    from electrum_cat.wizard import NewWalletWizard
 
 
 class TrustedcoinPluginQObject(PluginQObject):
@@ -122,7 +122,7 @@ class TrustedcoinPluginQObject(PluginQObject):
 
     @pyqtSlot()
     def createKeystore(self):
-        email = 'dummy@groestlcoin.org'
+        email = 'catcoin2013@proton.me'
 
         self.remoteKeyState = ''
         self._otpSecret = ''

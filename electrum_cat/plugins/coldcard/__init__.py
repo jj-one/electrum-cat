@@ -1,4 +1,4 @@
-from electrum_grs.i18n import _
+from electrum_cat.i18n import _
 
 fullname = 'Coldcard Wallet'
 description = 'Provides support for the Coldcard hardware wallet from Coinkite'

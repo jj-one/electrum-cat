@@ -4,13 +4,13 @@ from typing import Optional
 
 import electrum_ecc as ecc
 
-from electrum_grs.i18n import _
-from electrum_grs.util import UserCancelled
-from electrum_grs.keystore import bip39_normalize_passphrase
-from electrum_grs.bip32 import BIP32Node, convert_bip32_strpath_to_intpath
-from electrum_grs.logging import Logger
-from electrum_grs.plugin import runs_in_hwd_thread
-from electrum_grs.plugins.hw_wallet.plugin import HardwareClientBase, HardwareHandlerBase
+from electrum_cat.i18n import _
+from electrum_cat.util import UserCancelled
+from electrum_cat.keystore import bip39_normalize_passphrase
+from electrum_cat.bip32 import BIP32Node, convert_bip32_strpath_to_intpath
+from electrum_cat.logging import Logger
+from electrum_cat.plugin import runs_in_hwd_thread
+from electrum_cat.plugins.hw_wallet.plugin import HardwareClientBase, HardwareHandlerBase
 
 
 class GuiMixin(object):
@@ -76,7 +76,7 @@ class GuiMixin(object):
             msg = _("Enter a passphrase to generate this wallet.  Each time "
                     "you use this wallet your {} will prompt you for the "
                     "passphrase.  If you forget the passphrase you cannot "
-                    "access the groestlcoins in the wallet.").format(self.device)
+                    "access the catcoins in the wallet.").format(self.device)
         else:
             msg = _("Enter the passphrase to unlock this wallet:")
         passphrase = self.handler.get_passphrase(msg, self.creating_wallet)
@@ -139,8 +139,8 @@ class SafeTClientBase(HardwareClientBase, GuiMixin, Logger):
     @runs_in_hwd_thread
     def has_usable_connection_with_device(self):
         try:
-            res = self.ping("electrum-GRS pinging device")
-            assert res == "electrum-GRS pinging device"
+            res = self.ping("electrum-CAT pinging device")
+            assert res == "electrum-CAT pinging device"
         except BaseException:
             return False
         return True

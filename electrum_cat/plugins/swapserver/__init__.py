@@ -1,14 +1,14 @@
-from electrum_grs.i18n import _
+from electrum_cat.i18n import _
 
 fullname = _('SwapServer')
 description = """
-Submarine swap server for an Electrum-GRS daemon.
+Submarine swap server for an Electrum-CAT daemon.
 
 Example setup:
 
-  electrum-grs -o setconfig enable_plugin_swapserver True
-  electrum-grs -o setconfig swapserver_port 5455
-  electrum-grs daemon -v
+  electrum-cat -o setconfig enable_plugin_swapserver True
+  electrum-cat -o setconfig swapserver_port 5455
+  electrum-cat daemon -v
 
 """
 

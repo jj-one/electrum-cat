@@ -5,15 +5,15 @@ from typing import TYPE_CHECKING
 
 from aiohttp import web
 
-from electrum_grs.util import log_exceptions, ignore_exceptions
-from electrum_grs.logging import Logger
-from electrum_grs.util import EventListener
-from electrum_grs.lnaddr import lndecode
-from electrum_grs.daemon import AuthenticatedServer
+from electrum_cat.util import log_exceptions, ignore_exceptions
+from electrum_cat.logging import Logger
+from electrum_cat.util import EventListener
+from electrum_cat.lnaddr import lndecode
+from electrum_cat.daemon import AuthenticatedServer
 
 
 if TYPE_CHECKING:
-    from electrum_grs.network import Network
+    from electrum_cat.network import Network
 
 
 class WatchTowerServer(AuthenticatedServer):

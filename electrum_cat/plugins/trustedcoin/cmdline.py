@@ -23,7 +23,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from electrum_grs.i18n import _
+from electrum_cat.i18n import _
 from .trustedcoin import TrustedCoinPlugin
 
 

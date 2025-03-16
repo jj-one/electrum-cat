@@ -1,22 +1,22 @@
 from typing import NamedTuple, Any, Optional, TYPE_CHECKING, Sequence
 
-from electrum_grs.util import bfh, UserCancelled, UserFacingException
-from electrum_grs.bip32 import BIP32Node
-from electrum_grs import descriptor
-from electrum_grs import constants
-from electrum_grs.i18n import _
-from electrum_grs.plugin import Device, runs_in_hwd_thread
-from electrum_grs.transaction import Transaction, PartialTransaction, PartialTxInput, Sighash
-from electrum_grs.keystore import Hardware_KeyStore
-from electrum_grs.logging import get_logger
+from electrum_cat.util import bfh, UserCancelled, UserFacingException
+from electrum_cat.bip32 import BIP32Node
+from electrum_cat import descriptor
+from electrum_cat import constants
+from electrum_cat.i18n import _
+from electrum_cat.plugin import Device, runs_in_hwd_thread
+from electrum_cat.transaction import Transaction, PartialTransaction, PartialTxInput, Sighash
+from electrum_cat.keystore import Hardware_KeyStore
+from electrum_cat.logging import get_logger
 
-from electrum_grs.plugins.hw_wallet import HW_PluginBase
-from electrum_grs.plugins.hw_wallet.plugin import is_any_tx_output_on_change_branch, \
+from electrum_cat.plugins.hw_wallet import HW_PluginBase
+from electrum_cat.plugins.hw_wallet.plugin import is_any_tx_output_on_change_branch, \
     trezor_validate_op_return_output_and_get_data, LibraryFoundButUnusable, OutdatedHwFirmwareException
 
 if TYPE_CHECKING:
-    from electrum_grs.plugin import DeviceInfo
-    from electrum_grs.wizard import NewWalletWizard
+    from electrum_cat.plugin import DeviceInfo
+    from electrum_cat.wizard import NewWalletWizard
 
 _logger = get_logger(__name__)
 
@@ -247,7 +247,7 @@ class TrezorPlugin(HW_PluginBase):
         return client
 
     def get_coin_name(self):
-        return "Groestlcoin Testnet" if constants.net.TESTNET else "Groestlcoin"
+        return "Catcoin Testnet" if constants.net.TESTNET else "Catcoin"
 
     @runs_in_hwd_thread
     def _initialize_device(self, settings: TrezorInitSettings, method, device_id, handler):
