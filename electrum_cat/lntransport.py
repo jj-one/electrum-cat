@@ -26,7 +26,7 @@ class ConnStringFormatError(Exception): pass
 
 
 if TYPE_CHECKING:
-    from electrum_grs.network import Network
+    from electrum_cat.network import Network
 
 
 class HandshakeState(object):

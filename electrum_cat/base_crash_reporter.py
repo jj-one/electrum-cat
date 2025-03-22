@@ -41,7 +41,7 @@ class CrashReportResponse(NamedTuple):
 
 
 class BaseCrashReporter(Logger):
-    report_server = "https://crashhub.groestlcoin.org"
+    report_server = "https://crashhub.electrum-cat.org"
     issue_template = """<h2>Traceback</h2>
 <pre>
 {traceback}
@@ -49,7 +49,7 @@ class BaseCrashReporter(Logger):
 
 <h2>Additional information</h2>
 <ul>
-  <li>Electrum-GRS version: {app_version}</li>
+  <li>Electrum-CAT version: {app_version}</li>
   <li>Python version: {python_version}</li>
   <li>Operating system: {os}</li>
   <li>Wallet type: {wallet_type}</li>
@@ -71,7 +71,7 @@ class BaseCrashReporter(Logger):
 
     def send_report(self, asyncio_loop, proxy, *, timeout=None) -> CrashReportResponse:
         # FIXME the caller needs to catch generic "Exception", as this method does not have a well-defined API...
-        if constants.net.GENESIS[-4:] not in ["4943", "e26f"] and ".groestlcoin.org" in BaseCrashReporter.report_server:
+        if constants.net.GENESIS[-4:] not in ["4943", "e26f"] and ".electrum-cat.org" in BaseCrashReporter.report_server:
             # Gah! Some kind of altcoin wants to send us crash reports.
             raise Exception(_("Missing report URL."))
         report = self.get_traceback_info()

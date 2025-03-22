@@ -95,7 +95,7 @@ class Plugins(DaemonThread):
             #       we exclude the ones packaged as *code*, here:
             if loader.__class__.__qualname__ == "PyiFrozenImporter":
                 continue
-            full_name = f'electrum_grs.plugins.{name}'
+            full_name = f'electrum_cat.plugins.{name}'
             spec = importlib.util.find_spec(full_name)
             if spec is None:  # pkgutil found it but importlib can't ?!
                 raise Exception(f"Error pre-loading {full_name}: no spec")
@@ -248,7 +248,7 @@ class Plugins(DaemonThread):
     def load_internal_plugin(self, name) -> 'BasePlugin':
         if name in self.plugins:
             return self.plugins[name]
-        full_name = f'electrum_grs.plugins.{name}.{self.gui_name}'
+        full_name = f'electrum_cat.plugins.{name}.{self.gui_name}'
         spec = importlib.util.find_spec(full_name)
         if spec is None:
             raise RuntimeError(f"{self.gui_name} implementation for {name} plugin not found")
@@ -753,10 +753,10 @@ class DeviceMgr(ThreadJob):
         # The user input has wrong PIN or passphrase, or cancelled input,
         # or it is not pairable
         raise DeviceUnpairableError(
-            _('Electrum-GRS cannot pair with your {}.\n\n'
-              'Before you request groestlcoins to be sent to addresses in this '
+            _('Electrum-CAT cannot pair with your {}.\n\n'
+              'Before you request catcoins to be sent to addresses in this '
               'wallet, ensure you can pair with your device, or that you have '
-              'its seed (and passphrase, if any).  Otherwise all groestlcoins you '
+              'its seed (and passphrase, if any).  Otherwise all catcoins you '
               'receive will be unspendable.').format(plugin.device))
 
     def list_pairable_device_infos(

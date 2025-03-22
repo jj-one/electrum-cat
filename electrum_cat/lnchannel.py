@@ -1031,7 +1031,7 @@ class Channel(AbstractChannel):
             if amount_msat <= 0:
                 raise PaymentFailure("HTLC value must be positive")
             if amount_msat < chan_config.htlc_minimum_msat:
-                raise PaymentFailure(f'HTLC value too small: {amount_msat} mgro')
+                raise PaymentFailure(f'HTLC value too small: {amount_msat} mcatoshi')
 
         # check proposer can afford htlc
         max_can_send_msat = self.available_to_spend(htlc_proposer, strict=strict)
@@ -1053,9 +1053,9 @@ class Channel(AbstractChannel):
         # check "max_htlc_value_in_flight_msat"
         current_htlc_sum = htlcsum(self.hm.htlcs_by_direction(htlc_receiver, direction=RECEIVED, ctn=ctn).values())
         if current_htlc_sum + amount_msat > chan_config.max_htlc_value_in_flight_msat:
-            raise PaymentFailure(f'HTLC value sum (sum of pending htlcs: {current_htlc_sum/1000} gro '
-                                 f'plus new htlc: {amount_msat/1000} gro) '
-                                 f'would exceed max allowed: {chan_config.max_htlc_value_in_flight_msat/1000} gro')
+            raise PaymentFailure(f'HTLC value sum (sum of pending htlcs: {current_htlc_sum/1000} catoshi '
+                                 f'plus new htlc: {amount_msat/1000} catoshi) '
+                                 f'would exceed max allowed: {chan_config.max_htlc_value_in_flight_msat/1000} catoshi')
 
     def can_pay(self, amount_msat: int, *, check_frozen=False) -> bool:
         """Returns whether we can add an HTLC of given value."""
@@ -1597,7 +1597,7 @@ class Channel(AbstractChannel):
         if self.constraints.is_initiator != from_us:
             raise Exception(f"Cannot update_fee: wrong initiator. us: {from_us}")
         if feerate < FEERATE_PER_KW_MIN_RELAY_LIGHTNING:
-            raise Exception(f"Cannot update_fee: feerate lower than min relay fee. {feerate} gro/kw. us: {from_us}")
+            raise Exception(f"Cannot update_fee: feerate lower than min relay fee. {feerate} catoshi/kw. us: {from_us}")
         sender = LOCAL if from_us else REMOTE
         ctx_owner = -sender
         ctn = self.get_next_ctn(ctx_owner)

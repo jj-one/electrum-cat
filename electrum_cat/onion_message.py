@@ -33,15 +33,15 @@ from typing import TYPE_CHECKING, Optional, Sequence, NamedTuple
 
 import electrum_ecc as ecc
 
-from electrum_grs.lnrouter import PathEdge
-from electrum_grs.logging import get_logger, Logger
-from electrum_grs.crypto import sha256, get_ecdh
-from electrum_grs.lnmsg import OnionWireSerializer
-from electrum_grs.lnonion import (get_bolt04_onion_key, OnionPacket, process_onion_packet,
+from electrum_cat.lnrouter import PathEdge
+from electrum_cat.logging import get_logger, Logger
+from electrum_cat.crypto import sha256, get_ecdh
+from electrum_cat.lnmsg import OnionWireSerializer
+from electrum_cat.lnonion import (get_bolt04_onion_key, OnionPacket, process_onion_packet,
                               OnionHopsDataSingle, decrypt_onionmsg_data_tlv, encrypt_onionmsg_data_tlv,
                               get_shared_secrets_along_route, new_onion_packet)
-from electrum_grs.lnutil import LnFeatures
-from electrum_grs.util import OldTaskGroup, log_exceptions
+from electrum_cat.lnutil import LnFeatures
+from electrum_cat.util import OldTaskGroup, log_exceptions
 
 
 def now():
@@ -49,10 +49,10 @@ def now():
 
 
 if TYPE_CHECKING:
-    from electrum_grs.lnworker import LNWallet
-    from electrum_grs.network import Network
-    from electrum_grs.lnrouter import NodeInfo
-    from electrum_grs.lntransport import LNPeerAddr
+    from electrum_cat.lnworker import LNWallet
+    from electrum_cat.network import Network
+    from electrum_cat.lnrouter import NodeInfo
+    from electrum_cat.lntransport import LNPeerAddr
     from asyncio import Task
 
 logger = get_logger(__name__)

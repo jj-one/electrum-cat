@@ -574,7 +574,7 @@ class LNGossip(LNWorker):
         progress_percent = round(progress_percent)
         # take a minimal number of synchronized channels to get a more accurate
         # percentage estimate
-        if current_est < 2: # GRS
+        if current_est < 2: # CAT
             progress_percent = 0
         return current_est, total_est, progress_percent
 

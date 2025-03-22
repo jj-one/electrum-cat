@@ -16,19 +16,13 @@ _logger = get_logger(__name__)
 
 # hardcoded list
 # TODO for some pubkeys, there are multiple network addresses we could try
-TRAMPOLINE_NODES_MAINNET = {
-    'eclair':                 LNPeerAddr(host='82.196.13.206',           port=9735, pubkey=bytes.fromhex('02576fe2dfc26879c751a38f69a1e6b6d6646fa3edf045d5534d8674a188c7da81')),
-}
+TRAMPOLINE_NODES_MAINNET = {}
 
-TRAMPOLINE_NODES_TESTNET = {
-    'eclair testnet': LNPeerAddr(host='108.61.99.169', port=9735, pubkey=bytes.fromhex('021fedfc02b43971339bf9052e2c639e182be6565435d1606761718352be666f15')),
-}
+TRAMPOLINE_NODES_TESTNET = {}
 
 TRAMPOLINE_NODES_TESTNET4 = {}
 
-TRAMPOLINE_NODES_SIGNET = {
-    'eclair signet': LNPeerAddr(host='108.61.99.169', port=9735, pubkey=bytes.fromhex('021fedfc02b43971339bf9052e2c639e182be6565435d1606761718352be666f15')),
-}
+TRAMPOLINE_NODES_SIGNET = {}
 
 _TRAMPOLINE_NODES_UNITTESTS = {}  # used in unit tests
 

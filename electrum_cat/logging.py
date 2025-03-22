@@ -56,7 +56,7 @@ console_formatter = LogFormatterForConsole(fmt="%(asctime)s | %(levelname).1s | 
 def _shorten_name_of_logrecord(record: logging.LogRecord) -> logging.LogRecord:
     record = copy.copy(record)  # avoid mutating arg
     # strip the main module name from the logger name
-    if record.name.startswith("electrum_grs."):
+    if record.name.startswith("electrum_cat."):
         record.name = record.name[9:]
     # manual map to shorten common module names
     record.name = record.name.replace("interface.Interface", "interface", 1)
@@ -118,7 +118,7 @@ class TruncatingMemoryHandler(logging.handlers.MemoryHandler):
 
 
 def _delete_old_logs(path, *, num_files_keep: int):
-    files = sorted(list(pathlib.Path(path).glob("electrum_grs_log_*.log")), reverse=True)
+    files = sorted(list(pathlib.Path(path).glob("electrum_cat_log_*.log")), reverse=True)
     for f in files[num_files_keep:]:
         try:
             os.remove(str(f))
@@ -138,7 +138,7 @@ def _configure_file_logging(log_directory: pathlib.Path, *, num_files_keep: int)
 
     timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     PID = os.getpid()
-    _logfile_path = log_directory / f"electrum_grs_log_{timestamp}_{PID}.log"
+    _logfile_path = log_directory / f"electrum_cat_log_{timestamp}_{PID}.log"
     # we create the file with restrictive perms, instead of letting FileHandler create it
     with open(_logfile_path, "w+") as f:
         os_chmod(_logfile_path, 0o600)
@@ -262,7 +262,7 @@ root_logger.setLevel(logging.WARNING)
 # Note: this is set up at import-time instead of e.g. as part of a function that is
 #       called from run_electrum (the main script). This is to have this run as early
 #       as possible.
-# Note: some users might use Electrum-GRS as a python library and not use run_electrum_grs,
+# Note: some users might use Electrum-CAT as a python library and not use run_electrum_cat,
 #       in which case these logs might never get redirected or cleaned up.
 #       Also, the python docs recommend libraries not to set a handler, to
 #       avoid interfering with the user's logging.
@@ -272,14 +272,14 @@ if getattr(sys, "_ELECTRUM_RUNNING_VIA_RUNELECTRUM", False):
     root_logger.addHandler(_inmemory_startup_logs)
 
 # creates a logger specifically for electrum library
-electrum_logger = logging.getLogger("electrum_grs")
+electrum_logger = logging.getLogger("electrum_cat")
 electrum_logger.setLevel(logging.DEBUG)
 
 
 # --- External API
 
 def get_logger(name: str) -> logging.Logger:
-    if name.startswith("electrum_grs."):
+    if name.startswith("electrum_cat."):
         name = name[9:]
     return electrum_logger.getChild(name)
 
@@ -348,7 +348,7 @@ def configure_logging(config: 'SimpleConfig', *, log_to_file: Optional[bool] = N
 
     from . import ELECTRUM_VERSION
     from .constants import GIT_REPO_URL
-    _logger.info(f"Electrum-GRS version: {ELECTRUM_VERSION} - https://groestlcoin.org - {GIT_REPO_URL}")
+    _logger.info(f"Electrum-CAT version: {ELECTRUM_VERSION} - https://electrum-cat.org - {GIT_REPO_URL}")
     _logger.info(f"Python version: {sys.version}. On platform: {describe_os_version()}")
     _logger.info(f"Logging to file: {str(_logfile_path)}")
     _logger.info(f"Log filters: verbosity {repr(verbosity)}, verbosity_shortcuts {repr(verbosity_shortcuts)}")

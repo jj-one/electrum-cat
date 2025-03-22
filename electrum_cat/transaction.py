@@ -497,7 +497,7 @@ class BCDataStream(object):
         # 0 to 252 :  1-byte-length followed by bytes (if any)
         # 253 to 65,535 : byte'253' 2-byte-length followed by bytes
         # 65,536 to 4,294,967,295 : byte '254' 4-byte-length followed by bytes
-        # ... and the Groestlcoin client is coded to understand:
+        # ... and the Catcoin client is coded to understand:
         # greater than 4,294,967,295 : byte '255' 8-byte-length followed by bytes of string
         # ... but I don't think it actually handles any strings that big.
         if self.input is None:
@@ -993,7 +993,7 @@ class Transaction:
         return bfh(self.serialize())
 
     def serialize_to_network(self, *, estimate_size=False, include_sigs=True, force_legacy=False) -> str:
-        """Serialize the transaction as used on the Groestlcoin network, into hex.
+        """Serialize the transaction as used on the Catcoin network, into hex.
         `include_sigs` signals whether to include scriptSigs and witnesses.
         `force_legacy` signals to use the pre-segwit format
         note: (not include_sigs) implies force_legacy
@@ -1182,7 +1182,7 @@ class Transaction:
 
     @classmethod
     def satperbyte_from_satperkw(cls, feerate_kw):
-        """Converts feerate from sat/kw to gro/vbyte."""
+        """Converts feerate from sat/kw to catoshi/vbyte."""
         return feerate_kw * 4 / 1000
 
     def estimated_total_size(self):

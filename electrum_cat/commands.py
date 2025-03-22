@@ -294,8 +294,8 @@ class Commands(Logger):
     @command('')
     async def restore(self, text, passphrase=None, password=None, encrypt_file=True, wallet_path=None):
         """Restore a wallet from text. Text can be a seed phrase, a master
-        public key, a master private key, a list of groestlcoin addresses
-        or groestlcoin private keys.
+        public key, a master private key, a list of catcoin addresses
+        or catcoin private keys.
         If you want to be prompted for an argument, type '?' or ':' (concealed)
         """
         # TODO create a separate command that blocks until wallet is synced
@@ -432,7 +432,7 @@ class Commands(Logger):
                  "value_sats": 1000000, "privkey": "p2wpkh:cVDXzzQg6RoCTfiKpe8MBvmm5d5cJc6JLuFApsFDKwWa6Ey5hfc1"}
             ],
             "outputs": [
-                {"address": "tgrs1q9pzjpjq4nqx5ycnywekcmycqz0wjp2nqsv2vqc", "value_sats": 990000}
+                {"address": "tcat1q9pzjpjq4nqx5ycnywekcmycqz0wjp2nqsv2vqc", "value_sats": 990000}
             ]
         }
         """
@@ -579,7 +579,7 @@ class Commands(Logger):
     @command('')
     async def dumpprivkeys(self):
         """Deprecated."""
-        return "This command is deprecated. Use a pipe instead: 'electrum-grs listaddresses | electrum-grs getprivatekeys - '"
+        return "This command is deprecated. Use a pipe instead: 'electrum-cat listaddresses | electrum-cat getprivatekeys - '"
 
     @command('')
     async def validateaddress(self, address):
@@ -629,7 +629,7 @@ class Commands(Logger):
 
     @command('')
     async def version(self):
-        """Return the version of Electrum-GRS."""
+        """Return the version of Electrum-CAT."""
         return ELECTRUM_VERSION
 
     @command('')
@@ -902,7 +902,7 @@ class Commands(Logger):
 
     @command('w')
     async def setlabel(self, key, label, wallet: Abstract_Wallet = None):
-        """Assign a label to an item. Item may be a groestlcoin address or a
+        """Assign a label to an item. Item may be a catcoin address or a
         transaction ID"""
         wallet.set_label(key, label)
 
@@ -1144,7 +1144,7 @@ class Commands(Logger):
 
     @command('')
     async def getfeerate(self):
-        """Return current fee rate settings and current estimate (in gro/kvByte).
+        """Return current fee rate settings and current estimate (in catoshi/kvByte).
         """
         method, value, feerate, tooltip = self.config.getfeerate()
         return {
@@ -1375,7 +1375,7 @@ class Commands(Logger):
     @command('wnpl')
     async def normal_swap(self, onchain_amount, lightning_amount, password=None, wallet: Abstract_Wallet = None):
         """
-        Normal submarine swap: send on-chain GRS, receive on Lightning
+        Normal submarine swap: send on-chain CAT, receive on Lightning
         """
         sm = wallet.lnworker.swap_manager
         with sm.create_transport() as transport:
@@ -1446,9 +1446,9 @@ class Commands(Logger):
         to_ccy = to_ccy.upper()
         # Default currencies
         if from_ccy == '':
-            from_ccy = "GRS" if to_ccy != "GRS" else self.daemon.fx.ccy
+            from_ccy = "CAT" if to_ccy != "CAT" else self.daemon.fx.ccy
         if to_ccy == '':
-            to_ccy = "GRS" if from_ccy != "GRS" else self.daemon.fx.ccy
+            to_ccy = "CAT" if from_ccy != "CAT" else self.daemon.fx.ccy
         # Get current rates
         rate_from = self.daemon.fx.exchange.get_cached_spot_quote(from_ccy)
         rate_to = self.daemon.fx.exchange.get_cached_spot_quote(to_ccy)
@@ -1540,8 +1540,8 @@ def eval_bool(x: str) -> bool:
 
 param_descriptions = {
     'privkey': 'Private key. Type \'?\' to get a prompt.',
-    'destination': 'Groestlcoin address, contact or alias',
-    'address': 'Groestlcoin address',
+    'destination': 'Catcoin address, contact or alias',
+    'address': 'Catcoin address',
     'seed': 'Seed phrase',
     'txid': 'Transaction ID',
     'pos': 'Position',
@@ -1551,7 +1551,7 @@ param_descriptions = {
     'pubkey': 'Public key',
     'message': 'Clear text message. Use quotes if it contains spaces.',
     'encrypted': 'Encrypted message',
-    'amount': 'Amount to be sent (in GRS). Type \'!\' to send the maximum available.',
+    'amount': 'Amount to be sent (in CAT). Type \'!\' to send the maximum available.',
     'outputs': 'list of ["address", amount]',
     'redeem_script': 'redeem script (hexadecimal)',
     'lightning_amount': "Amount sent or received in a submarine swap. Set it to 'dryrun' to receive a value",
@@ -1572,7 +1572,7 @@ command_options = {
     'labels':      ("-l", "Show the labels of listed addresses"),
     'nocheck':     (None, "Do not verify aliases"),
     'imax':        (None, "Maximum number of inputs"),
-    'fee':         ("-f", "Transaction fee (absolute, in GRS)"),
+    'fee':         ("-f", "Transaction fee (absolute, in CAT)"),
     'feerate':     (None, f"Transaction fee rate (in {util.UI_UNIT_NAME_FEERATE_SAT_PER_VBYTE})"),
     'from_addr':   ("-F", "Source address (must be a wallet address; use sweep to spend from non-wallet address)."),
     'from_coins':  (None, "Source coins (must be in wallet; use sweep to spend from non-wallet address)."),
@@ -1595,7 +1595,7 @@ command_options = {
     'timeout':     (None, "Timeout in seconds"),
     'force':       (None, "Create new address beyond gap limit, if no more addresses are available."),
     'pending':     (None, "Show only pending requests."),
-    'push_amount': (None, 'Push initial amount (in GRS)'),
+    'push_amount': (None, 'Push initial amount (in CAT)'),
     'zeroconf':    (None, 'request zeroconf channel'),
     'expired':     (None, "Show only expired requests."),
     'paid':        (None, "Show only paid requests."),
@@ -1646,10 +1646,10 @@ config_variables = {
     'addrequest': {
         'ssl_privkey': 'Path to your SSL private key, needed to sign the request.',
         'ssl_chain': 'Chain of SSL certificates, needed for signed requests. Put your certificate at the top and the root CA at the end',
-        'url_rewrite': 'Parameters passed to str.replace(), in order to create the r= part of groestlcoin: URIs. Example: \"(\'file:///var/www/\',\'https://groestlcoin.org/\')\"',
+        'url_rewrite': 'Parameters passed to str.replace(), in order to create the r= part of catcoin: URIs. Example: \"(\'file:///var/www/\',\'https://electrum-cat.org/\')\"',
     },
     'listrequests':{
-        'url_rewrite': 'Parameters passed to str.replace(), in order to create the r= part of groestlcoin: URIs. Example: \"(\'file:///var/www/\',\'https://groestlcoin.org/\')\"',
+        'url_rewrite': 'Parameters passed to str.replace(), in order to create the r= part of catcoin: URIs. Example: \"(\'file:///var/www/\',\'https://electrum-cat.org/\')\"',
     }
 }
 
@@ -1732,8 +1732,8 @@ def add_global_options(parser):
     group = parser.add_argument_group('global options')
     group.add_argument("-v", dest="verbosity", help="Set verbosity (log levels)", default='')
     group.add_argument("-V", dest="verbosity_shortcuts", help="Set verbosity (shortcut-filter list)", default='')
-    group.add_argument("-D", "--dir", dest="electrum_path", help="electrum-grs directory")
-    group.add_argument("-P", "--portable", action="store_true", dest="portable", default=False, help="Use local 'electrum-grs_data' directory")
+    group.add_argument("-D", "--dir", dest="electrum_path", help="electrum-cat directory")
+    group.add_argument("-P", "--portable", action="store_true", dest="portable", default=False, help="Use local 'electrum-cat_data' directory")
     group.add_argument("--testnet", action="store_true", dest="testnet", default=False, help="Use Testnet")
     group.add_argument("--testnet4", action="store_true", dest="testnet4", default=False, help="Use Testnet4")
     group.add_argument("--regtest", action="store_true", dest="regtest", default=False, help="Use Regtest")
@@ -1752,14 +1752,14 @@ def add_wallet_option(parser):
 def get_parser():
     # create main parser
     parser = argparse.ArgumentParser(
-        epilog="Run 'electrum-grs help <command>' to see the help for a command")
-    parser.add_argument("--version", dest="cmd", action='store_const', const='version', help="Return the version of Electrum-GRS.")
+        epilog="Run 'electrum-cat help <command>' to see the help for a command")
+    parser.add_argument("--version", dest="cmd", action='store_const', const='version', help="Return the version of Electrum-CAT.")
     add_global_options(parser)
     add_wallet_option(parser)
     subparsers = parser.add_subparsers(dest='cmd', metavar='<command>')
     # gui
-    parser_gui = subparsers.add_parser('gui', description="Run Electrum-grs's Graphical User Interface.", help="Run GUI (default)")
-    parser_gui.add_argument("url", nargs='?', default=None, help="groestlcoin URI (or bip70 file)")
+    parser_gui = subparsers.add_parser('gui', description="Run Electrum-cat's Graphical User Interface.", help="Run GUI (default)")
+    parser_gui.add_argument("url", nargs='?', default=None, help="catcoin URI (or bip70 file)")
     parser_gui.add_argument("-g", "--gui", dest=SimpleConfig.GUI_NAME.key(), help="select graphical user interface", choices=['qt', 'text', 'stdio', 'qml'])
     parser_gui.add_argument("-m", action="store_true", dest=SimpleConfig.GUI_QT_HIDE_ON_STARTUP.key(), default=False, help="hide GUI on startup")
     parser_gui.add_argument("-L", "--lang", dest=SimpleConfig.LOCALIZATION_LANGUAGE.key(), default=None, help="default language used in GUI")

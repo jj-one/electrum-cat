@@ -84,12 +84,12 @@ class SynchronizerBase(NetworkJobOnDefaultServer):
             self.session.unsubscribe(self.status_queue)
 
     def add(self, addr):
-        if not is_address(addr): raise ValueError(f"invalid groestlcoin address {addr}")
+        if not is_address(addr): raise ValueError(f"invalid catcoin address {addr}")
         self._adding_addrs.add(addr)  # this lets is_up_to_date already know about addr
 
     async def _add_address(self, addr: str):
         try:
-            if not is_address(addr): raise ValueError(f"invalid groestlcoin address {addr}")
+            if not is_address(addr): raise ValueError(f"invalid catcoin address {addr}")
             if addr in self.requested_addrs: return
             self.requested_addrs.add(addr)
             await self.taskgroup.spawn(self._subscribe_to_address, addr)
@@ -248,7 +248,7 @@ class Synchronizer(SynchronizerBase):
         # request missing txns, if any
         for addr in random_shuffled_copy(self.adb.db.get_history()):
             history = self.adb.db.get_addr_history(addr)
-            # Old electrum-grs servers returned ['*'] when all history for the address
+            # Old electrum-cat servers returned ['*'] when all history for the address
             # was pruned. This no longer happens but may remain in old wallets.
             if history == ['*']: continue
             await self._request_missing_txs(history, allow_server_not_finding_tx=True)

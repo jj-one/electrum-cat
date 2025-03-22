@@ -91,18 +91,18 @@ def all_subclasses(cls) -> Set:
 ca_path = certifi.where()
 
 
-base_units = {'GRS':8, 'mGRS':5, 'groestls':2, 'gro':0}
+base_units = {'CAT':8, 'mCAT':5, 'μCAT':2, 'catoshi':0}
 base_units_inverse = inv_dict(base_units)
-base_units_list = ['GRS', 'mGRS', 'groestls', 'gro']  # list(dict) does not guarantee order
+base_units_list = ['CAT', 'mCAT', 'μCAT', 'catoshi']  # list(dict) does not guarantee order
 
-DECIMAL_POINT_DEFAULT = 8  # GRS
+DECIMAL_POINT_DEFAULT = 8  # CAT
 
 
 class UnknownBaseUnit(Exception): pass
 
 
 def decimal_point_to_base_unit_name(dp: int) -> str:
-    # e.g. 8 -> "GRS"
+    # e.g. 8 -> "CAT"
     try:
         return base_units_inverse[dp]
     except KeyError:
@@ -111,7 +111,7 @@ def decimal_point_to_base_unit_name(dp: int) -> str:
 
 def base_unit_name_to_decimal_point(unit_name: str) -> int:
     """Returns the max number of digits allowed after the decimal point."""
-    # e.g. "GRS" -> 8
+    # e.g. "CAT" -> 8
     try:
         return base_units[unit_name]
     except KeyError:
@@ -465,7 +465,7 @@ def json_decode(x):
 
 def json_normalize(x):
     # note: The return value of commands, when going through the JSON-RPC interface,
-    #       is json-encoded. The encoder used there cannot handle some types, e.g. electrum_grs.util.Satoshis.
+    #       is json-encoded. The encoder used there cannot handle some types, e.g. electrum_cat.util.Satoshis.
     # note: We should not simply do "json_encode(x)" here, as then later x would get doubly json-encoded.
     # see #5868
     return json_decode(json_encode(x))
@@ -562,7 +562,7 @@ def assert_datadir_available(config_path):
         return
     else:
         raise FileNotFoundError(
-            'Electrum-GRS datadir does not exist. Was it deleted while running?' + '\n' +
+            'Electrum-CAT datadir does not exist. Was it deleted while running?' + '\n' +
             'Should be at {}'.format(path))
 
 
@@ -678,11 +678,11 @@ def user_dir():
     elif 'ANDROID_DATA' in os.environ:
         return android_data_dir()
     elif os.name == 'posix':
-        return os.path.join(os.environ["HOME"], ".electrum-grs")
+        return os.path.join(os.environ["HOME"], ".electrum-cat")
     elif "APPDATA" in os.environ:
-        return os.path.join(os.environ["APPDATA"], "Electrum-grs")
+        return os.path.join(os.environ["APPDATA"], "Electrum-cat")
     elif "LOCALAPPDATA" in os.environ:
-        return os.path.join(os.environ["LOCALAPPDATA"], "Electrum-grs")
+        return os.path.join(os.environ["LOCALAPPDATA"], "Electrum-cat")
     else:
         #raise Exception("No home directory found in environment variables.")
         return
@@ -832,8 +832,8 @@ def format_satoshis(
 
 FEERATE_PRECISION = 1  # num fractional decimal places for sat/byte fee rates
 _feerate_quanta = Decimal(10) ** (-FEERATE_PRECISION)
-UI_UNIT_NAME_FEERATE_SAT_PER_VBYTE = "gro/vbyte"
-UI_UNIT_NAME_FEERATE_SAT_PER_VB = "gro/vB"
+UI_UNIT_NAME_FEERATE_SAT_PER_VBYTE = "catoshi/vbyte"
+UI_UNIT_NAME_FEERATE_SAT_PER_VB = "catoshi/vB"
 UI_UNIT_NAME_TXSIZE_VBYTES = "vbytes"
 UI_UNIT_NAME_MEMPOOL_MB = "vMB"
 
@@ -846,7 +846,7 @@ def format_fee_satoshis(fee, *, num_zeros=0, precision=None):
 
 
 def quantize_feerate(fee) -> Union[None, Decimal, int]:
-    """Strip gro/byte fee rate of excess precision."""
+    """Strip catoshi/byte fee rate of excess precision."""
     if fee is None:
         return None
     return Decimal(fee).quantize(_feerate_quanta, rounding=decimal.ROUND_HALF_DOWN)
@@ -944,43 +944,20 @@ def age(
             return _("in over {} years").format(round(distance_in_minutes / 525600))
 
 mainnet_block_explorers = {
-    'cryptoID.info': ('https://chainz.cryptoid.info/grs/',
+    'cryptoID.info': ('https://chainz.cryptoid.info/cat/',
                         {'tx': 'tx.dws?', 'addr': 'address.dws?'}),
-    'groestlsight': ('https://groestlsight.groestlcoin.org/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'blockbook': ('https://blockbook.groestlcoin.org/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'esplora': ('https://esplora.groestlcoin.org/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'blockchair.com': ('https://blockchair.com/groestlcoin/',
-                        {'tx': 'transaction/', 'addr': 'address/'}),
     'system default': ('blockchain://00000ac5927c594d49cc0bdb81759d0da8297eb614683d3acb62f0703b639023/',
                         {'tx': 'tx/', 'addr': 'address/'}),
 }
 
 testnet_block_explorers = {
-    'cryptoID.info': ('https://chainz.cryptoid.info/grs-test/',
+    'cryptoID.info': ('https://chainz.cryptoid.info/cat-test/',
                         {'tx': 'tx.dws?', 'addr': 'address.dws?'}),
-    'groestlsight': ('https://groestlsight-test.groestlcoin.org/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'blockbook': ('https://blockbook-test.groestlcoin.org/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'esplora': ('https://esplora-test.groestlcoin.org/',
-                            {'tx': 'tx/', 'addr': 'address/'}),
     'system default': ('blockchain://000000ffbb50fc9898cdd36ec163e6ba23230164c0052a28876255b7dcf2cd36/',
                         {'tx': 'tx/', 'addr': 'address/'}),
 }
 
-testnet4_block_explorers = {
-    'blockbook': ('https://blockbook-testnet4.groestlcoin.org/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-}
-
 signet_block_explorers = {
-    'blockbook': ('https://blockbook-signet.groestlcoin.org/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'esplora': ('https://esplora-signet.groestlcoin.org/',
-                            {'tx': 'tx/', 'addr': 'address/'}),
     'system default': ('blockchain:/',
                        {'tx': 'tx/', 'addr': 'address/'}),
 }
@@ -1283,7 +1260,7 @@ def format_short_id(short_channel_id: Optional[bytes]):
 
 def make_aiohttp_session(proxy: Optional[dict], headers=None, timeout=None):
     if headers is None:
-        headers = {'User-Agent': 'Electrum-GRS'}
+        headers = {'User-Agent': 'Electrum-CAT'}
     if timeout is None:
         # The default timeout is high intentionally.
         # DNS on some systems can be really slow, see e.g. #5337

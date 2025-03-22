@@ -280,7 +280,7 @@ class LnAddr(object):
             return
         assert isinstance(value, Decimal)
         if value.is_nan() or not (0 <= value <= TOTAL_COIN_SUPPLY_LIMIT_IN_BTC):
-            raise LnInvoiceException(f"amount is out-of-bounds: {value!r} GRS")
+            raise LnInvoiceException(f"amount is out-of-bounds: {value!r} CAT")
         if value * 10**12 % 10:
             # max resolution is millisatoshi
             raise LnInvoiceException(f"Cannot encode {value!r}: too many decimal places")
@@ -362,7 +362,7 @@ class LnAddr(object):
     def to_debug_json(self) -> Dict[str, Any]:
         d = {
             'pubkey': self.pubkey.serialize().hex(),
-            'amount_GRS': str(self.amount),
+            'amount_CAT': str(self.amount),
             'rhash': self.paymenthash.hex(),
             'payment_secret': self.payment_secret.hex() if self.payment_secret else None,
             'description': self.get_description(),

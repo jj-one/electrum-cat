@@ -159,7 +159,7 @@ class CoinChooserBase(Logger):
     def _change_amounts(self, tx: PartialTransaction, count: int, fee_estimator_numchange) -> List[int]:
         # Break change up if bigger than max_change
         output_amounts = [o.value for o in tx.outputs()]
-        # Don't split change of less than 0.02 GRS
+        # Don't split change of less than 0.02 CAT
         max_change = max([0.02 * COIN] + output_amounts) * 1.25
 
         # Use N change outputs
@@ -487,12 +487,12 @@ class CoinChooserPrivacy(CoinChooserRandom):
                 pass  # no change is great!
             elif change < min_change:
                 badness += (min_change - change) / (min_change + 10000)
-                # Penalize really small change; under 1 mGRS ~= using 1 more input
+                # Penalize really small change; under 1 mCAT ~= using 1 more input
                 if change < COIN / 1000:
                     badness += 1
             elif change > max_change:
                 badness += (change - max_change) / (max_change + 10000)
-                # Penalize large change; 5 GRS excess ~= using 1 more input
+                # Penalize large change; 5 CAT excess ~= using 1 more input
                 badness += change / (COIN * 5)
             return ScoredCandidate(badness, tx, buckets)
 

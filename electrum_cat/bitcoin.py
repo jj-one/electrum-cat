@@ -32,7 +32,7 @@ import electrum_ecc as ecc
 from .util import bfh, BitcoinException, assert_bytes, to_bytes, inv_dict, is_hex_str, classproperty
 from . import segwit_addr
 from . import constants
-from .crypto import groestlHash, sha256, hash_160
+from .crypto import catcoinHash, sha256, hash_160
 
 if TYPE_CHECKING:
     from .network import Network
@@ -42,7 +42,7 @@ if TYPE_CHECKING:
 
 COINBASE_MATURITY = 100
 COIN = 100000000
-TOTAL_COIN_SUPPLY_LIMIT_IN_BTC = 105000000
+TOTAL_COIN_SUPPLY_LIMIT_IN_BTC = 21000000
 
 NLOCKTIME_MIN = 0
 NLOCKTIME_BLOCKHEIGHT_MAX = 500_000_000 - 1
@@ -197,7 +197,7 @@ class opcodes(IntEnum):
 
 
 def script_num_to_bytes(i: int) -> bytes:
-    """See CScriptNum in Groestlcoin Core.
+    """See CScriptNum in Catcoin Core.
     Encodes an integer as bytes, to be used in script.
 
     ported from https://github.com/bitcoin/bitcoin/blob/8cbc5c4be4be22aca228074f087a374a7ec38be8/src/script/script.h#L326
@@ -295,7 +295,7 @@ def construct_witness(items: Sequence[Union[str, int, bytes]]) -> bytes:
 
 
 def construct_script(items: Sequence[Union[str, int, bytes, opcodes]], values=None) -> bytes:
-    """Constructs groestlcoin script from given items."""
+    """Constructs catcoin script from given items."""
     script = bytearray()
     values = values or {}
     for i, item in enumerate(items):
@@ -316,7 +316,7 @@ def construct_script(items: Sequence[Union[str, int, bytes, opcodes]], values=No
 
 
 def relayfee(network: 'Network' = None) -> int:
-    """Returns feerate in gro/kbyte."""
+    """Returns feerate in catoshi/kbyte."""
     from .simple_config import FEERATE_DEFAULT_RELAY, FEERATE_MAX_RELAY
     if network and network.relay_fee is not None:
         fee = network.relay_fee
@@ -338,7 +338,7 @@ DUST_LIMIT_P2WPKH = 294
 
 
 def dust_threshold(network: 'Network' = None) -> int:
-    """Returns the dust limit in gros."""
+    """Returns the dust limit in catoshis."""
     # Change <= dust threshold is added to the tx fee
     dust_lim = 182 * 3 * relayfee(network)  # in msat
     # convert to sat, but round up:
@@ -357,7 +357,7 @@ def hash_decode(x: str) -> bytes:
 
 def hash160_to_b58_address(h160: bytes, addrtype: int) -> str:
     s = bytes([addrtype]) + h160
-    s = s + groestlHash(s)[0:4]
+    s = s + catcoinHash(s)[0:4]
     return base_encode(s, base=58)
 
 
@@ -434,7 +434,7 @@ def script_to_address(script: bytes, *, net=None) -> Optional[str]:
 def address_to_script(addr: str, *, net=None) -> bytes:
     if net is None: net = constants.net
     if not is_address(addr, net=net):
-        raise BitcoinException(f"invalid groestlcoin address: {addr}")
+        raise BitcoinException(f"invalid catcoin address: {addr}")
     witver, witprog = segwit_addr.decode_segwit_address(net.SEGWIT_HRP, addr)
     if witprog is not None:
         if not (0 <= witver <= 16):
@@ -465,7 +465,7 @@ def address_to_payload(addr: str, *, net=None) -> Tuple[OnchainOutputType, bytes
     """Return (type, pubkey hash / witness program) for an address."""
     if net is None: net = constants.net
     if not is_address(addr, net=net):
-        raise BitcoinException(f"invalid groestlcoin address: {addr}")
+        raise BitcoinException(f"invalid catcoin address: {addr}")
     witver, witprog = segwit_addr.decode_segwit_address(net.SEGWIT_HRP, addr)
     if witprog is not None:
         if witver == 0:
@@ -579,7 +579,7 @@ class InvalidChecksum(BaseDecodeError):
 
 
 def EncodeBase58Check(vchIn: bytes) -> str:
-    hash = groestlHash(vchIn)
+    hash = catcoinHash(vchIn)
     return base_encode(vchIn + hash[0:4], base=58)
 
 
@@ -587,7 +587,7 @@ def DecodeBase58Check(psz: Union[bytes, str]) -> bytes:
     vchRet = base_decode(psz, base=58)
     payload = vchRet[0:-4]
     csum_found = vchRet[-4:]
-    csum_calculated = groestlHash(payload)[0:4]
+    csum_calculated = catcoinHash(payload)[0:4]
     if csum_calculated != csum_found:
         raise InvalidChecksum(f'calculated {csum_calculated.hex()}, found {csum_found.hex()}')
     else:
@@ -737,7 +737,7 @@ def is_minikey(text: str) -> bool:
     # permits any length of 20 or more provided the minikey is valid.
     # A valid minikey must begin with an 'S', be in base58, and when
     # suffixed with '?' have its SHA256 hash begin with a zero byte.
-    # They are widely used in Casascius physical groestlcoins.
+    # They are widely used in Casascius physical catcoins.
     return (len(text) >= 20 and text[0] == 'S'
             and all(ord(c) in __b58chars for c in text)
             and sha256(text + '?')[0] == 0x00)
@@ -863,7 +863,7 @@ def control_block_for_taproot_script_spend(
 # user message signing
 def usermessage_magic(message: bytes) -> bytes:
     length = var_int(len(message))
-    return b"\x1cGroestlCoin Signed Message:\n" + length + message
+    return b"\x1cCatCoin Signed Message:\n" + length + message
 
 
 def ecdsa_sign_usermessage(ec_privkey, message: Union[bytes, str], *, is_compressed: bool) -> bytes:

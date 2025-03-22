@@ -56,7 +56,7 @@ from . import GuiImportError
 from .plugin import run_hook, Plugins
 
 if TYPE_CHECKING:
-    from electrum_grs import gui
+    from electrum_cat import gui
 
 
 _logger = get_logger(__name__)
@@ -233,7 +233,7 @@ class AuthenticatedServer(Logger):
             try:
                 await self.authenticate(request.headers)
             except AuthenticationInvalidOrMissing:
-                return web.Response(headers={"WWW-Authenticate": "Basic realm=Electrum-GRS"},
+                return web.Response(headers={"WWW-Authenticate": "Basic realm=Electrum-CAT"},
                                     text='Unauthorized', status=401)
             except AuthenticationCredentialsInvalid:
                 return web.Response(text='Forbidden', status=403)
@@ -345,7 +345,7 @@ class CommandsServer(AuthenticatedServer):
             else:
                 raise UserFacingException("error: current GUI does not support multiple windows")
         else:
-            raise UserFacingException("error: Electrum-GRS is running in daemon mode. Please stop the daemon first.")
+            raise UserFacingException("error: Electrum-CAT is running in daemon mode. Please stop the daemon first.")
 
     async def run_cmdline(self, config_options):
         cmdname = config_options['cmd']
@@ -590,7 +590,7 @@ class Daemon(Logger):
         self.logger.info(f'launching GUI: {gui_name}')
         try:
             try:
-                gui = __import__('electrum_grs.gui.' + gui_name, fromlist=['electrum_grs'])
+                gui = __import__('electrum_cat.gui.' + gui_name, fromlist=['electrum_cat'])
             except GuiImportError as e:
                 sys.exit(str(e))
             self.gui_object = gui.ElectrumGui(config=self.config, daemon=self, plugins=self._plugins)

@@ -192,9 +192,9 @@ async def sweep(
         tx = PartialTransaction.from_io(inputs, outputs)
         fee = config.estimate_fee(tx.estimated_size())
     if total - fee < 0:
-        raise Exception(_('Not enough funds on address.') + '\nTotal: %d gro\nFee: %d'%(total, fee))
+        raise Exception(_('Not enough funds on address.') + '\nTotal: %d catoshi\nFee: %d'%(total, fee))
     if total - fee < dust_threshold(network):
-        raise Exception(_('Not enough funds on address.') + '\nTotal: %d gro\nFee: %d\nDust Threshold: %d'%(total, fee, dust_threshold(network)))
+        raise Exception(_('Not enough funds on address.') + '\nTotal: %d catoshi\nFee: %d\nDust Threshold: %d'%(total, fee, dust_threshold(network)))
 
     outputs = [PartialTxOutput(scriptpubkey=bitcoin.address_to_script(to_address),
                                value=total - fee)]
@@ -680,7 +680,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             addr = str(addrs[0])
             if not bitcoin.is_address(addr):
                 neutered_addr = addr[:5] + '..' + addr[-2:]
-                raise WalletFileException(f'The addresses in this wallet are not groestlcoin addresses.\n'
+                raise WalletFileException(f'The addresses in this wallet are not catcoin addresses.\n'
                                           f'e.g. {neutered_addr} (length: {len(addr)})')
 
     def check_returned_address_for_corruption(func):
@@ -829,7 +829,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         if self.is_watching_only():
             raise UserFacingException(_("This is a watching-only wallet"))
         if not is_address(address):
-            raise UserFacingException(_('Invalid groestlcoin address: {}').format(address))
+            raise UserFacingException(_('Invalid catcoin address: {}').format(address))
         if not self.is_mine(address):
             raise UserFacingException(_('Address not in wallet: {}').format(address))
         index = self.get_address_index(address)
@@ -1534,7 +1534,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                 out = {
                     'date': date,
                     'block_height': height,
-                    'GRS_balance': Satoshis(balance),
+                    'CAT_balance': Satoshis(balance),
                 }
                 if show_fiat:
                     ap = self.acquisition_price(coins, fx.timestamp_rate, fx.ccy)
@@ -1543,14 +1543,14 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                     out['liquidation_price'] = Fiat(lp, fx.ccy)
                     out['unrealized_gains'] = Fiat(lp - ap, fx.ccy)
                     out['fiat_balance'] = Fiat(fx.historical_value(balance, date), fx.ccy)
-                    out['GRS_fiat_price'] = Fiat(fx.historical_value(COIN, date), fx.ccy)
+                    out['CAT_fiat_price'] = Fiat(fx.historical_value(COIN, date), fx.ccy)
                 return out
 
             summary_start = summary_point(start_timestamp, start_height, start_balance, start_coins)
             summary_end = summary_point(end_timestamp, end_height, end_balance, end_coins)
             flow = {
-                'GRS_incoming': Satoshis(income),
-                'GRS_outgoing': Satoshis(expenditures)
+                'CAT_incoming': Satoshis(income),
+                'CAT_outgoing': Satoshis(expenditures)
             }
             if show_fiat:
                 flow['fiat_currency'] = fx.ccy
@@ -1787,7 +1787,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                 addrs = self.get_change_addresses(slice_start=-self.gap_limit_for_change)
                 change_addrs = [random.choice(addrs)] if addrs else []
         for addr in change_addrs:
-            assert is_address(addr), f"not valid groestlcoin address: {addr}"
+            assert is_address(addr), f"not valid catcoin address: {addr}"
             # note that change addresses are not necessarily ismine
             # in which case this is a no-op
             self.check_address_for_corruption(addr)
@@ -1818,7 +1818,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                 selected_addr = random.choice(addrs)
             else:  # fallback for e.g. imported wallets
                 selected_addr = self.get_receiving_address()
-        assert is_address(selected_addr), f"not valid groestlcoin address: {selected_addr}"
+        assert is_address(selected_addr), f"not valid catcoin address: {selected_addr}"
         return selected_addr
 
     def can_pay_onchain(self, outputs, coins=None):
@@ -2115,7 +2115,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             strategy: BumpFeeStrategy = BumpFeeStrategy.PRESERVE_PAYMENT,
     ) -> PartialTransaction:
         """Increase the miner fee of 'tx'.
-        'new_fee_rate' is the target min rate in gro/vbyte
+        'new_fee_rate' is the target min rate in catoshi/vbyte
         'coins' is a list of UTXOs we can choose from as potential new inputs to be added
 
         note: it is the caller's responsibility to have already called tx.add_info_from_network().
@@ -2135,7 +2135,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         old_tx_size = tx.estimated_size()
         old_fee = tx.get_fee()
         assert old_fee is not None
-        old_fee_rate = old_fee / old_tx_size  # gro/vbyte
+        old_fee_rate = old_fee / old_tx_size  # catoshi/vbyte
         if new_fee_rate <= old_fee_rate:
             raise CannotBumpFee(_("The new fee rate needs to be higher than the old fee rate."))
 
@@ -2386,7 +2386,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
     ) -> PartialTransaction:
         """Double-Spend-Cancel: cancel an unconfirmed tx by double-spending
         its inputs, paying ourselves.
-        'new_fee_rate' is the target min rate in gro/vbyte
+        'new_fee_rate' is the target min rate in catoshi/vbyte
 
         note: it is the caller's responsibility to have already called tx.add_info_from_network().
               Without that, all txins must be ismine.
@@ -2406,7 +2406,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         old_tx_size = tx.estimated_size()
         old_fee = tx.get_fee()
         assert old_fee is not None
-        old_fee_rate = old_fee / old_tx_size  # gro/vbyte
+        old_fee_rate = old_fee / old_tx_size  # catoshi/vbyte
         if new_fee_rate <= old_fee_rate:
             raise CannotDoubleSpendTx(_("The new fee rate needs to be higher than the old fee rate."))
         # grab all ismine inputs
@@ -3027,7 +3027,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         pass
 
     def price_at_timestamp(self, txid, price_func):
-        """Returns fiat price of groestlcoin at the time tx got confirmed."""
+        """Returns fiat price of catcoin at the time tx got confirmed."""
         timestamp = self.adb.get_tx_height(txid).timestamp
         return price_func(timestamp if timestamp else time.time())
 
@@ -3238,8 +3238,8 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             tx_size: int,
             fee: int) -> Optional[Tuple[bool, str, str]]:
 
-        assert invoice_amt >= 0, f"{invoice_amt=!r} must be non-negative gros"
-        assert fee >= 0, f"{fee=!r} must be non-negative gros"
+        assert invoice_amt >= 0, f"{invoice_amt=!r} must be non-negative catoshis"
+        assert fee >= 0, f"{fee=!r} must be non-negative catoshis"
         feerate = Decimal(fee) / tx_size  # sat/byte
         fee_ratio = Decimal(fee) / invoice_amt if invoice_amt else 0
         long_warning = None
@@ -4027,8 +4027,8 @@ def restore_wallet_from_text(
     gap_limit: Optional[int] = None,
 ) -> dict:
     """Restore a wallet from text. Text can be a seed phrase, a master
-    public key, a master private key, a list of groestlcoin addresses
-    or groestlcoin private keys."""
+    public key, a master private key, a list of catcoin addresses
+    or catcoin private keys."""
     if path is None:  # create wallet in-memory
         storage = None
     else:

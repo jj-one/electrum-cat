@@ -3,22 +3,22 @@ import os
 
 from typing import List, NamedTuple, Any, Dict, Optional, Tuple, TYPE_CHECKING
 
-from electrum_grs.i18n import _
-from electrum_grs.interface import ServerAddr
-from electrum_grs.keystore import hardware_keystore
-from electrum_grs.logging import get_logger
-from electrum_grs.plugin import run_hook
-from electrum_grs.slip39 import EncryptedSeed
-from electrum_grs.storage import WalletStorage, StorageEncryptionVersion
-from electrum_grs.wallet_db import WalletDB
-from electrum_grs.bip32 import normalize_bip32_derivation, xpub_type
-from electrum_grs import keystore, mnemonic, bitcoin
-from electrum_grs.mnemonic import is_any_2fa_seed_type, can_seed_have_passphrase
+from electrum_cat.i18n import _
+from electrum_cat.interface import ServerAddr
+from electrum_cat.keystore import hardware_keystore
+from electrum_cat.logging import get_logger
+from electrum_cat.plugin import run_hook
+from electrum_cat.slip39 import EncryptedSeed
+from electrum_cat.storage import WalletStorage, StorageEncryptionVersion
+from electrum_cat.wallet_db import WalletDB
+from electrum_cat.bip32 import normalize_bip32_derivation, xpub_type
+from electrum_cat import keystore, mnemonic, bitcoin
+from electrum_cat.mnemonic import is_any_2fa_seed_type, can_seed_have_passphrase
 
 if TYPE_CHECKING:
-    from electrum_grs.daemon import Daemon
-    from electrum_grs.plugin import Plugins
-    from electrum_grs.keystore import Hardware_KeyStore
+    from electrum_cat.daemon import Daemon
+    from electrum_cat.plugin import Plugins
+    from electrum_cat.keystore import Hardware_KeyStore
 
 
 class WizardViewState(NamedTuple):

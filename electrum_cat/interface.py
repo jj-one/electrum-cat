@@ -935,7 +935,7 @@ class Interface(Logger):
 
     @classmethod
     def client_name(cls) -> str:
-        return f'electrum-grs/{version.ELECTRUM_VERSION}'
+        return f'electrum-cat/{version.ELECTRUM_VERSION}'
 
     def is_tor(self):
         return self.host.endswith('.onion')
@@ -1124,7 +1124,7 @@ class Interface(Logger):
         return res
 
     async def get_relay_fee(self) -> int:
-        """Returns the min relay feerate in gro/kbyte."""
+        """Returns the min relay feerate in catoshi/kbyte."""
         # do request
         res = await self.session.send_request('blockchain.relayfee')
         # check response
@@ -1135,7 +1135,7 @@ class Interface(Logger):
 
     async def get_estimatefee(self, num_blocks: int) -> int:
         """Returns a feerate estimate for getting confirmed within
-        num_blocks blocks, in gro/kbyte.
+        num_blocks blocks, in catoshi/kbyte.
         Returns -1 if the server could not provide an estimate.
         """
         if not is_non_negative_integer(num_blocks):

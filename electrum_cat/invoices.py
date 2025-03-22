@@ -254,7 +254,7 @@ class BaseInvoice(StoredObject):
     def as_dict(self, status):
         d = {
             'is_lightning': self.is_lightning(),
-            'amount_GRS': format_satoshis(self.get_amount_sat()),
+            'amount_CAT': format_satoshis(self.get_amount_sat()),
             'message': self.message,
             'timestamp': self.get_time(),
             'expiry': self.exp,
@@ -355,7 +355,7 @@ class Request(BaseInvoice):
         if lightning_invoice:
             extra['lightning'] = lightning_invoice
         if not addr and lightning_invoice:
-            return "groestlcoin:?lightning="+lightning_invoice
+            return "catcoin:?lightning="+lightning_invoice
         if not addr and not lightning_invoice:
             return None
         uri = create_bip21_uri(addr, amount, message, extra_query_params=extra)

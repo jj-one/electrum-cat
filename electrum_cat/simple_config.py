@@ -27,7 +27,7 @@ FEE_DEPTH_TARGETS = [10_000_000, 5_000_000, 2_000_000, 1_000_000,
 FEE_LN_ETA_TARGET = 2       # note: make sure the network is asking for estimates for this target
 FEE_LN_LOW_ETA_TARGET = 25  # note: make sure the network is asking for estimates for this target
 
-# gro per kbyte
+# catoshi per kbyte
 FEERATE_MAX_DYNAMIC = 1500000
 FEERATE_WARNING_HIGH_FEE = 600000
 FEERATE_FALLBACK_STATIC_FEE = 50000
@@ -272,7 +272,7 @@ class SimpleConfig(Logger):
             path = os.path.join(path, 'signet')
             make_dir(path, allow_symlink=False)
 
-        self.logger.info(f"electrum-grs directory {path}")
+        self.logger.info(f"electrum-cat directory {path}")
         return path
 
     def rename_config_keys(self, config, keypairs, deprecation_warning=False):
@@ -385,7 +385,7 @@ class SimpleConfig(Logger):
         base_unit = self.user_config.get('base_unit')
         if isinstance(base_unit, str):
             self._set_key_in_user_config('base_unit', None)
-            map_ = {'grs':8, 'mgrs':5, 'ugrs':2, 'groestls':2, 'gro':0}
+            map_ = {'cat':8, 'mcat':5, 'μcat':2, 'catoshi':0}
             decimal_point = map_.get(base_unit.lower())
             self._set_key_in_user_config('decimal_point', decimal_point)
 
@@ -501,7 +501,7 @@ class SimpleConfig(Logger):
         return get_fee_within_limits
 
     def eta_to_fee(self, slider_pos) -> Optional[int]:
-        """Returns fee in gro/kbyte."""
+        """Returns fee in catoshi/kbyte."""
         slider_pos = max(slider_pos, 0)
         slider_pos = min(slider_pos, len(FEE_ETA_TARGETS))
         if slider_pos < len(FEE_ETA_TARGETS):
@@ -513,7 +513,7 @@ class SimpleConfig(Logger):
 
     @impose_hard_limits_on_fee
     def eta_target_to_fee(self, num_blocks: int) -> Optional[int]:
-        """Returns fee in gro/kbyte."""
+        """Returns fee in catoshi/kbyte."""
         if num_blocks == 1:
             fee = self.fee_estimates.get(2)
             if fee is not None:
@@ -526,7 +526,7 @@ class SimpleConfig(Logger):
         return fee
 
     def fee_to_depth(self, target_fee: Real) -> Optional[int]:
-        """For a given gro/vbyte fee, returns an estimate of how deep
+        """For a given catoshi/vbyte fee, returns an estimate of how deep
         it would be in the current mempool in vbytes.
         Pessimistic == overestimates the depth.
         """
@@ -540,13 +540,13 @@ class SimpleConfig(Logger):
         return depth
 
     def depth_to_fee(self, slider_pos) -> Optional[int]:
-        """Returns fee in gro/kbyte."""
+        """Returns fee in catoshi/kbyte."""
         target = self.depth_target(slider_pos)
         return self.depth_target_to_fee(target)
 
     @impose_hard_limits_on_fee
     def depth_target_to_fee(self, target: int) -> Optional[int]:
-        """Returns fee in gro/kbyte.
+        """Returns fee in catoshi/kbyte.
         target: desired mempool depth in vbytes
         """
         if self.mempool_fees is None:
@@ -639,7 +639,7 @@ class SimpleConfig(Logger):
         text is what we target: static fee / num blocks to confirm in / mempool depth
         tooltip is the corresponding estimate (e.g. num blocks for a static fee)
 
-        fee_rate is in gro/kbyte
+        fee_rate is in catoshi/kbyte
         """
         if fee_per_kb is None:
             rate_str = 'unknown'
@@ -736,7 +736,7 @@ class SimpleConfig(Logger):
         return fee_rate
 
     def fee_per_kb(self, dyn: bool=None, mempool: bool=None, fee_level: float=None) -> Optional[int]:
-        """Returns gro/kvB fee to pay for a txn.
+        """Returns catoshi/kvB fee to pay for a txn.
         Note: might return None.
 
         fee_level: float between 0.0 and 1.0, representing fee slider position
@@ -807,7 +807,7 @@ class SimpleConfig(Logger):
             raise Exception(f"Invalid parameter: {fee_method}. Valid methods are: ETA, mempool, static.")
 
     def fee_per_byte(self):
-        """Returns gro/vB fee to pay for a txn.
+        """Returns catoshi/vB fee to pay for a txn.
         Note: might return None.
         """
         fee_per_kb = self.fee_per_kb()
@@ -883,7 +883,7 @@ class SimpleConfig(Logger):
         return self.format_amount(*args, **kwargs) + ' ' + self.get_base_unit()
 
     def format_fee_rate(self, fee_rate) -> str:
-        """fee_rate is in gro/kvByte."""
+        """fee_rate is in catoshi/kvByte."""
         return format_fee_satoshis(fee_rate/1000, num_zeros=self.num_zeros) + f" {util.UI_UNIT_NAME_FEERATE_SAT_PER_VBYTE}"
 
     def get_base_unit(self):
@@ -903,7 +903,7 @@ class SimpleConfig(Logger):
 
         Compare:
         >>> config.NETWORK_SERVER
-        'electrum-test1.groestlcoin.org:51002:s'
+        'test1.electrum-cat.org:8103:s'
         >>> config.cv.NETWORK_SERVER
         <ConfigVarWithConfig key='server'>
         """
@@ -1246,7 +1246,7 @@ Warning: setting this to too low will result in lots of payment failures."""),
 
 
 def read_user_config(path: Optional[str]) -> Dict[str, Any]:
-    """Parse and store the user config settings in electrum-grs.conf into user_config[]."""
+    """Parse and store the user config settings in electrum-cat.conf into user_config[]."""
     if not path:
         return {}
     config_path = os.path.join(path, "config")

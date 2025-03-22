@@ -198,7 +198,7 @@ class ExchangeBase(Logger):
 
     def get_cached_spot_quote(self, ccy: str) -> Decimal:
         """Returns the cached exchange rate as a Decimal"""
-        if ccy == 'GRS':
+        if ccy == 'CAT':
             return Decimal(1)
         rate = self._quotes.get(ccy)
         if rate is None:
@@ -210,7 +210,7 @@ class ExchangeBase(Logger):
 
 class BTXPro(ExchangeBase):
     async def get_rates(self, ccy):
-        json1 = await self.get_json('api.btxpro.com', '/v1.1/public/getticker?market=btc-grs')
+        json1 = await self.get_json('api.btxpro.com', '/v1.1/public/getticker?market=btc-cat')
         if ccy != "BTC":
             json2 = await self.get_json('api.coingecko.com', '/api/v3/simple/price?ids=bitcoin&vs_currencies=%s' % ccy)
             return {ccy: to_decimal(json1['result']['Last'])*to_decimal(json2['bitcoin'][ccy.lower()])}
@@ -220,13 +220,13 @@ class Coinbase(ExchangeBase):
 
     async def get_rates(self, ccy):
         json = await self.get_json('api.coinbase.com',
-                             '/v2/exchange-rates?currency=GRS')
+                             '/v2/exchange-rates?currency=CAT')
         return {ccy: to_decimal(rate) for (ccy, rate) in json["data"]["rates"].items()}
 
 class CoinCap(ExchangeBase):
 
     async def get_rates(self, ccy):
-        json = await self.get_json('api.coincap.io', '/v2/assets/groestlcoin/')
+        json = await self.get_json('api.coincap.io', '/v2/assets/catcoin/')
         return {'USD': to_decimal(json['data']['priceUsd'])}
 
     def history_ccys(self):
@@ -236,13 +236,13 @@ class CoinCap(ExchangeBase):
         # Currently 2000 days is the maximum in 1 API call
         # (and history starts on 2017-03-23)
         history = await self.get_json('api.coincap.io',
-                                      '/v2/assets/groestlcoin/history?interval=d1&limit=2000')
+                                      '/v2/assets/catcoin/history?interval=d1&limit=2000')
         return dict([(timestamp_to_datetime(h['time']/1000, utc=True).strftime('%Y-%m-%d'), str(h['priceUsd']))
                      for h in history['data']])
 
 class CoinEx(ExchangeBase):
     async def get_rates(self, ccy):
-        json1 = await self.get_json('api.coinex.com', '/v1/market/ticker?market=grsbtc')
+        json1 = await self.get_json('api.coinex.com', '/v1/market/ticker?market=catbtc')
         if ccy != "BTC":
             json2 = await self.get_json('api.coingecko.com', '/api/v3/simple/price?ids=bitcoin&vs_currencies=%s' % ccy)
             return {ccy: to_decimal(json1['data']['ticker']['last'])*to_decimal(json2['bitcoin'][ccy.lower()])}
@@ -252,8 +252,8 @@ class CoinGecko(ExchangeBase):
 
     async def get_rates(self, ccy):
         json = await self.get_json('api.coingecko.com',
-                                   '/api/v3/simple/price?ids=groestlcoin&vs_currencies=%s' % ccy)
-        return {ccy: to_decimal(json['groestlcoin'][ccy.lower()])}
+                                   '/api/v3/simple/price?ids=catcoins&vs_currencies=%s' % ccy)
+        return {ccy: to_decimal(json['catcoins'][ccy.lower()])}
 
     def history_ccys(self):
         # CoinGecko seems to have historical data for all ccys it supports
@@ -266,7 +266,7 @@ class CoinGecko(ExchangeBase):
         # > Your request exceeds the allowed time range. Public API users are limited to querying
         # > historical data within the past 365 days. Upgrade to a paid plan to enjoy full historical data access
         history = await self.get_json('api.coingecko.com',
-                                      f"/api/v3/coins/groestlcoin/market_chart?vs_currency={ccy}&days={num_days}")
+                                      f"/api/v3/coins/catcoin/market_chart?vs_currency={ccy}&days={num_days}")
 
         return dict([(timestamp_to_datetime(h[0]/1000, utc=True).strftime('%Y-%m-%d'), str(h[1]))
                      for h in history['prices']])
@@ -275,7 +275,7 @@ class CryptoCompare(ExchangeBase):
 
     async def get_rates(self, ccy):
         tsyms = ','.join(self.history_ccys())
-        result = await self.get_json('min-api.cryptocompare.com', '/data/price?fsym=GRS&tsyms={}&extraParams=ElectrumGRS'.format(tsyms))
+        result = await self.get_json('min-api.cryptocompare.com', '/data/price?fsym=CAT&tsyms={}&extraParams=ElectrumCAT'.format(tsyms))
         return dict((k, to_decimal(v)) for k, v in result.items())
 
     def history_ccys(self):
@@ -283,14 +283,14 @@ class CryptoCompare(ExchangeBase):
 
 
     async def request_history(self, ccy):
-        result = await self.get_json('min-api.cryptocompare.com', '/data/histoday?fsym=GRS&tsym={}&limit=100&aggregate=1&extraParams=ElectrumGRS'.format(ccy))
+        result = await self.get_json('min-api.cryptocompare.com', '/data/histoday?fsym=CAT&tsym={}&limit=100&aggregate=1&extraParams=ElectrumCAT'.format(ccy))
         result = result.get('Data', [])
         return dict((datetime.fromtimestamp(i['time']).strftime('%Y-%m-%d'), float(i['close'])) for i in result)
 
 class Upbit(ExchangeBase):
 
     async def get_rates(self, ccy):
-        json1 = await self.get_json('api.upbit.com', '/v1/ticker?markets=BTC-GRS')
+        json1 = await self.get_json('api.upbit.com', '/v1/ticker?markets=BTC-CAT')
         if ccy != "BTC":
             json2 = await self.get_json('api.coingecko.com', '/api/v3/simple/price?ids=bitcoin&vs_currencies=%s' % ccy)
             return {ccy: to_decimal(json1[0]['trade_price'])*to_decimal(json2['bitcoin'][ccy.lower()])}

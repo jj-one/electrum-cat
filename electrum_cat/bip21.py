@@ -9,7 +9,7 @@ from .bitcoin import COIN, TOTAL_COIN_SUPPLY_LIMIT_IN_BTC
 from .lnaddr import lndecode, LnDecodeException
 
 # note: when checking against these, use .lower() to support case-insensitivity
-BITCOIN_BIP21_URI_SCHEME = 'groestlcoin'
+BITCOIN_BIP21_URI_SCHEME = 'catcoin'
 LIGHTNING_URI_SCHEME = 'lightning'
 
 
@@ -25,12 +25,12 @@ def parse_bip21_URI(uri: str) -> dict:
 
     if ':' not in uri:
         if not bitcoin.is_address(uri):
-            raise InvalidBitcoinURI("Not a groestlcoin address")
+            raise InvalidBitcoinURI("Not a catcoin address")
         return {'address': uri}
 
     u = urllib.parse.urlparse(uri)
     if u.scheme.lower() != BITCOIN_BIP21_URI_SCHEME:
-        raise InvalidBitcoinURI("Not a groestlcoin URI")
+        raise InvalidBitcoinURI("Not a catcoin URI")
     address = u.path
 
     # python for android fails to parse query
