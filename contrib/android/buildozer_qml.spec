@@ -76,8 +76,7 @@ requirements =
     cryptography,
     pyqt6sip,
     pyqt6,
-    libzbar,
-    catcoin_hash==1.0.3
+    libzbar
 
 # (str) Presplash of the application
 presplash.filename = %(source.dir)s/electrum_cat/gui/icons/electrum_presplash.png

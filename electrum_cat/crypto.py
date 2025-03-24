@@ -32,7 +32,6 @@ import hmac
 from typing import Union, Mapping, Optional
 
 import electrum_ecc as ecc
-import catcoin_hash
 
 from .util import assert_bytes, InvalidPassword, to_bytes, to_string, WalletFileException, versiontuple
 from .i18n import _
@@ -331,11 +330,6 @@ def sha256d(x: Union[bytes, str]) -> bytes:
     x = to_bytes(x, 'utf8')
     out = bytes(sha256(sha256(x)))
     return out
-
-
-def catcoinHash(x: bytes) -> bytes:
-    x = to_bytes(x, 'utf8')
-    return catcoin_hash.getHash(x, len(x))
 
 
 def hash_160(x: bytes) -> bytes:

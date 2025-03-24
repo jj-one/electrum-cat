@@ -32,7 +32,7 @@ import electrum_ecc as ecc
 from .util import bfh, BitcoinException, assert_bytes, to_bytes, inv_dict, is_hex_str, classproperty
 from . import segwit_addr
 from . import constants
-from .crypto import catcoinHash, sha256, hash_160
+from .crypto import sha256, hash_160
 
 if TYPE_CHECKING:
     from .network import Network
@@ -357,7 +357,7 @@ def hash_decode(x: str) -> bytes:
 
 def hash160_to_b58_address(h160: bytes, addrtype: int) -> str:
     s = bytes([addrtype]) + h160
-    s = s + catcoinHash(s)[0:4]
+    s = s + sha256d(s)[0:4]
     return base_encode(s, base=58)
 
 
@@ -579,7 +579,7 @@ class InvalidChecksum(BaseDecodeError):
 
 
 def EncodeBase58Check(vchIn: bytes) -> str:
-    hash = catcoinHash(vchIn)
+    hash = sha256d(vchIn)
     return base_encode(vchIn + hash[0:4], base=58)
 
 
@@ -587,7 +587,7 @@ def DecodeBase58Check(psz: Union[bytes, str]) -> bytes:
     vchRet = base_decode(psz, base=58)
     payload = vchRet[0:-4]
     csum_found = vchRet[-4:]
-    csum_calculated = catcoinHash(payload)[0:4]
+    csum_calculated = sha256d(payload)[0:4]
     if csum_calculated != csum_found:
         raise InvalidChecksum(f'calculated {csum_calculated.hex()}, found {csum_found.hex()}')
     else:
@@ -863,12 +863,12 @@ def control_block_for_taproot_script_spend(
 # user message signing
 def usermessage_magic(message: bytes) -> bytes:
     length = var_int(len(message))
-    return b"\x1cCatCoin Signed Message:\n" + length + message
+    return b"\x19Catcoin Signed Message:\n" + length + message
 
 
 def ecdsa_sign_usermessage(ec_privkey, message: Union[bytes, str], *, is_compressed: bool) -> bytes:
     message = to_bytes(message, 'utf8')
-    msg32 = sha256(usermessage_magic(message))
+    msg32 = sha256d(usermessage_magic(message))
     return ec_privkey.ecdsa_sign_recoverable(msg32, is_compressed=is_compressed)
 
 
@@ -876,7 +876,7 @@ def verify_usermessage_with_address(address: str, sig65: bytes, message: bytes, 
     from electrum_ecc import ECPubkey
     assert_bytes(sig65, message)
     if net is None: net = constants.net
-    h = sha256(usermessage_magic(message))
+    h = sha256d(usermessage_magic(message))
     try:
         public_key, compressed, txin_type_guess = ECPubkey.from_ecdsa_sig65(sig65, h)
     except Exception as e:

@@ -27,7 +27,7 @@ from typing import Optional, Dict, Mapping, Sequence, TYPE_CHECKING
 
 from . import util
 from .bitcoin import hash_encode
-from .crypto import catcoinHash
+from .crypto import sha256d
 from . import constants
 from .util import bfh, with_lock
 from .logging import get_logger, Logger
@@ -88,7 +88,7 @@ def hash_header(header: dict) -> str:
 
 def hash_raw_header(header: bytes) -> str:
     assert isinstance(header, bytes)
-    return hash_encode(catcoinHash(header))
+    return hash_encode(sha256d(header))
 
 
 pow_hash_header = hash_header
