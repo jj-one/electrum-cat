@@ -35,6 +35,13 @@ from .logging import get_logger, Logger
 if TYPE_CHECKING:
     from .simple_config import SimpleConfig
 
+try:
+    import scrypt
+    getPoWHash = lambda x: scrypt.hash(x, x, N=1024, r=1, p=1, buflen=32)
+except ImportError:
+    util.print_msg("Warning: package scrypt not available; synchronization could be very slow")
+    from .scrypt import scrypt_1024_1_1_80 as getPoWHash
+
 _logger = get_logger(__name__)
 
 HEADER_SIZE = 80  # bytes
@@ -91,7 +98,8 @@ def hash_raw_header(header: bytes) -> str:
     return hash_encode(sha256d(header))
 
 
-pow_hash_header = hash_header
+def pow_hash_header(header: dict) -> str:
+    return hash_encode(getPoWHash(serialize_header(header)))
 
 
 # key: blockhash hex at forkpoint
@@ -331,7 +339,7 @@ class Blockchain(Logger):
             except MissingHeader:
                 expected_header_hash = None
             raw_header = data[i*HEADER_SIZE : (i+1)*HEADER_SIZE]
-            header = deserialize_header(raw_header, index*2016 + i)
+            header = deserialize_header(raw_header, height)
             self.verify_header(header, prev_hash, target, expected_header_hash)
             prev_hash = hash_header(header)
 
@@ -518,7 +526,7 @@ class Blockchain(Logger):
             return constants.net.GENESIS
         elif is_height_checkpoint():
             index = height // 2016
-            h, t = self.checkpoints[index]
+            h, t, _ = self.checkpoints[index]
             return h
         else:
             header = self.read_header(height)
@@ -526,23 +534,31 @@ class Blockchain(Logger):
                 raise MissingHeader(height)
             return hash_header(header)
 
+    def get_timestamp(self, height: int) -> int:
+        if height < len(self.checkpoints) * 2016 and (height+1) % 2016 == 0:
+            index = height // 2016
+            _, _, ts = self.checkpoints[index]
+            return ts
+        return self.read_header(height).get('timestamp')      
+
     def get_target(self, index: int) -> int:
         # compute target from chunk x, used in chunk x+1
         if constants.net.TESTNET:
             return 0
         if index == -1:
-            return MAX_TARGET
+            return 0x00000FFFF0000000000000000000000000000000000000000000000000000000
         if index < len(self.checkpoints):
-            h, t = self.checkpoints[index]
+            h, t, _ = self.checkpoints[index]
             return t
         # new target
-        first = self.read_header(index * 2016)
+        # Catcoin: go back the full period unless it's the first retarget
+        first = self.get_timestamp(index * 2016 - 1 if index > 0 else 0)
         last = self.read_header(index * 2016 + 2015)
         if not first or not last:
             raise MissingHeader()
         bits = last.get('bits')
         target = self.bits_to_target(bits)
-        nActualTimespan = last.get('timestamp') - first.get('timestamp')
+        nActualTimespan = last.get('timestamp') - first
         nTargetTimespan = 14 * 24 * 60 * 60
         nActualTimespan = max(nActualTimespan, nTargetTimespan // 4)
         nActualTimespan = min(nActualTimespan, nTargetTimespan * 4)
@@ -665,7 +681,9 @@ class Blockchain(Logger):
         for index in range(n):
             h = self.get_hash((index+1) * 2016 -1)
             target = self.get_target(index)
-            cp.append((h, target))
+            # Catcoin: also store the timestamp of the last block
+            tstamp = self.get_timestamp((index+1) * 2016 - 1)
+            cp.append((h, target, tstamp))
         return cp
 
 

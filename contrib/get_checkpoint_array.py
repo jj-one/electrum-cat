@@ -54,9 +54,11 @@ while True:
     h = rpc('getblockhash', [i])['result']
     block = rpc('getblock', [h])['result']
 
+    # Electrum-CAT includes timestamp in the checkpoint json
     checkpoints.append([
         block['hash'],
-        bits_to_target(int(block['bits'], 16))
+        bits_to_target(int(block['bits'], 16)),
+        block['time']
     ])
 
     i += INTERVAL
