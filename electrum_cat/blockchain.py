@@ -331,7 +331,8 @@ class Blockchain(Logger):
         num = len(data) // HEADER_SIZE
         start_height = index * 2016
         prev_hash = self.get_hash(start_height - 1)
-        target = self.get_target(index-1)
+        target = self.get_target(start_height - 1)
+        headers = {}
         for i in range(num):
             height = start_height + i
             try:
@@ -340,8 +341,11 @@ class Blockchain(Logger):
                 expected_header_hash = None
             raw_header = data[i*HEADER_SIZE : (i+1)*HEADER_SIZE]
             header = deserialize_header(raw_header, height)
+            if height > constants.net.TARGET_DISRUPTION_HEIGHT1:
+                target = self.get_target(height - 1, headers)
             self.verify_header(header, prev_hash, target, expected_header_hash)
             prev_hash = hash_header(header)
+            headers[height] = header
 
     @with_lock
     def path(self):
@@ -535,18 +539,14 @@ class Blockchain(Logger):
             return hash_header(header)
 
     def get_timestamp(self, height: int) -> int:
-        if height < len(self.checkpoints) * 2016 and (height+1) % 2016 == 0:
+        if height < len(self.checkpoints) * 2016 and (height+1) % 2016 == 0 and height < constants.net.TARGET_DISRUPTION_HEIGHT1:
             index = height // 2016
             _, _, ts = self.checkpoints[index]
             return ts
-        return self.read_header(height).get('timestamp')      
+        return self.read_header(height).get('timestamp')
 
-    def get_target(self, index: int) -> int:
-        # compute target from chunk x, used in chunk x+1
-        if constants.net.TESTNET:
-            return 0
-        if index == -1:
-            return 0x00000FFFF0000000000000000000000000000000000000000000000000000000
+    def get_target_1(self, last_height: int) -> int:
+        index = last_height // 2016
         if index < len(self.checkpoints):
             h, t, _ = self.checkpoints[index]
             return t
@@ -559,13 +559,162 @@ class Blockchain(Logger):
         bits = last.get('bits')
         target = self.bits_to_target(bits)
         nActualTimespan = last.get('timestamp') - first
-        nTargetTimespan = 14 * 24 * 60 * 60
+        nTargetTimespan = constants.net.POW_TARGET_TIMESPAN_V1
         nActualTimespan = max(nActualTimespan, nTargetTimespan // 4)
         nActualTimespan = min(nActualTimespan, nTargetTimespan * 4)
         new_target = min(MAX_TARGET, (target * nActualTimespan) // nTargetTimespan)
         # not any target can be represented in 32 bits:
         new_target = self.bits_to_target(self.target_to_bits(new_target))
         return new_target
+
+    def get_target_14_to_36(self, last_height: int, headers: dict) -> int:
+        last_bits = headers[last_height].get('bits')
+        if str(last_height) in constants.net.TARGET_DISRUPTION_14_TO_36:
+            return self.bits_to_target(int(constants.net.TARGET_DISRUPTION_14_TO_36.get(str(last_height)), 16))
+        return self.bits_to_target(last_bits)
+
+    def get_target_3(self, last_height: int, headers: dict) -> int:
+        first_height = last_height - 36
+        try:
+            first_timestamp = headers[first_height].get("timestamp")
+        except:
+            try:
+                first_timestamp = self.read_header(first_height).get('timestamp')
+            except:
+                return None
+        try:
+            last_timestamp = headers[last_height].get("timestamp")
+            last_bits = headers[last_height].get("bits")
+        except:
+            try:
+                last_timestamp = self.read_header(last_height).get("timestamp")
+                last_bits = self.read_header(last_height).get("bits")
+            except:
+                return None
+        numerator = 112
+        denominator = 100
+        lowLimit = (constants.net.POW_TARGET_TIMESPAN_V2 * denominator) // numerator
+        highLimit = (constants.net.POW_TARGET_TIMESPAN_V2 * numerator) // denominator
+
+        bits = last_bits
+        target = self.bits_to_target(bits)
+        nActualTimespan = last_timestamp - first_timestamp
+        nTargetTimespan = constants.net.POW_TARGET_TIMESPAN_V2
+        nActualTimespan = max(nActualTimespan, lowLimit)
+        nActualTimespan = min(nActualTimespan, highLimit)
+        newTarget = min(MAX_TARGET, (target * nActualTimespan) // nTargetTimespan)
+        # not any target can be represented in 32 bits:
+        newTarget = self.bits_to_target(self.target_to_bits(newTarget))
+        return newTarget
+
+    def get_target_4(self, last_height: int, headers: dict) -> int:
+        first_height = last_height - 8
+        try:
+            first_timestamp = headers[first_height].get("timestamp")
+        except:
+            try:
+                first_timestamp = self.read_header(first_height).get('timestamp')
+            except:
+                return None
+        try:
+            last_timestamp = headers[last_height].get("timestamp")
+            last_bits = headers[last_height].get("bits")
+        except:
+            try:
+                last_timestamp = self.read_header(last_height).get("timestamp")
+                last_bits = self.read_header(last_height).get("bits")
+            except:
+                return None
+        nActualTimespan = (last_timestamp - first_timestamp) // 8
+        newTarget = self.bits_to_target(last_bits)
+        i = 0
+        while newTarget > 0:
+            i += 1
+            newTarget = newTarget >> 1
+            if i > 256:
+                newTarget = 0
+        newTarget = self.bits_to_target(last_bits)
+        error = nActualTimespan - constants.net.POW_TARGET_SPACING
+        pGainUp = -0.005125
+        iGainUp = -0.0225
+        dGainUp = -0.0075
+        pGainDn = -0.005125
+        iGainDn = -0.0525
+        dGainDn = -0.0075
+        if error >= -450 and error <= 450:
+            pCalc = pGainUp * error
+            iCalc = iGainUp * error * (constants.net.POW_TARGET_SPACING / nActualTimespan)
+            dCalc = dGainUp * (error / nActualTimespan) * iCalc
+        else:
+            pCalc = pGainDn * error
+            iCalc = iGainDn * error * (constants.net.POW_TARGET_SPACING / nActualTimespan)
+            dCalc = dGainDn * (error / nActualTimespan) * iCalc
+        if error > -10 and error < 10:
+            return newTarget
+        dResult = pCalc + iCalc + dCalc
+        result = int(dResult * 65536)
+        while result > 8388607:
+            result //= 2
+        bResult = result
+        if i > 24:
+            bResult = bResult << (i - 24)
+        newTarget = newTarget - bResult
+        if self.target_to_bits(newTarget) > 0x1e0fffff:
+            return self.bits_to_target(0x1e0fffff)
+        return newTarget
+
+    def get_target_5(self, last_height: int, headers: dict) -> int:
+        first_height = last_height - 1
+        try:
+            first_timestamp = headers[first_height].get("timestamp")
+        except:
+            try:
+                first_timestamp = self.read_header(first_height).get('timestamp')
+            except:
+                return None
+        try:
+            last_timestamp = headers[last_height].get("timestamp")
+            last_bits = headers[last_height].get("bits")
+        except:
+            try:
+                last_timestamp = self.read_header(last_height).get("timestamp")
+                last_bits = self.read_header(last_height).get("bits")
+            except:
+                return None
+        timestamp = last_timestamp % 60
+        if (timestamp >= 0 and timestamp <= 14) or (timestamp >= 30 and timestamp <= 44):
+            nActualTimespan = last_timestamp - first_timestamp
+            pts = constants.net.POW_TARGET_SPACING
+            if nActualTimespan < (pts - (pts // 4)):
+                nActualTimespan = (pts - (pts // 4))
+            if nActualTimespan > (pts + (pts // 2)):
+                nActualTimespan = (pts + (pts // 2))
+            newTarget = self.bits_to_target(last_bits)
+            newTarget *= nActualTimespan
+            newTarget //= pts
+            if newTarget > MAX_TARGET:
+                newTarget = MAX_TARGET
+            if self.target_to_bits(newTarget) > 0x1e0fffff:
+                return self.bits_to_target(0x1e0fffff)
+            return newTarget
+        return self.get_target_4(last_height, headers)
+            
+    def get_target(self, last_height: int, headers=None) -> int:
+        # compute target from chunk x, used in chunk x+1
+        if constants.net.TESTNET:
+            return 0
+        if last_height == -1:
+            return 0x00000FFFF0000000000000000000000000000000000000000000000000000000
+        if last_height < constants.net.TARGET_DISRUPTION_HEIGHT1:
+            return self.get_target_1(last_height)
+        if last_height >= constants.net.TARGET_DISRUPTION_HEIGHT1 and last_height < constants.net.TARGET_DISRUPTION_14_TO_36_END:
+            return self.get_target_14_to_36(last_height, headers)
+        if last_height < constants.net.TARGET_DISRUPTION_HEIGHT3:
+            return self.get_target_3(last_height, headers)
+        if last_height < constants.net.TARGET_DISRUPTION_HEIGHT4:
+            return self.get_target_4(last_height, headers)
+        if last_height >= constants.net.TARGET_DISRUPTION_HEIGHT4:
+            return self.get_target_5(last_height, headers)
 
     @classmethod
     def bits_to_target(cls, bits: int) -> int:
@@ -607,8 +756,7 @@ class Blockchain(Logger):
 
     def chainwork_of_header_at_height(self, height: int) -> int:
         """work done by single header at given height"""
-        chunk_idx = height // 2016 - 1
-        target = self.get_target(chunk_idx)
+        target = self.get_target(height-1)
         work = ((2 ** 256 - target - 1) // (target + 1)) + 1
         return work
 
@@ -654,7 +802,7 @@ class Blockchain(Logger):
         if prev_hash != header.get('prev_block_hash'):
             return False
         try:
-            target = self.get_target(height // 2016 - 1)
+            target = self.get_target(height - 1)
         except MissingHeader:
             return False
         try:
@@ -680,7 +828,7 @@ class Blockchain(Logger):
         n = self.height() // 2016
         for index in range(n):
             h = self.get_hash((index+1) * 2016 -1)
-            target = self.get_target(index)
+            target = self.get_target((index+1) * 2016 - 1)
             # Catcoin: also store the timestamp of the last block
             tstamp = self.get_timestamp((index+1) * 2016 - 1)
             cp.append((h, target, tstamp))

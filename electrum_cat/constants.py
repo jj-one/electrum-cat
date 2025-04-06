@@ -82,6 +82,14 @@ class AbstractNet:
     XPRV_HEADERS_INV: Mapping[int, str]
     XPUB_HEADERS: Mapping[str, int]
     XPUB_HEADERS_INV: Mapping[int, str]
+    TARGET_DISRUPTION_HEIGHT1: int
+    TARGET_DISRUPTION_HEIGHT3: int
+    TARGET_DISRUPTION_HEIGHT4: int
+    TARGET_DISRUPTION_14_TO_36: Mapping[str, str]
+    TARGET_DISRUPTION_14_TO_36_END: int
+    POW_TARGET_TIMESPAN_V1: int
+    POW_TARGET_TIMESPAN_V2: int
+    POW_TARGET_SPACING: int
 
     @classmethod
     def max_checkpoint(cls) -> int:
@@ -112,7 +120,23 @@ class BitcoinMainnet(AbstractNet):
     FALLBACK_LN_NODES = create_fallback_node_list(read_json(os.path.join('chains', 'fallback_lnnodes_mainnet.json')))
     CHECKPOINTS = read_json(os.path.join('chains', 'checkpoints.json'))
     BLOCK_HEIGHT_FIRST_LIGHTNING_CHANNELS = 497000
-
+    TARGET_DISRUPTION_HEIGHT1 = 20289
+    TARGET_DISRUPTION_HEIGHT3 = 27260
+    TARGET_DISRUPTION_HEIGHT4 = 46331
+    POW_TARGET_TIMESPAN_V1 = 14 * 24 * 60 * 60
+    POW_TARGET_TIMESPAN_V2 = 6 * 60 * 60
+    POW_TARGET_SPACING = 10 * 60
+    TARGET_DISRUPTION_14_TO_36_END = 21346
+    TARGET_DISRUPTION_14_TO_36 = {
+        '20289': '1c0ffff0', '20303': '1c3fffc0', '20339': '1c0ffff0', '20375': '1c0440a5',
+        '20411': '1c05b465', '20447': '1c041076', '20483': '1c0a6691', '20519': '1c0299a4',
+        '20555': '1c0993ee', '20591': '1c059d71', '20627': '1c040f15', '20663': '1c0894be',
+        '20699': '1c033e15', '20735': '1c0cf854', '20771': '1c044cc7', '20807': '1c058eb4',
+        '20843': '1c0fc3ab', '20879': '1c03f0ea', '20915': '1c0dac5f', '20951': '1c03b5a3',
+        '20987': '1c0ed68c', '21023': '1c04065b', '21059': '1c10196c', '21095': '1c04065b',
+        '21131': '1c10196c', '21167': '1c04065b', '21203': '1c03f352', '21239': '1c02eb40',
+        '21275': '1c03f513', '21311': '1c025bab', '21346': '1c02a41b'
+    }
     XPRV_HEADERS = {
         'standard':    0x0488ade4,  # xprv
         'p2wpkh-p2sh': 0x049d7878,  # yprv
