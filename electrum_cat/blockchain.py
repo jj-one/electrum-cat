@@ -582,7 +582,7 @@ class Blockchain(Logger):
             try:
                 first_timestamp = self.read_header(first_height).get('timestamp')
             except:
-                return None
+                raise MissingHeader()
         try:
             last_timestamp = headers[last_height].get("timestamp")
             last_bits = headers[last_height].get("bits")
@@ -591,7 +591,7 @@ class Blockchain(Logger):
                 last_timestamp = self.read_header(last_height).get("timestamp")
                 last_bits = self.read_header(last_height).get("bits")
             except:
-                return None
+                raise MissingHeader()
         numerator = 112
         denominator = 100
         lowLimit = (constants.net.POW_TARGET_TIMESPAN_V2 * denominator) // numerator
@@ -616,7 +616,7 @@ class Blockchain(Logger):
             try:
                 first_timestamp = self.read_header(first_height).get('timestamp')
             except:
-                return None
+                raise MissingHeader()
         try:
             last_timestamp = headers[last_height].get("timestamp")
             last_bits = headers[last_height].get("bits")
@@ -625,7 +625,7 @@ class Blockchain(Logger):
                 last_timestamp = self.read_header(last_height).get("timestamp")
                 last_bits = self.read_header(last_height).get("bits")
             except:
-                return None
+                raise MissingHeader()
         nActualTimespan = (last_timestamp - first_timestamp) // 8
         newTarget = self.bits_to_target(last_bits)
         i = 0
@@ -672,7 +672,7 @@ class Blockchain(Logger):
             try:
                 first_timestamp = self.read_header(first_height).get('timestamp')
             except:
-                return None
+                raise MissingHeader()
         try:
             last_timestamp = headers[last_height].get("timestamp")
             last_bits = headers[last_height].get("bits")
@@ -681,7 +681,7 @@ class Blockchain(Logger):
                 last_timestamp = self.read_header(last_height).get("timestamp")
                 last_bits = self.read_header(last_height).get("bits")
             except:
-                return None
+                raise MissingHeader()
         timestamp = last_timestamp % 60
         if (timestamp >= 0 and timestamp <= 14) or (timestamp >= 30 and timestamp <= 44):
             nActualTimespan = last_timestamp - first_timestamp
@@ -699,6 +699,59 @@ class Blockchain(Logger):
                 return self.bits_to_target(0x1e0fffff)
             return newTarget
         return self.get_target_4(last_height, headers)
+
+    def get_target_lwma(self, last_height: int, headers: dict) -> int:
+        try:
+            last_timestamp = headers[last_height].get("timestamp")
+            last_bits = headers[last_height].get("bits")
+        except:
+            try:
+                last_timestamp = self.read_header(last_height).get("timestamp")
+                last_bits = self.read_header(last_height).get("bits")
+            except:
+                raise MissingHeader()
+        t = constants.net.POW_TARGET_SPACING
+        n = constants.net.LWMA_AVERAGING_WINDOW
+        k = n * (n + 1) * t // 2
+        height = last_height
+        powLimit = MAX_TARGET
+
+        if height < n:
+            return powLimit
+
+        sumWeightedSolvetimes = 0
+        j = 0
+        avgTarget = 0
+        try:
+            ancestor_timestamp = headers[height - n].get("timestamp")
+        except:
+            try:
+                ancestor_timestamp = self.read_header(height - n).get("timestamp")
+            except:
+                raise MissingHeader()
+        
+        for i in range(height - n + 1, height, 1):
+            try:
+                thisBlock = headers[i]
+                ancestor_i_timestamp = thisBlock.get("timestamp")
+            except:
+                try:
+                    thisBlock = self.read_header(i)
+                    ancestor_i_timestamp = thisBlock.get("timestamp")
+                except:
+                    raise MissingHeader() 
+            thisTimestamp = ancestor_i_timestamp if ancestor_i_timestamp > ncestor_timestamp else ncestor_timestamp + 1
+            solvetime = min(6 * t, thisTimestamp - ancestor_timestamp)
+            ancestor_timestamp = thisTimestamp
+            j += 1
+            sumWeightedSolvetimes += solvetime * j
+            thisTarget = self.bits_to_target(thisBlock.get("bits"))
+            avgTarget += thisTarget // n // k
+
+        nextTarget = avgTarget * sumWeightedSolvetimes
+        if nextTarget > powLimit:
+            return powLimit
+        return nextTarget
             
     def get_target(self, last_height: int, headers=None) -> int:
         # compute target from chunk x, used in chunk x+1
@@ -714,8 +767,9 @@ class Blockchain(Logger):
             return self.get_target_3(last_height, headers)
         if last_height < constants.net.TARGET_DISRUPTION_HEIGHT4:
             return self.get_target_4(last_height, headers)
-        if last_height >= constants.net.TARGET_DISRUPTION_HEIGHT4:
+        if last_height < constants.net.TARGET_DISRUPTION_HEIGHT5:
             return self.get_target_5(last_height, headers)
+        return self.get_target_lwma(last_height, headers)
 
     @classmethod
     def bits_to_target(cls, bits: int) -> int:
