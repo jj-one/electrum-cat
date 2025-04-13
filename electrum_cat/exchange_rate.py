@@ -252,8 +252,9 @@ class CoinGecko(ExchangeBase):
 
     async def get_rates(self, ccy):
         json = await self.get_json('api.coingecko.com',
-                                   '/api/v3/simple/price?ids=catcoins&vs_currencies=%s' % ccy)
-        return {ccy: to_decimal(json['catcoins'][ccy.lower()])}
+                                   '/api/v3/simple/price?ids=catcoin&vs_currencies=%s' % ccy)
+        print(f"Current Price from {self.name()} in {ccy} is {to_decimal(json['catcoin'][ccy.lower()])}")
+        return {ccy: to_decimal(json['catcoin'][ccy.lower()])}
 
     def history_ccys(self):
         # CoinGecko seems to have historical data for all ccys it supports
@@ -279,7 +280,7 @@ class CryptoCompare(ExchangeBase):
         return dict((k, to_decimal(v)) for k, v in result.items())
 
     def history_ccys(self):
-        return ['USD','AED','ARS','AUD','BDT','BHD','BMD','BRL','CAD','CHF','CLP','CNY','CZK','DKK','EUR','GBP','HKD','HUF','IDR','ILS','INR','JPY','KRW','KWD','LKR','MMK','MXN','MYR','NGN','NOK','NZD','PHP','PKR','PLN','RUB','SAR','SEK','SGD','THB','TRY','TWD','UAH','VEF','VND','ZAR']
+        return ['USD']
 
 
     async def request_history(self, ccy):
