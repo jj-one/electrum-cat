@@ -671,6 +671,38 @@ class Interface(Logger):
             return conn, 0
         return conn, res['count']
 
+    async def request_chunk_before_last_cp(self, height: int, tip=None, *, can_return_early=False):
+        if not is_non_negative_integer(height):
+            raise Exception(f"{repr(height)} is not a block height")
+        index = height // 2016
+        if can_return_early and index in self._requested_chunks:
+            return
+        self.logger.info(f"requesting chunk from height {height}")
+        size = 2016
+        if tip is not None:
+            size = min(size, tip - index * 2016 + 1)
+            size = max(size, 0)
+        try:
+            self._requested_chunks.add(index)
+            res = await self.session.send_request('blockchain.block.headers', [index * 2016, size])
+        finally:
+            self._requested_chunks.discard(index)
+        assert_dict_contains_field(res, field_name='count')
+        assert_dict_contains_field(res, field_name='hex')
+        assert_dict_contains_field(res, field_name='max')
+        assert_non_negative_integer(res['count'])
+        assert_non_negative_integer(res['max'])
+        assert_hex_str(res['hex'])
+        if len(res['hex']) != HEADER_SIZE * 2 * res['count']:
+            raise RequestCorrupted('inconsistent chunk hex and count')
+        # we never request more than 2016 headers, but we enforce those fit in a single response
+        if res['max'] < 2016:
+            raise RequestCorrupted(f"server uses too low 'max' count for block.headers: {res['max']} < 2016")
+        if res['count'] != size:
+            raise RequestCorrupted(f"expected {size} headers but only got {res['count']}")
+        conn = self.blockchain.connect_chunk_before_cp(index, res['hex'])
+        return conn
+
     def is_main_server(self) -> bool:
         return (self.network.interface == self or
                 self.network.interface is None and self.network.default_server == self.server)
@@ -838,6 +870,14 @@ class Interface(Logger):
             height, header, bad, bad_header = await self._search_headers_backwards(height, header)
             chain = blockchain.check_header(header) if 'mock' not in header else header['mock']['check'](header)
             can_connect = blockchain.can_connect(header) if 'mock' not in header else header['mock']['connect'](height)
+            
+            # Request the immediate chunk before the last checkpoint
+            cps = constants.net.CHECKPOINTS
+            if not can_connect and chain and height + 1 == 2016 * len(cps) and len(cps) > 2:
+                conn = await self.request_chunk_before_last_cp(height)
+                if conn:
+                    can_connect = blockchain.can_connect(header) if 'mock' not in header else header['mock']['connect'](height)
+                
             assert chain or can_connect
         if can_connect:
             self.logger.info(f"new block: {height=}")

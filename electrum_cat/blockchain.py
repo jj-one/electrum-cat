@@ -877,6 +877,28 @@ class Blockchain(Logger):
             self.logger.info(f'verify_chunk idx {idx} failed: {repr(e)}')
             return False
 
+    def connect_chunk_before_cp(self, idx: int, hexdata: str) -> bool:
+        assert idx >= 0, idx
+        try:
+            data = bfh(hexdata)
+            cps = constants.net.CHECKPOINTS
+            height = idx * 2016 + 2015
+            first_r_header = data[:HEADER_SIZE]
+            first_header = deserialize_header(first_r_header, height - 2015)
+            last_r_header = data[-HEADER_SIZE:]
+            last_header = deserialize_header(last_r_header, height)
+            first_cp_prev_hash = first_header["prev_block_hash"]
+            first_cp_hash_from_file = cps[-2][0]
+            last_cp_target = self.bits_to_target(last_header["bits"])
+            last_cp_target_from_file = cps[-1][1]
+            if first_cp_prev_hash == first_cp_hash_from_file and last_cp_target == last_cp_target_from_file:
+                self.save_chunk(idx, data)
+                return True
+            return False
+        except BaseException as e:
+            self.logger.info(f'verify_chunk_before_cp idx {idx} failed: {repr(e)}')
+            return False
+
     def get_checkpoints(self):
         # for each chunk, store the hash of the last block and the target after the chunk
         cp = []
