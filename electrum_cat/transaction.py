@@ -52,7 +52,7 @@ from .bitcoin import (TYPE_ADDRESS, TYPE_SCRIPT, hash_160,
                       opcodes, base_decode,
                       base_encode, construct_witness, construct_script,
                       taproot_tweak_seckey)
-from .crypto import sha256
+from .crypto import sha256d
 from .logging import get_logger
 from .util import ShortID, OldTaskGroup
 from .bitcoin import DummyAddress
@@ -227,11 +227,11 @@ class BIP143SharedTxDigestFields(NamedTuple):  # witness v0
     def from_tx(cls, tx: 'PartialTransaction') -> 'BIP143SharedTxDigestFields':
         inputs = tx.inputs()
         outputs = tx.outputs()
-        hashPrevouts = sha256(b''.join(txin.prevout.serialize_to_network() for txin in inputs))
-        hashSequence = sha256(b''.join(
+        hashPrevouts = sha256d(b''.join(txin.prevout.serialize_to_network() for txin in inputs))
+        hashSequence = sha256d(b''.join(
             int.to_bytes(txin.nsequence, length=4, byteorder="little", signed=False)
             for txin in inputs))
-        hashOutputs = sha256(b''.join(o.serialize_to_network() for o in outputs))
+        hashOutputs = sha256d(b''.join(o.serialize_to_network() for o in outputs))
         return BIP143SharedTxDigestFields(
             hashPrevouts=hashPrevouts,
             hashSequence=hashSequence,
@@ -250,17 +250,17 @@ class BIP341SharedTxDigestFields(NamedTuple):  # witness v1
     def from_tx(cls, tx: 'PartialTransaction') -> 'BIP341SharedTxDigestFields':
         inputs = tx.inputs()
         outputs = tx.outputs()
-        sha_prevouts = sha256(b''.join(txin.prevout.serialize_to_network() for txin in inputs))
-        sha_amounts = sha256(b''.join(
+        sha_prevouts = sha256d(b''.join(txin.prevout.serialize_to_network() for txin in inputs))
+        sha_amounts = sha256d(b''.join(
             int.to_bytes(txin.value_sats(), length=8, byteorder="little", signed=False)
             for txin in inputs))
-        sha_scriptpubkeys = sha256(b''.join(
+        sha_scriptpubkeys = sha256d(b''.join(
             var_int(len(txin.scriptpubkey)) + txin.scriptpubkey
             for txin in inputs))
-        sha_sequences = sha256(b''.join(
+        sha_sequences = sha256d(b''.join(
             int.to_bytes(txin.nsequence, length=4, byteorder="little", signed=False)
             for txin in inputs))
-        sha_outputs = sha256(b''.join(o.serialize_to_network() for o in outputs))
+        sha_outputs = sha256d(b''.join(o.serialize_to_network() for o in outputs))
         return BIP341SharedTxDigestFields(
             sha_prevouts=sha_prevouts,
             sha_amounts=sha_amounts,
@@ -294,7 +294,7 @@ class TxOutpoint(NamedTuple):
     @classmethod
     def from_str(cls, s: str) -> 'TxOutpoint':
         hash_str, idx_str = s.split(':')
-        assert len(hash_str) == 64, f"{hash_str} should be a sha256 hash"
+        assert len(hash_str) == 64, f"{hash_str} should be a sha256d hash"
         return TxOutpoint(txid=bfh(hash_str),
                           out_idx=int(idx_str))
 
@@ -1050,7 +1050,7 @@ class Transaction:
             except UnknownTxinType:
                 # we might not know how to construct scriptSig for some scripts
                 return None
-            self._cached_txid = sha256(bfh(ser))[::-1].hex()
+            self._cached_txid = sha256d(bfh(ser))[::-1].hex()
         return self._cached_txid
 
     def wtxid(self) -> Optional[str]:
@@ -1062,7 +1062,7 @@ class Transaction:
         except UnknownTxinType:
             # we might not know how to construct scriptSig/witness for some scripts
             return None
-        return sha256(bfh(ser))[::-1].hex()
+        return sha256d(bfh(ser))[::-1].hex()
 
     def add_info_from_wallet(self, wallet: 'Abstract_Wallet', **kwargs) -> None:
         # populate prev_txs
@@ -2248,7 +2248,7 @@ class PartialTransaction(Transaction):
                         txout = outputs[txin_index]
                     except IndexError:
                         raise Exception("Using SIGHASH_SINGLE without a corresponding output") from None
-                    preimage_outputdata += sha256(txout.serialize_to_network())
+                    preimage_outputdata += sha256d(txout.serialize_to_network())
                 return bytes(sighash_epoch + hash_type + preimage_txdata + preimage_inputdata + preimage_outputdata)
             else:  # segwit (witness v0)
                 scache = sighash_cache.get_witver0_data_for_tx(self)
@@ -2263,7 +2263,7 @@ class PartialTransaction(Transaction):
                 if (sighash & 0x1f) != Sighash.SINGLE and (sighash & 0x1f) != Sighash.NONE:
                     hashOutputs = scache.hashOutputs
                 elif (sighash & 0x1f) == Sighash.SINGLE and txin_index < len(outputs):
-                    hashOutputs = sha256(outputs[txin_index].serialize_to_network())
+                    hashOutputs = sha256d(outputs[txin_index].serialize_to_network())
                 else:
                     hashOutputs = bytes(32)
                 outpoint = txin.prevout.serialize_to_network()
@@ -2324,7 +2324,7 @@ class PartialTransaction(Transaction):
             sighash = txin.sighash if txin.sighash is not None else Sighash.DEFAULT
         else:
             privkey = ecc.ECPrivkey(privkey_bytes)
-            msg_hash = sha256(pre_hash)
+            msg_hash = sha256d(pre_hash)
             sig = privkey.ecdsa_sign(msg_hash, sigencode=ecc.ecdsa_der_sig_from_r_and_s)
             sighash = txin.sighash if txin.sighash is not None else Sighash.ALL
         return sig + Sighash.to_sigbytes(sighash)
@@ -2378,7 +2378,7 @@ class PartialTransaction(Transaction):
                 continue
             if sig in list(txin.sigs_ecdsa.values()):
                 continue
-            msg_hash = sha256(self.serialize_preimage(i))
+            msg_hash = sha256d(self.serialize_preimage(i))
             sig64 = ecc.ecdsa_sig64_from_der_sig(sig[:-1])
             for recid in range(4):
                 try:

@@ -1187,7 +1187,7 @@ class Channel(AbstractChannel):
 
         pending_local_commitment = self.get_next_commitment(LOCAL)
         pre_hash = pending_local_commitment.serialize_preimage(0)
-        msg_hash = sha256(pre_hash)
+        msg_hash = sha256d(pre_hash)
         if not ECPubkey(self.config[REMOTE].multisig_key.pubkey).ecdsa_verify(sig, msg_hash):
             raise LNProtocolWarning(
                 f'failed verifying signature for our updated commitment transaction. '
@@ -1236,7 +1236,7 @@ class Channel(AbstractChannel):
             # peer sent us a signature for our ctx using anchor sighash flags
             htlc_tx.inputs()[0].sighash = Sighash.ANYONECANPAY | Sighash.SINGLE
         pre_hash = htlc_tx.serialize_preimage(0)
-        msg_hash = sha256(pre_hash)
+        msg_hash = sha256d(pre_hash)
         remote_htlc_pubkey = derive_pubkey(self.config[REMOTE].htlc_basepoint.pubkey, pcp)
         if not ECPubkey(remote_htlc_pubkey).ecdsa_verify(htlc_sig, msg_hash):
             raise LNProtocolWarning(
@@ -1718,7 +1718,7 @@ class Channel(AbstractChannel):
     def signature_fits(self, tx: PartialTransaction) -> bool:
         remote_sig = self.config[LOCAL].current_commitment_signature
         pre_hash = tx.serialize_preimage(0)
-        msg_hash = sha256(pre_hash)
+        msg_hash = sha256d(pre_hash)
         assert remote_sig
         res = ECPubkey(self.config[REMOTE].multisig_key.pubkey).ecdsa_verify(remote_sig, msg_hash)
         return res
