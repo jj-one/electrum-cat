@@ -399,7 +399,7 @@ class WCWalletType(WalletWizardComponent):
         WalletWizardComponent.__init__(self, parent, wizard, title=_('Create new wallet'))
         message = _('What kind of wallet do you want to create?')
         wallet_kinds = [
-            ('standard',  _('Standard wallet')),
+            ('standard',  _('Standard wallet (Legacy)')),
             ('2fa',       _('Wallet with two-factor authentication')),
             ('multisig',  _('Multi-signature wallet')),
             ('imported',  _('Import Catcoin addresses or private keys')),

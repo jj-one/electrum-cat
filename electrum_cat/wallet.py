@@ -202,7 +202,9 @@ async def sweep(
         locktime = get_locktime_for_new_transaction(network)
 
     tx = PartialTransaction.from_io(inputs, outputs, locktime=locktime, version=tx_version)
-    tx.set_rbf(True)
+    # Permanently diable rbf and locktime as catcoincore does not support it yet
+    # tx.set_rbf(True)
+    tx.set_rbf(False)
     tx.sign(keypairs)
     return tx
 
@@ -212,7 +214,9 @@ def get_locktime_for_new_transaction(
     *,
     include_random_component: bool = True,
 ) -> int:
-    # if no network or not up to date, just set locktime to zero
+    # Permanently set locktime zero for all transaction
+    return 0
+    """"# if no network or not up to date, just set locktime to zero
     if not network:
         return 0
     chain = network.blockchain()
@@ -234,7 +238,7 @@ def get_locktime_for_new_transaction(
         if random.randint(0, 9) == 0:
             locktime = max(0, locktime - random.randint(0, 99))
     locktime = max(0, locktime)
-    return locktime
+    return locktime"""
 
 
 class CannotRBFTx(Exception): pass
@@ -1841,7 +1845,9 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             fee=None,
             change_addr: str = None,
             is_sweep: bool = False,  # used by Wallet_2fa subclass
-            rbf: Optional[bool] = True,
+            # Permanently diable rbf and locktime as catcoincore does not support it yet
+            # rbf: Optional[bool] = True,
+            rbf: Optional[bool] = False,
             BIP69_sort: Optional[bool] = True,
             base_tx: Optional[PartialTransaction] = None,
             send_change_to_lightning: Optional[bool] = None,
@@ -1879,7 +1885,9 @@ class Abstract_Wallet(ABC, Logger, EventListener):
 
         for txin in coins:
             self.add_input_info(txin)
-            nSequence = 0xffffffff - (2 if rbf else 1)
+            # Permanently diable rbf and locktime as catcoincore does not support it yet
+            # nSequence = 0xffffffff - (2 if rbf else 1)
+            nSequence = 0xffffffff
             txin.nsequence = nSequence
 
         # Fee estimator
@@ -2165,7 +2173,9 @@ class Abstract_Wallet(ABC, Logger, EventListener):
                 f"got {actual_fee}, expected >={target_min_fee}. "
                 f"target rate was {new_fee_rate}")
         tx_new.locktime = get_locktime_for_new_transaction(self.network)
-        tx_new.set_rbf(True)
+        # Permanently diable rbf and locktime as catcoincore does not support it yet
+        # tx_new.set_rbf(True)
+        tx_new.set_rbf(False)
         tx_new.add_info_from_wallet(self)
         return tx_new
 
@@ -2377,7 +2387,9 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         outputs = [PartialTxOutput.from_address_and_value(out_address, output_value)]
         locktime = get_locktime_for_new_transaction(self.network)
         tx_new = PartialTransaction.from_io(inputs, outputs, locktime=locktime)
-        tx_new.set_rbf(True)
+        # Permanently diable rbf and locktime as catcoincore does not support it yet
+        # tx_new.set_rbf(True)
+        tx_new.set_rbf(False)
         tx_new.add_info_from_wallet(self)
         return tx_new
 
@@ -2431,7 +2443,9 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             raise CannotDoubleSpendTx(_("The output value remaining after fee is too low."))
         outputs = [PartialTxOutput.from_address_and_value(out_address, value - new_fee)]
         tx_new = PartialTransaction.from_io(inputs, outputs, locktime=locktime)
-        tx_new.set_rbf(True)
+        # Permanently diable rbf and locktime as catcoincore does not support it yet
+        # tx_new.set_rbf(True)
+        tx_new.set_rbf(False)
         tx_new.add_info_from_wallet(self)
         return tx_new
 
@@ -3110,9 +3124,13 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         domain_addr=None,
         domain_coins=None,
         sign=True,
-        rbf=True,
+        # Permanently diable rbf and locktime as catcoincore does not support it yet
+        # rbf=True,
+        rbf=False,
         password=None,
-        locktime=None,
+        # Permanently set locktime zero for all transaction
+        # locktime=None,
+        locktime=0,
         tx_version: Optional[int] = None,
         base_tx: Optional[PartialTransaction] = None,
         inputs: Optional[List[PartialTxInput]] = None,

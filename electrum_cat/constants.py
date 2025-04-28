@@ -162,6 +162,92 @@ class BitcoinMainnet(AbstractNet):
     LN_DNS_SEEDS = []
 
 
+class BitcoinTestnet(AbstractNet):
+
+    NET_NAME = "testnet"
+    TESTNET = True
+    WIF_PREFIX = 0x97
+    ADDRTYPE_P2PKH = 23
+    ADDRTYPE_P2SH = 83
+    SEGWIT_HRP = "t1cat"
+    BOLT11_HRP = SEGWIT_HRP
+    GENESIS = "ec7987a2ab5225246c5cf9b8d93b4b75bcef383a4a65d5a265bc09ed54006188"
+    DEFAULT_PORTS = {'t': '19935', 's': '19933'}
+    DEFAULT_SERVERS = read_json(os.path.join('chains', 'servers_testnet.json'), {})
+    FALLBACK_LN_NODES = create_fallback_node_list(read_json(os.path.join('chains', 'fallback_lnnodes_testnet3.json'), {}))
+    CHECKPOINTS = read_json(os.path.join('chains', 'checkpoints_testnet.json'), [])
+
+    XPRV_HEADERS = {
+        'standard':    0x04358394,  # tprv
+        'p2wpkh-p2sh': 0x044a4e28,  # uprv
+        'p2wsh-p2sh':  0x024285b5,  # Uprv
+        'p2wpkh':      0x045f18bc,  # vprv
+        'p2wsh':       0x02575048,  # Vprv
+    }
+    XPRV_HEADERS_INV = inv_dict(XPRV_HEADERS)
+    XPUB_HEADERS = {
+        'standard':    0x043587cf,  # tpub
+        'p2wpkh-p2sh': 0x044a5262,  # upub
+        'p2wsh-p2sh':  0x024289ef,  # Upub
+        'p2wpkh':      0x045f1cf6,  # vpub
+        'p2wsh':       0x02575483,  # Vpub
+    }
+    XPUB_HEADERS_INV = inv_dict(XPUB_HEADERS)
+    BIP44_COIN_TYPE = 1
+    LN_REALM_BYTE = 1
+    LN_DNS_SEEDS = [
+        'testnet-lseed1.electrum-cat.org.',
+    ]
+
+
+class BitcoinTestnet4(BitcoinTestnet):
+
+    NET_NAME = "testnet4"
+    GENESIS = "ec7987a2ab5225246c5cf9b8d93b4b75bcef383a4a65d5a265bc09ed54006188"
+    DEFAULT_SERVERS = read_json(os.path.join('chains', 'servers_testnet4.json'), {})
+    FALLBACK_LN_NODES = create_fallback_node_list(read_json(os.path.join('chains', 'fallback_lnnodes_testnet4.json'), {}))
+    CHECKPOINTS = read_json(os.path.join('chains', 'checkpoints_testnet4.json'), [])
+    LN_DNS_SEEDS = []
+
+
+class BitcoinRegtest(BitcoinTestnet):
+
+    NET_NAME = "regtest"
+    SEGWIT_HRP = "rcat"
+    BOLT11_HRP = SEGWIT_HRP
+    GENESIS = "4a6a1cc63350ee455cdf0e342adf0b01e6280d71f03b63176d09f9ba4f245743"
+    DEFAULT_SERVERS = read_json(os.path.join('chains', 'servers_regtest.json'), {})
+    FALLBACK_LN_NODES = []
+    CHECKPOINTS = []
+    LN_DNS_SEEDS = []
+
+
+class BitcoinSimnet(BitcoinTestnet):
+
+    NET_NAME = "simnet"
+    WIF_PREFIX = 0x64
+    ADDRTYPE_P2PKH = 0x3f
+    ADDRTYPE_P2SH = 0x7b
+    SEGWIT_HRP = "sg"
+    BOLT11_HRP = SEGWIT_HRP
+    GENESIS = "000000ffbb50fc9898cdd36ec163e6ba23230164c0052a28876255b7dcf2cd36"
+    DEFAULT_SERVERS = read_json(os.path.join('chains', 'servers_regtest.json'), {})
+    FALLBACK_LN_NODES = []
+    CHECKPOINTS = []
+    LN_DNS_SEEDS = []
+
+
+class BitcoinSignet(BitcoinTestnet):
+
+    NET_NAME = "signet"
+    BOLT11_HRP = "tgrss"
+    GENESIS = "0000007fcaa2a27993c6cde9e7818c254357af517b876ceba2f23592bb14ab31"
+    DEFAULT_SERVERS = read_json(os.path.join('chains', 'servers_signet.json'), {})
+    FALLBACK_LN_NODES = create_fallback_node_list(read_json(os.path.join('chains', 'fallback_lnnodes_signet.json'), {}))
+    CHECKPOINTS = []
+    LN_DNS_SEEDS = []
+
+
 NETS_LIST = tuple(all_subclasses(AbstractNet))
 
 # don't import net directly, import the module instead (so that net is singleton)

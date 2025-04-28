@@ -204,6 +204,8 @@ class Mnemonic(Logger):
             seed_type = 'segwit'
         if num_bits is None:
             num_bits = 132
+        if seed_type == 'standard':
+            num_bits = 128
         prefix = version.seed_prefix(seed_type)
         # increase num_bits in order to obtain a uniform distribution for the last word
         bpw = math.log(len(self.wordlist), 2)

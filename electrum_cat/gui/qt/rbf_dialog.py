@@ -83,8 +83,9 @@ class _BaseRBFDialog(TxEditor):
         grid.addLayout(self.fee_target_hbox, 4, 1, 1, 3)
         grid.setColumnStretch(4, 1)
         # locktime
-        grid.addWidget(self.locktime_label, 5, 0)
-        grid.addWidget(self.locktime_e, 5, 1, 1, 2)
+        # Permanently set locktime zero for all transaction
+        # grid.addWidget(self.locktime_label, 5, 0)
+        # grid.addWidget(self.locktime_e, 5, 1, 1, 2)
         return grid
 
     def run(self) -> None:

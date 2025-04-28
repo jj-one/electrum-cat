@@ -438,7 +438,9 @@ class Commands(Logger):
         """
         keypairs = {}
         inputs = []  # type: List[PartialTxInput]
-        locktime = jsontx.get('locktime', 0)
+        # Permanently set locktime zero for all transaction
+        # locktime = jsontx.get('locktime', 0)
+        locktime = 0
         for txin_idx, txin_dict in enumerate(jsontx.get('inputs')):
             if txin_dict.get('prevout_hash') is not None and txin_dict.get('prevout_n') is not None:
                 prevout = TxOutpoint(txid=bfh(txin_dict['prevout_hash']), out_idx=int(txin_dict['prevout_n']))
@@ -761,9 +763,13 @@ class Commands(Logger):
         message = util.to_bytes(message)
         return bitcoin.verify_usermessage_with_address(address, sig, message)
 
+    # Permanently set locktime zero for all transaction
+    """@command('wp')
+    async def payto(self, destination, amount, fee=None, feerate=None, from_addr=None, from_coins=None, change_addr=None,
+                    nocheck=False, unsigned=False, rbf=True, password=None, locktime=None, addtransaction=False, wallet: Abstract_Wallet = None):"""
     @command('wp')
     async def payto(self, destination, amount, fee=None, feerate=None, from_addr=None, from_coins=None, change_addr=None,
-                    nocheck=False, unsigned=False, rbf=True, password=None, locktime=None, addtransaction=False, wallet: Abstract_Wallet = None):
+                    nocheck=False, unsigned=False, rbf=False, password=None, locktime=0, addtransaction=False, wallet: Abstract_Wallet = None):                
         """Create a transaction. """
         self.nocheck = nocheck
         tx_fee = satoshis(fee)
@@ -789,9 +795,13 @@ class Commands(Logger):
             await self.addtransaction(result, wallet=wallet)
         return result
 
+    # Permanently set locktime zero for all transaction
+    """@command('wp')
+    async def paytomany(self, outputs, fee=None, feerate=None, from_addr=None, from_coins=None, change_addr=None,
+                        nocheck=False, unsigned=False, rbf=True, password=None, locktime=None, addtransaction=False, wallet: Abstract_Wallet = None):"""
     @command('wp')
     async def paytomany(self, outputs, fee=None, feerate=None, from_addr=None, from_coins=None, change_addr=None,
-                        nocheck=False, unsigned=False, rbf=True, password=None, locktime=None, addtransaction=False, wallet: Abstract_Wallet = None):
+                        nocheck=False, unsigned=False, rbf=False, password=None, locktime=0, addtransaction=False, wallet: Abstract_Wallet = None):
         """Create a multi-output transaction. """
         self.nocheck = nocheck
         tx_fee = satoshis(fee)
@@ -1764,7 +1774,7 @@ def get_parser():
     parser_gui.add_argument("-m", action="store_true", dest=SimpleConfig.GUI_QT_HIDE_ON_STARTUP.key(), default=False, help="hide GUI on startup")
     parser_gui.add_argument("-L", "--lang", dest=SimpleConfig.LOCALIZATION_LANGUAGE.key(), default=None, help="default language used in GUI")
     parser_gui.add_argument("--daemon", action="store_true", dest="daemon", default=False, help="keep daemon running after GUI is closed")
-    parser_gui.add_argument("--nosegwit", action="store_true", dest=SimpleConfig.WIZARD_DONT_CREATE_SEGWIT.key(), default=False, help="Do not create segwit wallets")
+    parser_gui.add_argument("--nosegwit", action="store_true", dest=SimpleConfig.WIZARD_DONT_CREATE_SEGWIT.key(), default=True, help="Do not create segwit wallets")
     add_wallet_option(parser_gui)
     add_network_options(parser_gui)
     add_global_options(parser_gui)

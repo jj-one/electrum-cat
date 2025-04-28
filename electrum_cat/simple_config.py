@@ -989,7 +989,7 @@ class SimpleConfig(Logger):
     )
 
     FX_USE_EXCHANGE_RATE = ConfigVar('use_exchange_rate', default=False, type_=bool)
-    FX_CURRENCY = ConfigVar('currency', default='EUR', type_=str)
+    FX_CURRENCY = ConfigVar('currency', default='USD', type_=str)
     FX_EXCHANGE = ConfigVar('use_exchange', default='CoinGecko', type_=str)  # default exchange should ideally provide historical rates
     FX_HISTORY_RATES = ConfigVar(
         'history_rates', default=False, type_=bool,
@@ -1186,7 +1186,7 @@ Warning: setting this to too low will result in lots of payment failures."""),
     WALLET_BACKUP_DIRECTORY = ConfigVar('backup_dir', default=None, type_=str)
     CONFIG_PIN_CODE = ConfigVar('pin_code', default=None, type_=str)
     QR_READER_FLIP_X = ConfigVar('qrreader_flip_x', default=True, type_=bool)
-    WIZARD_DONT_CREATE_SEGWIT = ConfigVar('nosegwit', default=False, type_=bool)
+    WIZARD_DONT_CREATE_SEGWIT = ConfigVar('nosegwit', default=True, type_=bool)
     CONFIG_FORGET_CHANGES = ConfigVar('forget_config', default=False, type_=bool)
 
     # connect to remote submarine swap server

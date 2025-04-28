@@ -665,7 +665,9 @@ class ConfirmTxDialog(TxEditor):
             self.tx = None
             self.main_window.show_error(str(e))
             raise
-        self.tx.set_rbf(True)
+        # Permanently diable rbf and locktime as catcoincore does not support it yet
+        # self.tx.set_rbf(True)
+        self.tx.set_rbf(False)
 
     def can_pay_assuming_zero_fees(self, confirmed_only) -> bool:
         # called in send_tab.py

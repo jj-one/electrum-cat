@@ -319,7 +319,7 @@ class TxOutpoint(NamedTuple):
     def short_name(self):
         return f"{self.txid.hex()[0:10]}:{self.out_idx}"
 
-
+# Permanently diable rbf and locktime as catcoincore does not support it yet
 class TxInput:
     prevout: TxOutpoint
     script_sig: Optional[bytes]
@@ -330,7 +330,8 @@ class TxInput:
     def __init__(self, *,
                  prevout: TxOutpoint,
                  script_sig: bytes = None,
-                 nsequence: int = 0xffffffff - 1,
+                 # nsequence: int = 0xffffffff - 1,
+                 nsequence: int = 0xffffffff,
                  witness: bytes = None,
                  is_coinbase_output: bool = False):
         self.prevout = prevout
@@ -827,7 +828,9 @@ class Transaction:
         self._inputs = None  # type: List[TxInput]
         self._outputs = None  # type: List[TxOutput]
         self._locktime = 0
-        self._version = 2
+        # Catcoin network does not support version 2 transactions yet
+        # self._version = 2
+        self._version = 1
 
         self._cached_txid = None  # type: Optional[str]
 
@@ -839,7 +842,9 @@ class Transaction:
     @locktime.setter
     def locktime(self, value: int):
         assert isinstance(value, int), f"locktime must be int, not {value!r}"
-        self._locktime = value
+        # Permanently set locktime zero for all transaction
+        # self._locktime = value
+        self._locktime = 0
         self.invalidate_ser_cache()
 
     @property
@@ -1137,7 +1142,9 @@ class Transaction:
 
     def is_rbf_enabled(self) -> bool:
         """Whether the tx explicitly signals BIP-0125 replace-by-fee."""
-        return any([txin.nsequence < 0xffffffff - 1 for txin in self.inputs()])
+        # Permanently diable rbf and locktime as catcoincore does not support it yet
+        # return any([txin.nsequence < 0xffffffff - 1 for txin in self.inputs()])
+        return False
 
     def estimated_size(self) -> int:
         """Return an estimated virtual tx size in vbytes.
@@ -2182,7 +2189,9 @@ class PartialTransaction(Transaction):
         self.invalidate_ser_cache()
 
     def set_rbf(self, rbf: bool) -> None:
-        nSequence = 0xffffffff - (2 if rbf else 1)
+        # Permanently diable rbf and locktime as catcoincore does not support it yet
+        # nSequence = 0xffffffff - (2 if rbf else 1)
+        nSequence = 0xffffffff
         for txin in self.inputs():
             txin.nsequence = nSequence
         self.invalidate_ser_cache()

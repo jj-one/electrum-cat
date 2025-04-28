@@ -812,16 +812,19 @@ class SwapManager(Logger):
         # create funding tx
         # note: rbf must not decrease payment
         # this is taken care of in wallet._is_rbf_allowed_to_touch_tx_output
+        # Permanently diable rbf and locktime as catcoincore does not support it yet
         if tx is None:
             funding_output = self.create_funding_output(swap)
             tx = self.wallet.create_transaction(
                 outputs=[funding_output],
-                rbf=True,
+                # rbf=True,
+                rbf=False,
                 password=password,
             )
         else:
             tx.replace_output_address(DummyAddress.SWAP, swap.lockup_address)
-            tx.set_rbf(True)
+            # tx.set_rbf(True)
+            tx.set_rbf(False)
             self.wallet.sign_transaction(tx, password)
         return tx
 
@@ -1104,7 +1107,9 @@ class SwapManager(Logger):
         sig_dummy = b'\x00' * 71  # DER-encoded ECDSA sig, with low S and low R
         witness = [sig_dummy, preimage, witness_script]
         txin.witness_sizehint = len(construct_witness(witness))
-        txin.nsequence = 0xffffffff - 2
+        # Permanently diable rbf and locktime as catcoincore does not support it yet
+        # txin.nsequence = 0xffffffff - 2
+        txin.nsequence = 0xffffffff
 
     @classmethod
     def create_claim_txin(

@@ -517,7 +517,9 @@ class QETxRbfFeeBumper(TxFeeSlider, TxMonMixin):
         self._oldfee = QEAmount()
         self._oldfee_rate = 0
         self._orig_tx = None
-        self._rbf = True
+        # Permanently diable rbf and locktime as catcoincore does not support it yet
+        # self._rbf = True
+        self._rbf = False
         self._bump_method = BumpFeeStrategy.PRESERVE_PAYMENT.name
         self._bump_methods_available = []
 
@@ -638,7 +640,9 @@ class QETxCanceller(TxFeeSlider, TxMonMixin):
         self._oldfee_rate = 0
         self._orig_tx = None
         self._txid = ''
-        self._rbf = True
+        # Permanently diable rbf and locktime as catcoincore does not support it yet
+        # self._rbf = True
+        self._rbf = False
 
     oldfeeChanged = pyqtSignal()
     @pyqtProperty(QEAmount, notify=oldfeeChanged)
@@ -743,7 +747,9 @@ class QETxCpfpFeeBumper(TxFeeSlider, TxMonMixin):
         self._parent_fee = 0
         self._max_fee = 0
         self._txid = ''
-        self._rbf = True
+        # Permanently diable rbf and locktime as catcoincore does not support it yet
+        # self._rbf = True
+        self._rbf = False
 
     totalFeeChanged = pyqtSignal()
     @pyqtProperty(QEAmount, notify=totalFeeChanged)
