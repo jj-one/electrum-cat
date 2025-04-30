@@ -267,7 +267,7 @@ class TxEditor(WindowModalDialog):
                and (self.feerate_e.text() or self.feerate_e.hasFocus())
 
     def feerounding_text(self):
-        return (_('Additional {} satoshis are going to be added.').format(self.feerounding_sats))
+        return (_('Additional {} catoshis are going to be added.').format(self.feerounding_sats))
 
     def set_feerounding_visibility(self, b:bool):
         # we do not use setVisible because it affects the layout
@@ -392,16 +392,20 @@ class TxEditor(WindowModalDialog):
             return add_pref_action(b, action, short_desc, tooltip)
 
         add_cv_action(self.config.cv.GUI_QT_TX_EDITOR_SHOW_IO, self.toggle_io_visibility)
-        add_cv_action(self.config.cv.GUI_QT_TX_EDITOR_SHOW_FEE_DETAILS, self.toggle_fee_details)
-        add_cv_action(self.config.cv.GUI_QT_TX_EDITOR_SHOW_LOCKTIME, self.toggle_locktime)
+        # Permanently disable widgets not compatible with the current Catcoin network
+        # add_cv_action(self.config.cv.GUI_QT_TX_EDITOR_SHOW_FEE_DETAILS, self.toggle_fee_details)
+        # Permanently disable widgets not compatible with the current Catcoin network
+        # add_cv_action(self.config.cv.GUI_QT_TX_EDITOR_SHOW_LOCKTIME, self.toggle_locktime)
         self.pref_menu.addSeparator()
-        add_cv_action(self.config.cv.WALLET_SEND_CHANGE_TO_LIGHTNING, self.toggle_send_change_to_lightning)
+        # Permanently disable widgets not compatible with the current Catcoin network
+        # add_cv_action(self.config.cv.WALLET_SEND_CHANGE_TO_LIGHTNING, self.toggle_send_change_to_lightning)
         add_pref_action(
             self.wallet.use_change,
             self.toggle_use_change,
             _('Use change addresses'),
             _('Using change addresses makes it more difficult for other people to track your transactions.'))
-        self.use_multi_change_menu = add_pref_action(
+        # Permanently disable widgets not compatible with the current Catcoin network
+        """self.use_multi_change_menu = add_pref_action(
             self.wallet.multiple_change, self.toggle_multiple_change,
             _('Use multiple change addresses',),
             '\n'.join([
@@ -409,9 +413,11 @@ class TxEditor(WindowModalDialog):
                   'up large coin amounts and obfuscate the recipient address.'),
                 _('This may result in higher transactions fees.')
             ]))
-        self.use_multi_change_menu.setEnabled(self.wallet.use_change)
-        add_cv_action(self.config.cv.WALLET_BATCH_RBF, self.toggle_batch_rbf)
-        add_cv_action(self.config.cv.WALLET_MERGE_DUPLICATE_OUTPUTS, self.toggle_merge_duplicate_outputs)
+        self.use_multi_change_menu.setEnabled(self.wallet.use_change)"""
+        # Permanently disable widgets not compatible with the current Catcoin network
+        # add_cv_action(self.config.cv.WALLET_BATCH_RBF, self.toggle_batch_rbf)
+        # Permanently disable widgets not compatible with the current Catcoin network
+        # add_cv_action(self.config.cv.WALLET_MERGE_DUPLICATE_OUTPUTS, self.toggle_merge_duplicate_outputs)
         add_cv_action(self.config.cv.WALLET_SPEND_CONFIRMED_ONLY, self.toggle_confirmed_only)
         add_cv_action(self.config.cv.WALLET_COIN_CHOOSER_OUTPUT_ROUNDING, self.toggle_output_rounding)
         self.pref_button = QToolButton()

@@ -23,6 +23,9 @@ class FeeComboBox(QComboBox):
             ]
         )
 
+        # Permanently disable other fee types except Static
+        self.setEnabled(False)
+
     def on_fee_type(self, x):
         self.config.FEE_EST_USE_MEMPOOL = (x == 2)
         self.config.FEE_EST_DYNAMIC = (x > 0)

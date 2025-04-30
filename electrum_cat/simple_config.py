@@ -21,7 +21,7 @@ from .i18n import _
 from .logging import get_logger, Logger
 
 
-FEE_ETA_TARGETS = [5, 4, 3, 2]
+"""FEE_ETA_TARGETS = [5, 4, 3, 2]
 FEE_DEPTH_TARGETS = [10_000_000, 5_000_000, 2_000_000, 1_000_000,
                      800_000, 600_000, 400_000, 250_000, 100_000]
 FEE_LN_ETA_TARGET = 2       # note: make sure the network is asking for estimates for this target
@@ -42,8 +42,31 @@ FEERATE_STATIC_VALUES = [1000, 2000, 3000, 5000, 8000, 10000,
 # see https://github.com/ElementsProject/lightning/commit/2e687b9b352c9092b5e8bd4a688916ac50b44af0
 FEERATE_PER_KW_MIN_RELAY_LIGHTNING = 253
 
-FEE_RATIO_HIGH_WARNING = 0.05  # warn user if fee/amount for on-chain tx is higher than this
+FEE_RATIO_HIGH_WARNING = 0.05  # warn user if fee/amount for on-chain tx is higher than this"""
 
+
+# Updated to reflect Catcoin's fee conditions
+FEE_ETA_TARGETS = [5, 4, 3, 2]
+FEE_DEPTH_TARGETS = [10_000_000, 5_000_000, 2_000_000, 1_000_000,
+                     800_000, 600_000, 400_000, 250_000, 100_000]
+FEE_LN_ETA_TARGET = 2       # note: make sure the network is asking for estimates for this target
+FEE_LN_LOW_ETA_TARGET = 25  # note: make sure the network is asking for estimates for this target
+
+# catoshi per kbyte
+FEERATE_MAX_DYNAMIC = 2000000
+FEERATE_WARNING_HIGH_FEE = 1300000
+FEERATE_FALLBACK_STATIC_FEE = 1000000
+FEERATE_DEFAULT_RELAY = 1000000
+FEERATE_MAX_RELAY = 1600000
+FEERATE_STATIC_VALUES = [1000000, 1100000, 1200000, 1300000, 1400000, 1500000]
+
+# The min feerate_per_kw that can be used in lightning so that
+# the resulting onchain tx pays the min relay fee.
+# This would be FEERATE_DEFAULT_RELAY / 4 if not for rounding errors,
+# see https://github.com/ElementsProject/lightning/commit/2e687b9b352c9092b5e8bd4a688916ac50b44af0
+FEERATE_PER_KW_MIN_RELAY_LIGHTNING = 253
+
+FEE_RATIO_HIGH_WARNING = 0.5  # warn user if fee/amount for on-chain tx is higher than this
 
 
 _logger = get_logger(__name__)
@@ -716,7 +739,9 @@ class SimpleConfig(Logger):
             return self.has_fee_etas()
 
     def is_dynfee(self) -> bool:
-        return self.FEE_EST_DYNAMIC
+        # Permanently disable other fee types except Static
+        # return self.FEE_EST_DYNAMIC
+        return False
 
     def use_mempool_fees(self) -> bool:
         return self.FEE_EST_USE_MEMPOOL
@@ -1057,7 +1082,8 @@ Warning: setting this to too low will result in lots of payment failures."""),
     TEST_SHUTDOWN_FEE_RANGE = ConfigVar('test_shutdown_fee_range', default=None)
     TEST_SHUTDOWN_LEGACY = ConfigVar('test_shutdown_legacy', default=False, type_=bool)
 
-    FEE_EST_DYNAMIC = ConfigVar('dynamic_fees', default=True, type_=bool)
+    # Permanently disable other fee types except Static
+    FEE_EST_DYNAMIC = ConfigVar('dynamic_fees', default=False, type_=bool)
     FEE_EST_USE_MEMPOOL = ConfigVar('mempool_fees', default=False, type_=bool)
     FEE_EST_STATIC_FEERATE = ConfigVar('fee_per_kb', default=FEERATE_FALLBACK_STATIC_FEE, type_=int)
     FEE_EST_DYNAMIC_ETA_SLIDERPOS = ConfigVar('fee_level', default=2, type_=int)
@@ -1099,7 +1125,7 @@ Warning: setting this to too low will result in lots of payment failures."""),
     )
     GUI_QT_RECEIVE_TAB_QR_VISIBLE = ConfigVar('receive_qr_visible', default=False, type_=bool)
     GUI_QT_TX_EDITOR_SHOW_IO = ConfigVar(
-        'show_tx_io', default=False, type_=bool,
+        'show_tx_io', default=True, type_=bool,
         short_desc=lambda: _('Show inputs and outputs'),
     )
     GUI_QT_TX_EDITOR_SHOW_FEE_DETAILS = ConfigVar(
