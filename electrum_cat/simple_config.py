@@ -1166,11 +1166,11 @@ Warning: setting this to too low will result in lots of payment failures."""),
     )
 
     BLOCK_EXPLORER = ConfigVar(
-        'block_explorer', default='Blockstream.info', type_=str,
+        'block_explorer', default='https://chainz.cryptoid.info/cat/', type_=str,
         short_desc=lambda: _('Online Block Explorer'),
         long_desc=lambda: _('Choose which online block explorer to use for functions that open a web browser'),
     )
-    BLOCK_EXPLORER_CUSTOM = ConfigVar('block_explorer_custom', default=None)
+    BLOCK_EXPLORER_CUSTOM = ConfigVar('block_explorer_custom', default='https://chainz.cryptoid.info/cat/')
     VIDEO_DEVICE_PATH = ConfigVar(
         'video_device', default='default', type_=str,
         short_desc=lambda: _('Video Device'),

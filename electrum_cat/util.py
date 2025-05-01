@@ -945,24 +945,20 @@ def age(
 
 mainnet_block_explorers = {
     'cryptoID.info': ('https://chainz.cryptoid.info/cat/',
-                        {'tx': 'tx.dws?', 'addr': 'address.dws?'}),
-    'system default': ('blockchain://00000ac5927c594d49cc0bdb81759d0da8297eb614683d3acb62f0703b639023/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
+                        {'tx': 'tx.dws?', 'addr': 'address.dws?', 'block': 'block.dws?'}),
 }
 
 testnet_block_explorers = {
     'cryptoID.info': ('https://chainz.cryptoid.info/cat-test/',
-                        {'tx': 'tx.dws?', 'addr': 'address.dws?'}),
-    'system default': ('blockchain://000000ffbb50fc9898cdd36ec163e6ba23230164c0052a28876255b7dcf2cd36/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
+                        {'tx': 'tx.dws?', 'addr': 'address.dws?', 'block': 'block.dws?'}),
 }
 
 signet_block_explorers = {
-    'system default': ('blockchain:/',
-                       {'tx': 'tx/', 'addr': 'address/'}),
+    'cryptoID.info': ('https://chainz.cryptoid.info/cat-signet/',
+                        {'tx': 'tx.dws?', 'addr': 'address.dws?', 'block': 'block.dws?'}),
 }
 
-_block_explorer_default_api_loc = {'tx': 'tx/', 'addr': 'address/'}
+_block_explorer_default_api_loc = {'tx': 'tx.dws?', 'addr': 'address.dws?', 'block': 'block.dws?'}
 
 
 def block_explorer_info():

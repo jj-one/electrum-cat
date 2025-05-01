@@ -401,7 +401,8 @@ class WCWalletType(WalletWizardComponent):
         wallet_kinds = [
             ('standard',  _('Standard wallet (Legacy)')),
             ('2fa',       _('Wallet with two-factor authentication')),
-            ('multisig',  _('Multi-signature wallet')),
+            # Permanently disable widgets not compatible with the current Catcoin network
+            # ('multisig',  _('Multi-signature wallet')),
             ('imported',  _('Import Catcoin addresses or private keys')),
         ]
         choices = [pair for pair in wallet_kinds if pair[0] in wallet_types]
@@ -423,7 +424,8 @@ class WCKeystoreType(WalletWizardComponent):
             ('createseed', _('Create a new seed')),
             ('haveseed',   _('I already have a seed')),
             ('masterkey',  _('Use a master key')),
-            ('hardware',   _('Use a hardware device'))
+            # Permanently disable widgets not compatible with the current Catcoin network
+            # ('hardware',   _('Use a hardware device'))
         ]
 
         self.choice_w = ChoiceWidget(message=message, choices=choices)

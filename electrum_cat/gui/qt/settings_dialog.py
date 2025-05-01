@@ -406,7 +406,8 @@ class SettingsDialog(QDialog, QtEventListener):
         units_widgets = []
         units_widgets.append((unit_label, unit_combo))
         units_widgets.append((nz_label, nz))
-        units_widgets.append((msat_cb, None))
+        # Permanently hide Lightning Channel settings and window
+        # units_widgets.append((msat_cb, None))
         units_widgets.append((thousandsep_cb, None))
         lightning_widgets = []
         lightning_widgets.append((trampoline_cb, None))
@@ -428,7 +429,8 @@ class SettingsDialog(QDialog, QtEventListener):
             (gui_widgets, _('Appearance')),
             (units_widgets, _('Units')),
             (fiat_widgets, _('Fiat')),
-            (lightning_widgets, _('Lightning')),
+            # Permanently hide Lightning Channel settings and window
+            # (lightning_widgets, _('Lightning')),
             (misc_widgets, _('Misc')),
         ]
         for widgets, name in tabs_info:
