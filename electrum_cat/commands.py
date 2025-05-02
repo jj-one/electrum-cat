@@ -529,10 +529,11 @@ class Commands(Logger):
     @command('')
     async def createmultisig(self, num, pubkeys):
         """Create multisig address"""
-        assert isinstance(pubkeys, list), (type(num), type(pubkeys))
+        """assert isinstance(pubkeys, list), (type(num), type(pubkeys))
         redeem_script = multisig_script(pubkeys, num)
         address = bitcoin.hash160_to_p2sh(hash_160(redeem_script))
-        return {'address': address, 'redeemScript': redeem_script.hex()}
+        return {'address': address, 'redeemScript': redeem_script.hex()}"""
+        return "Multi-signature wallet is not currently supported on Catcoin network as it uses P2SH"
 
     @command('w')
     async def freeze(self, address: str, wallet: Abstract_Wallet = None):
@@ -856,7 +857,7 @@ class Commands(Logger):
         """Bump the fee for an unconfirmed transaction.
         'tx' can be either a raw hex tx or a txid. If txid, the corresponding tx must already be part of the wallet history.
         """
-        if is_hash256_str(tx):  # txid
+        """if is_hash256_str(tx):  # txid
             tx = wallet.db.get_transaction(tx)
             if tx is None:
                 raise UserFacingException("Transaction not in wallet.")
@@ -879,7 +880,8 @@ class Commands(Logger):
             new_fee_rate=new_fee_rate)
         if not unsigned:
             wallet.sign_transaction(new_tx, password)
-        return new_tx.serialize()
+        return new_tx.serialize()"""
+        return "Catcoin network does not support RBF and Bump Fee at the moment"
 
     @command('w')
     async def onchain_history(self, show_fiat=False, year=None, show_addresses=False, wallet: Abstract_Wallet = None):
@@ -906,9 +908,10 @@ class Commands(Logger):
     @command('wl')
     async def lightning_history(self, wallet: Abstract_Wallet = None):
         """ lightning history. """
-        lightning_history = wallet.lnworker.get_lightning_history() if wallet.lnworker else {}
+        """lightning_history = wallet.lnworker.get_lightning_history() if wallet.lnworker else {}
         sorted_hist= sorted(lightning_history.values(), key=lambda x: x.timestamp)
-        return json_normalize([x.to_dict() for x in sorted_hist])
+        return json_normalize([x.to_dict() for x in sorted_hist])"""
+        return "Lightning related operations are not allowed on Catcoin network at the moment"
 
     @command('w')
     async def setlabel(self, key, label, wallet: Abstract_Wallet = None):
@@ -1222,7 +1225,7 @@ class Commands(Logger):
 
     @command('wpnl')
     async def open_channel(self, connection_string, amount, push_amount=0, public=False, zeroconf=False, password=None, wallet: Abstract_Wallet = None):
-        funding_sat = satoshis(amount)
+        """funding_sat = satoshis(amount)
         push_sat = satoshis(push_amount)
         peer = await wallet.lnworker.add_peer(connection_string)
         chan, funding_tx = await wallet.lnworker.open_channel_with_peer(
@@ -1231,7 +1234,8 @@ class Commands(Logger):
             public=public,
             zeroconf=zeroconf,
             password=password)
-        return chan.funding_outpoint.to_str()
+        return chan.funding_outpoint.to_str()"""
+        return "Lightning operations are not supported on Cattcoin network currently"
 
     @command('')
     async def decode_invoice(self, invoice: str):
