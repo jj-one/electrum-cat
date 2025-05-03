@@ -144,7 +144,7 @@ Implementing new features, or improving/refactoring the codebase, is of course
 also welcome, but to avoid wasted effort, especially for larger changes,
 we encourage discussing these on the issue tracker or IRC first.
 
-Besides [GitHub](https://github.com/CatcoinCore/electrum-cat),
+Besides [GitHub](https://github.com/jj-one/electrum-cat),
 most communication about Electrum-CAT development happens on Discord, in the
 `#General` channel on Catcoin Team 3 (Unofficial) Discord server. The easiest way to participate 
 with the web client, [https://discord.gg/4HDPB5DE](https://discord.gg/4HDPB5DE).

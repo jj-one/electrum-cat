@@ -253,7 +253,7 @@ class CoinGecko(ExchangeBase):
     async def get_rates(self, ccy):
         json = await self.get_json('api.coingecko.com',
                                    '/api/v3/simple/price?ids=catcoin&vs_currencies=%s' % ccy)
-        print(f"Current Price from {self.name()} in {ccy} is {to_decimal(json['catcoin'][ccy.lower()])}")
+        # print(f"Current Price from {self.name()} in {ccy} is {to_decimal(json['catcoin'][ccy.lower()])}")
         return {ccy: to_decimal(json['catcoin'][ccy.lower()])}
 
     def history_ccys(self):

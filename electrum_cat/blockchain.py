@@ -344,7 +344,7 @@ class Blockchain(Logger):
             if height > constants.net.TARGET_DISRUPTION_HEIGHT1:
                 target = self.get_target(height - 1, headers)
             self.verify_header(header, prev_hash, target, expected_header_hash)
-            print(f"Verified {height}")
+            # print(f"Verified {height}")
             prev_hash = hash_header(header)
             headers[height] = header
 
