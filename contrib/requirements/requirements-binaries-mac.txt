@@ -1,2 +1,3 @@
 PyQt6
+scrypt>=0.8.27
 cryptography>=2.6
