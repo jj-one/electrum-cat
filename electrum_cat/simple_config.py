@@ -1001,7 +1001,7 @@ class SimpleConfig(Logger):
         long_desc=lambda: _('This may result in large QR codes'),
     )
     WALLET_BOLT11_FALLBACK = ConfigVar(
-        'bolt11_fallback', default=True, type_=bool,
+        'bolt11_fallback', default=False, type_=bool,
         short_desc=lambda: _('Add on-chain fallback to lightning requests'),
     )
     WALLET_PAYREQ_EXPIRY_SECONDS = ConfigVar('request_expiry', default=invoices.PR_DEFAULT_EXPIRATION_WHEN_CREATING, type_=int)

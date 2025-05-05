@@ -10,7 +10,6 @@ set -e
 
 . "$CONTRIB"/build_tools_util.sh
 
-info "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ WINEPREFIX: $WINEPREFIX"
 pushd $WINEPREFIX/drive_c/electrum-cat
 
 VERSION=4.5.8

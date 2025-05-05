@@ -63,7 +63,8 @@ class WCWelcome(WizardComponent):
         self.config_server_w.stateChanged.connect(self.on_updated)
         options_w = QWidget()
         vbox = QVBoxLayout()
-        vbox.addWidget(self.config_proxy_w)
+        # Permanently disable widgets not compatible with the current Catcoin network
+        # vbox.addWidget(self.config_proxy_w)
         vbox.addWidget(self.config_server_w)
         vbox.addStretch(1)
         options_w.setLayout(vbox)
