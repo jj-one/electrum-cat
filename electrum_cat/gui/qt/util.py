@@ -490,13 +490,16 @@ class ChoiceWidget(QWidget):
                 self.selected_item = c
                 self.selected_key = c[0]
                 button.setChecked(True)
+            else:
+                # Walkaround for PyQt6 bug that makes all QRadioButton in a QButtonGroup to appear selected on Windows OS
+                button.setChecked(False)
         group.buttonClicked.connect(self.on_selected)
 
     def on_selected(self, button):
         self.selected_index = self.group.id(button)
         self.selected_item = self.choices[self.selected_index]
         self.selected_key = self.choices[self.selected_index][0]
-        
+
         # Walkaround for PyQt6 bug that makes all QRadioButton in a QButtonGroup to appear selected on Windows OS
         for btn in self.group.buttons():
             if btn != button:
