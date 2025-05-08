@@ -76,13 +76,16 @@ class WCWelcome(WizardComponent):
         self._valid = True
 
     def on_advanced_changed(self):
-        self.config_proxy_w.setVisible(self.use_advanced_w.isChecked())
+        # Permanently disable widgets not compatible with the current Catcoin network
+        # self.config_proxy_w.setVisible(self.use_advanced_w.isChecked())
         self.config_server_w.setVisible(self.use_advanced_w.isChecked())
         self.on_updated()
 
     def apply(self):
         self.wizard_data['use_defaults'] = not self.use_advanced_w.isChecked()
-        self.wizard_data['want_proxy'] = self.use_advanced_w.isChecked() and self.config_proxy_w.isChecked()
+        # Permanently disable widgets not compatible with the current Catcoin network
+        # self.wizard_data['want_proxy'] = self.use_advanced_w.isChecked() and self.config_proxy_w.isChecked()
+        self.wizard_data['want_proxy'] = False
         self.wizard_data['autoconnect'] = not self.use_advanced_w.isChecked() or not self.config_server_w.isChecked()
 
 
