@@ -7,7 +7,7 @@ title = Electrum-CAT
 package.name = ElectrumCAT
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.catcoin
+package.domain = org.electrum_cat
 
 # (str) Source code where the main.py live
 source.dir = .
