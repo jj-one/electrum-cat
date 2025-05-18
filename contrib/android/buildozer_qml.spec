@@ -77,7 +77,7 @@ requirements =
     pyqt6sip,
     pyqt6,
     libzbar,
-    scrypt==0.8.27
+    scrypt
 
 # (str) Presplash of the application
 presplash.filename = %(source.dir)s/electrum_cat/gui/icons/electrum_presplash.png
