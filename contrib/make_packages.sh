@@ -55,7 +55,7 @@ export BUILD_TIME="$(LC_ALL=C TZ=UTC date +'%H:%M:%S' -d @$SOURCE_DATE_EPOCH)"
 #       and the android apk build need to make sure these files get excluded.
 # note: --no-build-isolation is needed so that pip uses the locally available setuptools and wheel,
 #       instead of downloading the latest ones
-python3 -m pip install --no-build-isolation --no-compile --no-dependencies --no-binary :all: --only-binary scrypt \
+python3 -m pip install --no-build-isolation --no-compile --no-dependencies --no-binary :all: \
     -r "$CONTRIB"/deterministic-build/requirements.txt -t "$PACKAGES"
 
 echo "Pure-python dependencies have been placed into $PACKAGES"
