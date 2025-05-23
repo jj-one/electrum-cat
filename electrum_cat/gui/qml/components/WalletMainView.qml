@@ -194,15 +194,16 @@ Item {
                 enabled: Daemon.currentWallet && app.stack.currentItem.objectName != 'Addresses'
             }
         }
-        MenuItem {
-            icon.color: action.enabled ? 'transparent' : Material.iconDisabledColor
-            icon.source: '../../icons/lightning.png'
-            action: Action {
-                text: qsTr('Channels');
-                enabled: Daemon.currentWallet && Daemon.currentWallet.isLightning && app.stack.currentItem.objectName != 'Channels'
-                onTriggered: menu.openPage(Qt.resolvedUrl('Channels.qml'))
-            }
-        }
+        // Permanently disable widgets not compatible with the current Catcoin network
+        // MenuItem {
+        //    icon.color: action.enabled ? 'transparent' : Material.iconDisabledColor
+        //    icon.source: '../../icons/lightning.png'
+        //    action: Action {
+        //        text: qsTr('Channels');
+        //        enabled: Daemon.currentWallet && Daemon.currentWallet.isLightning && app.stack.currentItem.objectName != 'Channels'
+        //        onTriggered: menu.openPage(Qt.resolvedUrl('Channels.qml'))
+        //    }
+        // }
 
         MenuItem {
             icon.color: action.enabled ? 'transparent' : Material.iconDisabledColor
@@ -622,7 +623,11 @@ Item {
             title: qsTr('Confirm Payment')
             finalizer: TxFinalizer {
                 wallet: Daemon.currentWallet
-                canRbf: true
+
+                // Permanently disable widgets not compatible with the current Catcoin network
+                // canRbf: true
+                canRbf: false
+
                 onFinished: (signed, saved, complete) => {
                     if (!complete) {
                         var msg
@@ -670,7 +675,11 @@ Item {
             satoshis: MAX
             finalizer: SweepFinalizer {
                 wallet: Daemon.currentWallet
-                canRbf: true
+
+                // Permanently disable widgets not compatible with the current Catcoin network
+                // canRbf: true
+                canRbf: false
+                
                 privateKeys: _confirmSweepDialog.privateKeys
             }
         }

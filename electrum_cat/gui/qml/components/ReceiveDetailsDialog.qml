@@ -109,6 +109,10 @@ ElDialog {
                 enabled: Daemon.currentWallet.isLightning && Daemon.currentWallet.lightningCanReceive.satsInt > amountBtc.textAsSats.satsInt
                 text: qsTr('Lightning')
                 icon.source: '../../icons/lightning.png'
+
+                // Permanently disable widgets not compatible with the current Catcoin network
+                visible: false
+
                 onClicked: { dialog.isLightning = true; doAccept() }
             }
         }

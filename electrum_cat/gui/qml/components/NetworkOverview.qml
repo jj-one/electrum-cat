@@ -276,7 +276,8 @@ Pane {
                 }
             }
 
-            FlatButton {
+            // Permanently disable widgets not compatible with the current Catcoin network
+            /* FlatButton {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
                 text: qsTr('Proxy Settings');
@@ -285,7 +286,7 @@ Pane {
                     var dialog = proxyConfig.createObject(root)
                     dialog.open()
                 }
-            }
+            } */
         }
     }
 

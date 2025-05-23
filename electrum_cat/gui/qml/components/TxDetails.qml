@@ -69,7 +69,9 @@ Pane {
                             ? qsTr('Transaction is unrelated to this wallet.')
                             : txdetails.inMempool
                                 ? qsTr('This transaction is still unconfirmed.') +
-                                    (txdetails.canBump || txdetails.canCpfp || txdetails.canCancel
+                                    // Permanently disable widgets not compatible with the current Catcoin network
+                                    // (txdetails.canBump || txdetails.canCpfp || txdetails.canCancel
+                                    (false
                                         ? txdetails.canCancel
                                             ? '\n' + qsTr('You can bump its fee to speed up its confirmation, or cancel this transaction.')
                                             : '\n' + qsTr('You can bump its fee to speed up its confirmation.')
@@ -358,7 +360,11 @@ Pane {
                 id: feebumpButton
                 icon.source: '../../icons/add.png'
                 text: qsTr('Bump fee')
-                visible: txdetails.canBump || txdetails.canCpfp
+
+                // Permanently disable widgets not compatible with the current Catcoin network
+                // visible: txdetails.canBump || txdetails.canCpfp
+                visible: false
+
                 onClicked: {
                     if (txdetails.canBump) {
                         var dialog = rbfBumpFeeDialog.createObject(root, { txid: txdetails.txid })

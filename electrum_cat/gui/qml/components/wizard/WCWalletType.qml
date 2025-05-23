@@ -9,8 +9,9 @@ WizardComponent {
 
     function apply() {
         wizard_data['wallet_type'] = wallettypegroup.checkedButton.wallettype
+        // Permanently disable widgets not compatible with the current Catcoin network
         if (wizard_data['wallet_type'] == 'standard')
-            wizard_data['seed_type'] = 'segwit'
+            wizard_data['seed_type'] = 'standard'
         else if (wizard_data['wallet_type'] == '2fa')
             wizard_data['seed_type'] = '2fa_segwit'
         // TODO: multisig
@@ -33,14 +34,15 @@ WizardComponent {
             ButtonGroup.group: wallettypegroup
             property string wallettype: 'standard'
             checked: true
-            text: qsTr('Standard Wallet')
+            text: qsTr('Standard Wallet (Legacy)')
         }
-        ElRadioButton {
-            Layout.fillWidth: true
-            ButtonGroup.group: wallettypegroup
-            property string wallettype: 'multisig'
-            text: qsTr('Multi-signature wallet')
-        }
+        // Permanently disable widgets not compatible with the current Catcoin network
+        // ElRadioButton {
+        //    Layout.fillWidth: true
+        //    ButtonGroup.group: wallettypegroup
+        //    property string wallettype: 'multisig'
+        //    text: qsTr('Multi-signature wallet')
+        // }
         ElRadioButton {
             Layout.fillWidth: true
             ButtonGroup.group: wallettypegroup

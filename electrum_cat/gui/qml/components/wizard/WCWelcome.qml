@@ -10,7 +10,9 @@ WizardComponent {
 
     function apply() {
         wizard_data['use_defaults'] = !config_advanced.checked
-        wizard_data['want_proxy'] = config_advanced.checked && config_proxy.checked
+        // Permanently disable widgets not compatible with the current Catcoin network
+        // wizard_data['want_proxy'] = config_advanced.checked && config_proxy.checked
+        wizard_data['want_proxy'] = false
         wizard_data['autoconnect'] = !config_server.checked || !config_advanced.checked
     }
 
@@ -41,13 +43,14 @@ WizardComponent {
             Behavior on opacity {
                 NumberAnimation { duration: 300 }
             }
-
-            CheckBox {
-                id: config_proxy
-                text: qsTr('Configure Proxy')
-                checked: false
-                onCheckedChanged: checkIsLast()
-            }
+            
+            // # Permanently disable widgets not compatible with the current Catcoin network
+            // CheckBox {
+            //    id: config_proxy
+            //    text: qsTr('Configure Proxy')
+            //    checked: false
+            //    onCheckedChanged: checkIsLast()
+            // }
             CheckBox {
                 id: config_server
                 text: qsTr('Select Server')

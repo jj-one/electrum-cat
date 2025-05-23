@@ -271,7 +271,9 @@ Pane {
                         }
                     }
 
-                    PrefsHeading {
+
+                    // Permanently disable widgets not compatible with the current Catcoin network
+                    /* PrefsHeading {
                         Layout.columnSpan: 2
                         text: qsTr('Lightning')
                     }
@@ -397,7 +399,7 @@ Pane {
                             text: qsTr('Create lightning invoices with on-chain fallback address')
                             wrapMode: Text.Wrap
                         }
-                    }
+                    }*/
 
                     PrefsHeading {
                         Layout.columnSpan: 2
@@ -459,12 +461,15 @@ Pane {
         rateSources.currentIndex = rateSources.indexOfValue(Daemon.fx.rateSource)
         fiatEnable.checked = Daemon.fx.enabled
         spendUnconfirmed.checked = Config.spendUnconfirmed
-        useTrampolineRouting.checked = !Config.useGossip
+
+        // Permanently disable widgets not compatible with the current Catcoin network
+        /* useTrampolineRouting.checked = !Config.useGossip
         useFallbackAddress.checked = Config.useFallbackAddress
+        useRecoverableChannels.checked = Config.useRecoverableChannels */
+
         enableDebugLogs.checked = Config.enableDebugLogs
         alwaysAllowScreenshots.checked = Config.alwaysAllowScreenshots
         setMaxBrightnessOnQrDisplay.checked = Config.setMaxBrightnessOnQrDisplay
-        useRecoverableChannels.checked = Config.useRecoverableChannels
         syncLabels.checked = AppController.isPluginEnabled('labels')
     }
 }
