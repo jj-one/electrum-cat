@@ -1,0 +1,24 @@
+# If you want Electrum-CAT to appear in a Linux app launcher ("start menu"), install this by doing:
+# sudo desktop-file-install electrum-cat.desktop
+# Note: This assumes $HOME/.local/bin is in your $PATH
+
+[Desktop Entry]
+Comment=Lightweight Catcoin Client
+Exec=electrum-cat %u
+GenericName[en_US]=Electrum-CAT
+GenericName=Electrum-CAT
+Icon=electrum-cat
+Name[en_US]=Electrum-CAT Catcoin Wallet
+Name=Electrum-CAT Catcoin Wallet
+Categories=Finance;Network;
+StartupNotify=true
+StartupWMClass=electrum-cat
+Terminal=false
+Type=Application
+MimeType=x-scheme-handler/catcoin;x-scheme-handler/lightning;
+Actions=Testnet;
+Keywords=crypto;currency;CAT
+
+[Desktop Action Testnet]
+Exec=electrum-cat --testnet %u
+Name=Testnet mode

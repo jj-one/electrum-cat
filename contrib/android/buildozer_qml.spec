@@ -1,13 +1,13 @@
 [app]
 
 # (str) Title of your application
-title = Electrum-GRS
+title = Electrum-CAT
 
 # (str) Package name
-package.name = ElectrumGRS
+package.name = ElectrumCAT
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.groestlcoin
+package.domain = org.catcoin
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -27,22 +27,22 @@ source.exclude_dirs =
     env,
     tests,
     fastlane,
-    electrum_grs/www,
-    electrum_grs/scripts,
-    electrum_grs/utils,
-    electrum_grs/gui/qt,
-    electrum_grs/plugins/audio_modem,
-    electrum_grs/plugins/bitbox02,
-    electrum_grs/plugins/coldcard,
-    electrum_grs/plugins/digitalbitbox,
-    electrum_grs/plugins/hw_wallet,
-    electrum_grs/plugins/jade,
-    electrum_grs/plugins/keepkey,
-    electrum_grs/plugins/ledger,
-    electrum_grs/plugins/trezor,
-    electrum_grs/plugins/payserver,
-    electrum_grs/plugins/revealer,
-    electrum_grs/plugins/safe_t,
+    electrum_cat/www,
+    electrum_cat/scripts,
+    electrum_cat/utils,
+    electrum_cat/gui/qt,
+    electrum_cat/plugins/audio_modem,
+    electrum_cat/plugins/bitbox02,
+    electrum_cat/plugins/coldcard,
+    electrum_cat/plugins/digitalbitbox,
+    electrum_cat/plugins/hw_wallet,
+    electrum_cat/plugins/jade,
+    electrum_cat/plugins/keepkey,
+    electrum_cat/plugins/ledger,
+    electrum_cat/plugins/trezor,
+    electrum_cat/plugins/payserver,
+    electrum_cat/plugins/revealer,
+    electrum_cat/plugins/safe_t,
     packages/qdarkstyle,
     packages/qtpy,
     packages/bin,
@@ -58,7 +58,7 @@ source.exclude_patterns = Makefile,setup*,
 
 # (str) Application versioning (method 1)
 version.regex = ELECTRUM_VERSION = '(.*)'
-version.filename = %(source.dir)s/electrum_grs/version.py
+version.filename = %(source.dir)s/electrum_cat/version.py
 
 # (str) Application versioning (method 2)
 #version = $("$CONTRIB"/print_electrum_version.py APK_VERSION)
@@ -77,15 +77,15 @@ requirements =
     pyqt6sip,
     pyqt6,
     libzbar,
-    groestlcoin_hash==1.0.3
+    scrypt
 
 # (str) Presplash of the application
-presplash.filename = %(source.dir)s/electrum_grs/gui/icons/electrum_presplash.png
+presplash.filename = %(source.dir)s/electrum_cat/gui/icons/electrum_presplash.png
 
 # (str) Icon of the application
-icon.filename = %(source.dir)s/electrum_grs/gui/icons/android_electrum_icon_legacy.png
-icon.adaptive_foreground.filename = %(source.dir)s/electrum_grs/gui/icons/android_electrum_icon_foreground.png
-icon.adaptive_background.filename = %(source.dir)s/electrum_grs/gui/icons/android_electrum_icon_background.png
+icon.filename = %(source.dir)s/electrum_cat/gui/icons/android_electrum_icon_legacy.png
+icon.adaptive_foreground.filename = %(source.dir)s/electrum_cat/gui/icons/android_electrum_icon_foreground.png
+icon.adaptive_background.filename = %(source.dir)s/electrum_cat/gui/icons/android_electrum_icon_background.png
 
 # (str) Supported orientation (one of landscape, portrait or all)
 orientation = portrait
@@ -151,12 +151,12 @@ android.accept_sdk_license = True
 #android.add_jars = foo.jar,bar.jar,path/to/more/*.jar
 #android.add_jars = lib/android/zbar.jar
 
-android.add_jars = .buildozer/android/platform/*/build/libs_collections/ElectrumGRS/jar/*.jar
+android.add_jars = .buildozer/android/platform/*/build/libs_collections/ElectrumCAT/jar/*.jar
 
 
 # (list) List of Java files to add to the android project (can be java or a
 # directory containing the files)
-android.add_src = electrum_grs/gui/qml/java_classes/
+android.add_src = electrum_cat/gui/qml/java_classes/
 
 android.gradle_dependencies =
     com.android.support:support-compat:28.0.0,
@@ -174,7 +174,7 @@ android.add_activities = org.electrum.qr.SimpleScannerActivity
 # 3) A directory, here 'legal_resources' must contain one or more directories,
 # each of a resource kind:  drawable, xml, etc...
 # android.add_resources = legal_resources
-android.add_resources = electrum_grs/gui/qml/android_res/layout:layout
+android.add_resources = electrum_cat/gui/qml/android_res/layout:layout
 
 # (str) python-for-android branch to use, if not master, useful to try
 # not yet merged features.

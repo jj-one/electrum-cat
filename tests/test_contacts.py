@@ -2,9 +2,9 @@ import os
 
 from . import ElectrumTestCase
 
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs.wallet import restore_wallet_from_text, Abstract_Wallet
-from electrum_grs.daemon import Daemon
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat.wallet import restore_wallet_from_text, Abstract_Wallet
+from electrum_cat.daemon import Daemon
 
 
 class TestContacts(ElectrumTestCase):

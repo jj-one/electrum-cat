@@ -9,9 +9,11 @@ Please send any report to *all* emails listed here.
 
 The following GPG keys may be used to communicate sensitive information.
 
-| Name         | Email                      | Fingerprint                                       |
-|--------------|----------------------------|---------------------------------------------------|
-| jackielove4u | groestlcoin [AT] gmail.com | 287A E4CA 1187 C68C 08B4 9CB2 D11B D4F3 3F1D B499 |
+
+| Name        | Email                                  | GPG fingerprint                                   |
+|-------------|----------------------------------------|---------------------------------------------------|
+| ThomasV     | thomasv [AT] electrum [DOT] org        | 6694 D8DE 7BE8 EE56 31BE D950 2BD5 824B 7F94 70E6 |
+| SomberNight | somber.night [AT] protonmail [DOT] com | 4AD6 4339 DFA0 5E20 B3F6 AD51 E7B7 48CD AF5E 5ED9 |
 
 
 #### Where to find GPG keys
@@ -19,5 +21,5 @@ The following GPG keys may be used to communicate sensitive information.
 You can import a key by running the following command with that
 individual’s fingerprint: `gpg --recv-keys "<fingerprint>"`
 
-These public keys can also be found in the Electrum-grs git repository,
+These public keys can also be found in the Electrum-cat git repository,
 in the top-level `pubkeys` folder.

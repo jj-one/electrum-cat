@@ -26,7 +26,7 @@ task:
   binaries_artifacts:
     path: "contrib/build-wine/dist/*"
   env:
-    CIRRUS_WORKING_DIR: /opt/wine64/drive_c/electrum-grs
+    CIRRUS_WORKING_DIR: /opt/wine64/drive_c/electrum-cat
     CIRRUS_DOCKER_CONTEXT: contrib/build-wine
 
 task:

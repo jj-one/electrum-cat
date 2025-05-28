@@ -8,20 +8,20 @@ import time
 from io import StringIO
 import asyncio
 
-from electrum_grs.storage import WalletStorage
-from electrum_grs.wallet_db import FINAL_SEED_VERSION
-from electrum_grs.wallet import (Abstract_Wallet, Standard_Wallet, create_new_wallet,
+from electrum_cat.storage import WalletStorage
+from electrum_cat.wallet_db import FINAL_SEED_VERSION
+from electrum_cat.wallet import (Abstract_Wallet, Standard_Wallet, create_new_wallet,
                              restore_wallet_from_text, Imported_Wallet, Wallet)
-from electrum_grs.exchange_rate import ExchangeBase, FxThread
-from electrum_grs.util import TxMinedInfo, InvalidPassword
-from electrum_grs.bitcoin import COIN
-from electrum_grs.wallet_db import WalletDB, JsonDB
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs import util
-from electrum_grs.daemon import Daemon
-from electrum_grs.invoices import PR_UNPAID, PR_PAID, PR_UNCONFIRMED
-from electrum_grs.transaction import tx_from_any
-from electrum_grs.address_synchronizer import TX_HEIGHT_UNCONFIRMED
+from electrum_cat.exchange_rate import ExchangeBase, FxThread
+from electrum_cat.util import TxMinedInfo, InvalidPassword
+from electrum_cat.bitcoin import COIN
+from electrum_cat.wallet_db import WalletDB, JsonDB
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat import util
+from electrum_cat.daemon import Daemon
+from electrum_cat.invoices import PR_UNPAID, PR_PAID, PR_UNCONFIRMED
+from electrum_cat.transaction import tx_from_any
+from electrum_cat.address_synchronizer import TX_HEIGHT_UNCONFIRMED
 
 from . import ElectrumTestCase
 

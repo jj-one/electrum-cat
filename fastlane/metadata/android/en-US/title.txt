@@ -1,1 +1,1 @@
-Electrum-GRS Groestlcoin Wallet
+Electrum-CAT Catcoin Wallet

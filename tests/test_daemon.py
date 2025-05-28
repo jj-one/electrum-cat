@@ -1,11 +1,11 @@
 import os
 from typing import Optional, Iterable
 
-from electrum_grs.commands import Commands
-from electrum_grs.daemon import Daemon
-from electrum_grs.simple_config import SimpleConfig
-from electrum_grs.wallet import restore_wallet_from_text, Abstract_Wallet
-from electrum_grs import util
+from electrum_cat.commands import Commands
+from electrum_cat.daemon import Daemon
+from electrum_cat.simple_config import SimpleConfig
+from electrum_cat.wallet import restore_wallet_from_text, Abstract_Wallet
+from electrum_cat import util
 
 from . import ElectrumTestCase, as_testnet
 

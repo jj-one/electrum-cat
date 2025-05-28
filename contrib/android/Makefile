@@ -24,9 +24,9 @@ export BUILD_TIME         := $(shell LC_ALL=C TZ=UTC date +'%H:%M:%S' -d @$(SOUR
 
 prepare:
 	# running pre build setup
-	# copy electrum-grs to main.py
+	# copy electrum-cat to main.py
 	@cp buildozer_$(ELEC_APK_GUI).spec ../../buildozer.spec
-	@cp ../../run_electrum_grs ../../main.py
+	@cp ../../run_electrum_cat ../../main.py
 	@-if [ ! -d "../../.buildozer" ];then \
 		cd ../..; buildozer android debug;\
 		cp -f blacklist.txt .buildozer/android/platform/python-for-android/src/blacklist.txt;\
@@ -42,7 +42,7 @@ release:
 	@make clean
 clean:
 	# Cleaning up
-	# rename main.py to electrum-grs
+	# rename main.py to electrum-cat
 	@-rm ../../main.py
 	# remove buildozer.spec
 	@-rm ../../buildozer.spec

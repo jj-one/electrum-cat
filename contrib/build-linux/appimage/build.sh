@@ -29,13 +29,13 @@ fi
 info "building docker image."
 docker build \
     $DOCKER_BUILD_FLAGS \
-    -t electrum-grs-appimage-builder-img \
+    -t electrum-cat-appimage-builder-img \
     "$CONTRIB_APPIMAGE"
 
 # maybe do fresh clone
 if [ ! -z "$ELECBUILD_COMMIT" ] ; then
     info "ELECBUILD_COMMIT=$ELECBUILD_COMMIT. doing fresh clone and git checkout."
-    FRESH_CLONE="/tmp/electrum_build/appimage/fresh_clone/electrum-grs"
+    FRESH_CLONE="/tmp/electrum_build/appimage/fresh_clone/electrum-cat"
     rm -rf "$FRESH_CLONE" 2>/dev/null || ( info "we need sudo to rm prev FRESH_CLONE." && sudo rm -rf "$FRESH_CLONE" )
     umask 0022
     git clone "$PROJECT_ROOT" "$FRESH_CLONE"
@@ -55,11 +55,11 @@ if [ ! -z "$ELECBUILD_COMMIT" ] ; then  # fresh clone (reproducible build)
     fi
 fi
 docker run -it \
-    --name electrum-grs-appimage-builder-cont \
-    -v "$PROJECT_ROOT_OR_FRESHCLONE_ROOT":/opt/electrum-grs \
+    --name electrum-cat-appimage-builder-cont \
+    -v "$PROJECT_ROOT_OR_FRESHCLONE_ROOT":/opt/electrum-cat \
     --rm \
-    --workdir /opt/electrum-grs/contrib/build-linux/appimage \
-    electrum-grs-appimage-builder-img \
+    --workdir /opt/electrum-cat/contrib/build-linux/appimage \
+    electrum-cat-appimage-builder-img \
     ./make_appimage.sh
 
 # make sure resulting binary location is independent of fresh_clone

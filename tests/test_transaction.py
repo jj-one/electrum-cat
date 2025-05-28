@@ -4,16 +4,16 @@ from typing import NamedTuple, Union
 
 from electrum_ecc import ECPrivkey
 
-from electrum_grs import transaction, bitcoin
-from electrum_grs.transaction import (convert_raw_tx_to_hex, tx_from_any, Transaction,
+from electrum_cat import transaction, bitcoin
+from electrum_cat.transaction import (convert_raw_tx_to_hex, tx_from_any, Transaction,
                                   PartialTransaction, TxOutpoint, PartialTxInput,
                                   PartialTxOutput, Sighash, match_script_against_template,
                                   SCRIPTPUBKEY_TEMPLATE_ANYSEGWIT, TxOutput, script_GetOp,
                                   MalformedBitcoinScript)
-from electrum_grs.util import bfh
-from electrum_grs.bitcoin import (deserialize_privkey, opcodes,
+from electrum_cat.util import bfh
+from electrum_cat.bitcoin import (deserialize_privkey, opcodes,
                               construct_script, construct_witness)
-from electrum_grs import descriptor
+from electrum_cat import descriptor
 
 from .test_bitcoin import disable_ecdsa_r_value_grinding
 from . import ElectrumTestCase

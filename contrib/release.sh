@@ -59,10 +59,13 @@ fi
 
 export SSHUSER="$GPGUSER"
 RELEASEMANAGER=""
-if [ "$GPGUSER" == "jackielove4u" ]; then
-    PUBKEY="--local-user 287A E4CA1187C68C08B49CB2D11BD4F33F1DB499"
-    export SSHUSER=jackielove4u
+if [ "$GPGUSER" == "ThomasV" ]; then
+    PUBKEY="--local-user 6694D8DE7BE8EE5631BED9502BD5824B7F9470E6"
+    export SSHUSER=thomasv
     RELEASEMANAGER=1
+elif [ "$GPGUSER" == "sombernight_releasekey" ]; then
+    PUBKEY="--local-user 0EEDCFD5CAFB459067349B23CA9EEEC43DF911DC"
+    export SSHUSER=sombernight
 else
     warn "unexpected GPGUSER=$GPGUSER"
 fi
@@ -96,7 +99,7 @@ fi
 set -x
 
 # create tarball
-tarball="Electrum-grs-$VERSION.tar.gz"
+tarball="Electrum-cat-$VERSION.tar.gz"
 if test -f "dist/$tarball"; then
     info "file exists: $tarball"
 else
@@ -104,7 +107,7 @@ else
 fi
 
 # create source-only tarball
-srctarball="Electrum-grs-sourceonly-$VERSION.tar.gz"
+srctarball="Electrum-cat-sourceonly-$VERSION.tar.gz"
 if test -f "dist/$srctarball"; then
     info "file exists: $srctarball"
 else
@@ -112,7 +115,7 @@ else
 fi
 
 # appimage
-appimage="electrum-grs-$REV-x86_64.AppImage"
+appimage="electrum-cat-$REV-x86_64.AppImage"
 if test -f "dist/$appimage"; then
     info "file exists: $appimage"
 else
@@ -121,9 +124,9 @@ fi
 
 
 # windows
-win1="electrum-grs-$REV.exe"
-win2="electrum-grs-$REV-portable.exe"
-win3="electrum-grs-$REV-setup.exe"
+win1="electrum-cat-$REV.exe"
+win2="electrum-cat-$REV-portable.exe"
+win3="electrum-cat-$REV-setup.exe"
 if test -f "dist/$win1"; then
     info "file exists: $win1"
 else
@@ -144,13 +147,13 @@ else
 fi
 
 # android
-apk1="ElectrumGRS-$VERSION-armeabi-v7a-release.apk"
-apk2="ElectrumGRS-$VERSION-arm64-v8a-release.apk"
-apk3="ElectrumGRS-$VERSION-x86_64-release.apk"
+apk1="ElectrumCAT-$VERSION-armeabi-v7a-release.apk"
+apk2="ElectrumCAT-$VERSION-arm64-v8a-release.apk"
+apk3="ElectrumCAT-$VERSION-x86_64-release.apk"
 for arch in armeabi-v7a arm64-v8a x86_64
 do
-    apk="ElectrumGRS-$VERSION-$arch-release.apk"
-    apk_unsigned="ElectrumGRS-$VERSION-$arch-release-unsigned.apk"
+    apk="ElectrumCAT-$VERSION-$arch-release.apk"
+    apk_unsigned="ElectrumCAT-$VERSION-$arch-release-unsigned.apk"
     if test -f "dist/$apk"; then
         info "file exists: $apk"
     else
@@ -166,7 +169,7 @@ done
 
 # the macos binary is built on a separate machine.
 # the file that needs to be copied over is the codesigned release binary (regardless of builder role)
-dmg="electrum-grs-$VERSION.dmg"
+dmg="electrum-cat-$VERSION.dmg"
 if ! test -f "dist/$dmg"; then
     if [ ! -z "$RELEASEMANAGER" ] ; then  # RM
         fail "dmg is missing, aborting. Please build and codesign the dmg on a mac and copy it over."
@@ -207,7 +210,7 @@ if [ -z "$RELEASEMANAGER" ] ; then
     cd "$PROJECT_ROOT/dist/releasemanager"
     # TODO check somehow that RM had finished uploading
     sftp -oBatchMode=no -b - "$SSHUSER@uploadserver" << !
-       cd electrum-grs-downloads-airlock
+       cd electrum-cat-downloads-airlock
        cd "$VERSION"
        mget *
        bye

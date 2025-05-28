@@ -1,4 +1,4 @@
-from electrum_grs.interface import ServerAddr
+from electrum_cat.interface import ServerAddr
 
 from . import ElectrumTestCase
 

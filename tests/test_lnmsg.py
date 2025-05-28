@@ -1,15 +1,15 @@
 import io
 
-from electrum_grs.lnmsg import (read_bigsize_int, write_bigsize_int, FieldEncodingNotMinimal,
+from electrum_cat.lnmsg import (read_bigsize_int, write_bigsize_int, FieldEncodingNotMinimal,
                             UnexpectedEndOfStream, LNSerializer, UnknownMandatoryTLVRecordType,
                             MalformedMsg, MsgTrailingGarbage, MsgInvalidFieldOrder, encode_msg,
                             decode_msg, UnexpectedFieldSizeForEncoder, OnionWireSerializer,
                             UnknownMsgType)
-from electrum_grs.lnonion import OnionRoutingFailure
-from electrum_grs.util import bfh
-from electrum_grs.lnutil import ShortChannelID, LnFeatures
-from electrum_grs.channel_db import NodeInfo
-from electrum_grs import constants
+from electrum_cat.lnonion import OnionRoutingFailure
+from electrum_cat.util import bfh
+from electrum_cat.lnutil import ShortChannelID, LnFeatures
+from electrum_cat.channel_db import NodeInfo
+from electrum_cat import constants
 
 from . import ElectrumTestCase
 

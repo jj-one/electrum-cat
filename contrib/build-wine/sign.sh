@@ -33,8 +33,8 @@ for f in $(ls *.exe); do
         -h sha256 \
         -certs "$CERT_FILE" \
         -key "$KEY_FILE" \
-        -n "Electrum-GRS" \
-        -i "https://groestlcoin.org/" \
+        -n "Electrum-CAT" \
+        -i "https://electrum-cat.org/" \
         -t "http://timestamp.digicert.com/" \
         -in "$f" \
         -out "../signed/$f"

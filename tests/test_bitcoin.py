@@ -6,8 +6,8 @@ import sys
 
 import electrum_ecc as ecc
 
-from electrum_grs import bitcoin
-from electrum_grs.bitcoin import (public_key_to_p2pkh, address_from_private_key,
+from electrum_cat import bitcoin
+from electrum_cat.bitcoin import (public_key_to_p2pkh, address_from_private_key,
                               is_address, is_private_key,
                               var_int, _op_push, address_to_script, OnchainOutputType, address_to_payload,
                               deserialize_privkey, serialize_privkey, is_segwit_address,
@@ -17,18 +17,18 @@ from electrum_grs.bitcoin import (public_key_to_p2pkh, address_from_private_key,
                               opcodes, base_encode, base_decode, BitcoinException,
                               taproot_tweak_pubkey, taproot_tweak_seckey, taproot_output_script,
                               control_block_for_taproot_script_spend)
-from electrum_grs import bip32
-from electrum_grs import segwit_addr
-from electrum_grs.segwit_addr import DecodedBech32
-from electrum_grs.bip32 import (BIP32Node, convert_bip32_intpath_to_strpath,
+from electrum_cat import bip32
+from electrum_cat import segwit_addr
+from electrum_cat.segwit_addr import DecodedBech32
+from electrum_cat.bip32 import (BIP32Node, convert_bip32_intpath_to_strpath,
                             xpub_from_xprv, xpub_type, is_xprv, is_bip32_derivation,
                             is_xpub, convert_bip32_strpath_to_intpath,
                             normalize_bip32_derivation, is_all_public_derivation)
-from electrum_grs.crypto import sha256d, SUPPORTED_PW_HASH_VERSIONS
-from electrum_grs import crypto, constants, bitcoin
-from electrum_grs.util import bfh, InvalidPassword, randrange
-from electrum_grs.storage import WalletStorage
-from electrum_grs.keystore import xtype_from_derivation
+from electrum_cat.crypto import sha256d, SUPPORTED_PW_HASH_VERSIONS
+from electrum_cat import crypto, constants, bitcoin
+from electrum_cat.util import bfh, InvalidPassword, randrange
+from electrum_cat.storage import WalletStorage
+from electrum_cat.keystore import xtype_from_derivation
 
 from . import ElectrumTestCase
 from . import FAST_TESTS
@@ -206,17 +206,17 @@ class Test_bitcoin(ElectrumTestCase):
         msg2 = b'Electrum'
 
         sig1 = self.sign_message_with_wif_privkey(
-            'L1TnU2zbNaAqMoVh65Cyvmcjzbrj41Gs9iTLcWbpJCMynXwh1frH', msg1)  # compressed pubkey
-        addr1 = 'FZrwuZcbL7DJTNNBkLeavY7qrJyArcge8Z'
+            'P6bL9KXEG9TazUKR6wkABxRPUxAisC2RiHQaKGQSpuPQmkvb7eJb', msg1)  # compressed pubkey
+        addr1 = '9iLjfSuCo5qDz2aCUmdfqYG2zvZEGBZhwH'
         sig2 = self.sign_message_with_wif_privkey(
-            '5Hxn5C4SQuiV6e62A1MtZmbSeQyrLFhu5uYks62pU5VBUva3Y5H', msg2)  # uncompressed pubkey
-        addr2 = 'FkYzwNGW2hqKQhm6GAt4UyLdbdsBBnEF2p'
+            '61MvGw3KQpgZArEgu6c9sy4G4ccHHMd7xaAsbVsAvuCRREFiDvy', msg2)  # uncompressed pubkey
+        addr2 = '9kxVuiDFmnLZGXZnQKess15oV71KNVX99A'
 
         sig1_b64 = base64.b64encode(sig1)
         sig2_b64 = base64.b64encode(sig2)
 
-        self.assertEqual(sig1_b64, b'IAif/RUZGwevZzO9EGfYGSLNwuz92w0USgyhXwdfm95iDz1nTIrOCc+rfEAn5kfJXJyMjnJxrsKx19/4+8OaLag=')
-        self.assertEqual(sig2_b64, b'Gyn+i4kpkyRQYLFwJhifWz6m7DeM33OmC8XCBN4QTxPYbvACNtxbRZ4hkfsv2MJWrCbMir2NssMj+cCWmTRB2oM=')
+        self.assertEqual(sig1_b64, b'H87xS9DFANodFDBHoBZ1ShSEXpYuvuH7S+MEaOy0FXt5RsE6xC9V1OVxV2qlxJh0X/7jRq4Tv5BdSWm1cO9Z3ks=')
+        self.assertEqual(sig2_b64, b'G4kWjOzOMLSsiTvTJx023y8gFPuJqGPyoDqfusa1pJy0Z3RBseW8wkRKjEoOX6CPwXzXvf+O7GsU3q9Ywx0cuIA=')
 
         self.assertTrue(bitcoin.verify_usermessage_with_address(addr1, sig1, msg1))
         self.assertTrue(bitcoin.verify_usermessage_with_address(addr2, sig2, msg2))
@@ -522,12 +522,12 @@ class Test_bitcoin(ElectrumTestCase):
         self.assertFalse(is_address('bc1gmk9yu'))
 
         # base58 P2PKH
-        self.assertEqual(address_to_script('FYrKsifCJhUpBoPJc2PfPSuyXxPcEbrh5w').hex(), '76a91428662c67561b95c79d2257d2a93d9d151c977e9188ac')
-        self.assertEqual(address_to_script('FfQZ7uRS6YgXnQtn9ovUdPdutUmTgRNjXR').hex(), '76a914704f4b81cadb7bf7e68c08cd3657220f680f863c88ac')
+        self.assertEqual(address_to_script('9WeD5GQJA5EvPWWLPBmYaXPRiVuugM2dCC').hex(), '76a91426df7b007096f32472ca7dc7225e93454512595c88ac')
+        self.assertEqual(address_to_script('9ec7zSH2pestMinTRX94UtYKEBYkG9a4BV').hex(), '76a9147e3b69596cc5a9d8cfdeb2f16c5e643eb928057d88ac')
 
         # base58 P2SH
-        self.assertEqual(address_to_script('35ZqQJcBQMZ1rsv8aSuJ2wkC7ohUFNJZ77').hex(), 'a9142a84cf00d47f699ee7bbc1dea5ec1bdecb4ac15487')
-        self.assertEqual(address_to_script('3PyjzJ3im7f7bcV724GR57edKDqoZn2jJo').hex(), 'a914f47c8954e421031ad04ecd8e7752c9479206b9d387')
+        self.assertEqual(address_to_script('ciBvKgph8Ya2sGNnejx9KUCUrouCL4p21w').hex(), 'a914bf5d2b3f8231595f79cdb0895eb43f087483b61e87')
+        self.assertEqual(address_to_script('cZDbsjaDskhL62muA4h7jHTVVy5FvbSjEA').hex(), 'a9145cf5783aa398a2fa56f09a831adb4ca96380dbae87')
 
     def test_address_to_payload(self):
         # bech32 P2WPKH
@@ -1058,7 +1058,7 @@ class Test_keyImport(ElectrumTestCase):
            {'priv': 'L8g5V8kFFeg2WbecahRSdobARbHz2w2STH9S8ePHVSY4fmfYtzuL',
             'exported_privkey': 'p2wpkh:Kz6SuyPM5VktY5dr2d2YqdVgBA6LCWkiHqXJaC3BzxnMPSUjPJw2',
             'pub': '03e9f948421aaa89415dc5f281a61b60dde12aae3181b3a76cd2d849b164fc6d0b',
-            'address': 'grs1qqmpt7u5e9hfznljta5gnvhyvfd2kdd0rc7t09c',
+            'address': 'cat1qqmpt7u5e9hfznljta5gnvhyvfd2kdd0rc7t09c',
             'minikey': False,
             'txin_type': 'p2wpkh',
             'compressed': True,
@@ -1067,7 +1067,7 @@ class Test_keyImport(ElectrumTestCase):
            {'priv': 'p2wpkh:KyDWy5WbjLA58Zesh1o8m3pADGdJ3v33DKk4m7h8BD5zDK8H6P7p',
             'exported_privkey': 'p2wpkh:KyDWy5WbjLA58Zesh1o8m3pADGdJ3v33DKk4m7h8BD5zDK8H6P7p',
             'pub': '038c57657171c1f73e34d5b3971d05867d50221ad94980f7e87cbc2344425e6a1e',
-            'address': 'grs1qpakeeg4d9ydyjxd8paqrw4xy9htsg532mn6jdw',
+            'address': 'cat1qpakeeg4d9ydyjxd8paqrw4xy9htsg532mn6jdw',
             'minikey': False,
             'txin_type': 'p2wpkh',
             'compressed': True,

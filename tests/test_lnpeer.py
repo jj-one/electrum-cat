@@ -15,35 +15,35 @@ from typing import Iterable, NamedTuple, Tuple, List, Dict
 from aiorpcx import timeout_after, TaskTimeout
 from electrum_ecc import ECPrivkey
 
-import electrum_grs
-import electrum_grs.trampoline
-from electrum_grs import bitcoin
-from electrum_grs import util
-from electrum_grs import constants
-from electrum_grs.network import Network
-from electrum_grs import simple_config, lnutil
-from electrum_grs.lnaddr import lnencode, LnAddr, lndecode
-from electrum_grs.bitcoin import COIN, sha256
-from electrum_grs.transaction import Transaction
-from electrum_grs.util import NetworkRetryManager, bfh, OldTaskGroup, EventListener, InvoiceError
-from electrum_grs.lnpeer import Peer
-from electrum_grs.lntransport import LNPeerAddr
-from electrum_grs.crypto import privkey_to_pubkey
-from electrum_grs.lnutil import Keypair, PaymentFailure, LnFeatures, HTLCOwner, PaymentFeeBudget
-from electrum_grs.lnchannel import ChannelState, PeerState, Channel
-from electrum_grs.lnrouter import LNPathFinder, PathEdge, LNPathInconsistent
-from electrum_grs.channel_db import ChannelDB
-from electrum_grs.lnworker import LNWallet, NoPathFound, SentHtlcInfo, PaySession
-from electrum_grs.lnmsg import encode_msg, decode_msg
-from electrum_grs import lnmsg
-from electrum_grs.logging import console_stderr_handler, Logger
-from electrum_grs.lnworker import PaymentInfo, RECEIVED
-from electrum_grs.lnonion import OnionFailureCode, OnionRoutingFailure
-from electrum_grs.lnutil import UpdateAddHtlc
-from electrum_grs.lnutil import LOCAL, REMOTE
-from electrum_grs.invoices import PR_PAID, PR_UNPAID
-from electrum_grs.interface import GracefulDisconnect
-from electrum_grs.simple_config import SimpleConfig
+import electrum_cat
+import electrum_cat.trampoline
+from electrum_cat import bitcoin
+from electrum_cat import util
+from electrum_cat import constants
+from electrum_cat.network import Network
+from electrum_cat import simple_config, lnutil
+from electrum_cat.lnaddr import lnencode, LnAddr, lndecode
+from electrum_cat.bitcoin import COIN, sha256
+from electrum_cat.transaction import Transaction
+from electrum_cat.util import NetworkRetryManager, bfh, OldTaskGroup, EventListener, InvoiceError
+from electrum_cat.lnpeer import Peer
+from electrum_cat.lntransport import LNPeerAddr
+from electrum_cat.crypto import privkey_to_pubkey
+from electrum_cat.lnutil import Keypair, PaymentFailure, LnFeatures, HTLCOwner, PaymentFeeBudget
+from electrum_cat.lnchannel import ChannelState, PeerState, Channel
+from electrum_cat.lnrouter import LNPathFinder, PathEdge, LNPathInconsistent
+from electrum_cat.channel_db import ChannelDB
+from electrum_cat.lnworker import LNWallet, NoPathFound, SentHtlcInfo, PaySession
+from electrum_cat.lnmsg import encode_msg, decode_msg
+from electrum_cat import lnmsg
+from electrum_cat.logging import console_stderr_handler, Logger
+from electrum_cat.lnworker import PaymentInfo, RECEIVED
+from electrum_cat.lnonion import OnionFailureCode, OnionRoutingFailure
+from electrum_cat.lnutil import UpdateAddHtlc
+from electrum_cat.lnutil import LOCAL, REMOTE
+from electrum_cat.invoices import PR_PAID, PR_UNPAID
+from electrum_cat.interface import GracefulDisconnect
+from electrum_cat.simple_config import SimpleConfig
 
 
 
@@ -521,7 +521,7 @@ class TestPeer(ElectrumTestCase):
         for lnworker in self._lnworkers_created:
             shutil.rmtree(lnworker._user_dir)
         self._lnworkers_created.clear()
-        electrum_grs.trampoline._TRAMPOLINE_NODES_UNITTESTS = {}
+        electrum_cat.trampoline._TRAMPOLINE_NODES_UNITTESTS = {}
         await super().asyncTearDown()
 
     @staticmethod
@@ -841,7 +841,7 @@ class TestPeerDirect(TestPeer):
         if test_trampoline:
             await self._activate_trampoline(w1)
             # declare bob as trampoline node
-            electrum_grs.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
+            electrum_cat.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
                 'bob': LNPeerAddr(host="127.0.0.1", port=9735, pubkey=w2.node_keypair.pubkey),
             }
 
@@ -1702,7 +1702,7 @@ class TestPeerForwarding(TestPeer):
                 self.assertEqual(None, graph.workers['alice'].get_preimage(lnaddr1.paymenthash))
             with self.subTest(msg="try to make Bob forward in trampoline mode"):
                 # declare Bob as trampoline forwarding node
-                electrum_grs.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
+                electrum_cat.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
                     graph.workers['bob'].name: LNPeerAddr(host="127.0.0.1", port=9735, pubkey=graph.workers['bob'].node_keypair.pubkey),
                 }
                 await self._activate_trampoline(graph.workers['alice'])
@@ -1870,7 +1870,7 @@ class TestPeerForwarding(TestPeer):
 
     async def test_payment_multipart_trampoline_e2e(self):
         graph = self.prepare_chans_and_peers_in_graph(self.GRAPH_DEFINITIONS['square_graph'])
-        electrum_grs.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
+        electrum_cat.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
             graph.workers['bob'].name: LNPeerAddr(host="127.0.0.1", port=9735, pubkey=graph.workers['bob'].node_keypair.pubkey),
             graph.workers['carol'].name: LNPeerAddr(host="127.0.0.1", port=9735, pubkey=graph.workers['carol'].node_keypair.pubkey),
         }
@@ -1885,7 +1885,7 @@ class TestPeerForwarding(TestPeer):
 
     async def test_payment_multipart_trampoline_legacy(self):
         graph = self.prepare_chans_and_peers_in_graph(self.GRAPH_DEFINITIONS['square_graph'])
-        electrum_grs.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
+        electrum_cat.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
             graph.workers['bob'].name: LNPeerAddr(host="127.0.0.1", port=9735, pubkey=graph.workers['bob'].node_keypair.pubkey),
             graph.workers['carol'].name: LNPeerAddr(host="127.0.0.1", port=9735, pubkey=graph.workers['carol'].node_keypair.pubkey),
         }
@@ -1979,10 +1979,10 @@ class TestPeerForwarding(TestPeer):
         peers = graph.peers.values()
 
         # declare routing nodes as trampoline nodes
-        electrum_grs.trampoline._TRAMPOLINE_NODES_UNITTESTS = {}
+        electrum_cat.trampoline._TRAMPOLINE_NODES_UNITTESTS = {}
         for tf_name in tf_names:
             peer_addr = LNPeerAddr(host="127.0.0.1", port=9735, pubkey=graph.workers[tf_name].node_keypair.pubkey)
-            electrum_grs.trampoline._TRAMPOLINE_NODES_UNITTESTS[graph.workers[tf_name].name] = peer_addr
+            electrum_cat.trampoline._TRAMPOLINE_NODES_UNITTESTS[graph.workers[tf_name].name] = peer_addr
 
         await f()
 

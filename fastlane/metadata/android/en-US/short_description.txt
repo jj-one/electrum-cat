@@ -1,1 +1,1 @@
-Fast and self-custodial wallet for Groestlcoin and the Lightning Network
+Fast and self-custodial wallet for Catcoin and the Lightning Network

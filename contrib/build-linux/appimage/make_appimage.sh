@@ -7,7 +7,7 @@ CONTRIB="$PROJECT_ROOT/contrib"
 CONTRIB_APPIMAGE="$CONTRIB/build-linux/appimage"
 DISTDIR="$PROJECT_ROOT/dist"
 BUILDDIR="$CONTRIB_APPIMAGE/build/appimage"
-APPDIR="$BUILDDIR/electrum-grs.AppDir"
+APPDIR="$BUILDDIR/electrum-cat.AppDir"
 CACHEDIR="$CONTRIB_APPIMAGE/.cache/appimage"
 export DLL_TARGET_DIR="$CACHEDIR/dlls"
 PIP_CACHE_DIR="$CONTRIB_APPIMAGE/.cache/pip_cache"
@@ -23,8 +23,8 @@ PYTHON_VERSION=3.11.9
 PY_VER_MAJOR="3.11"  # as it appears in fs paths
 PKG2APPIMAGE_COMMIT="a9c85b7e61a3a883f4a35c41c5decb5af88b6b5d"
 
-VERSION=4.5.4
-APPIMAGE="$DISTDIR/electrum-grs-$VERSION-x86_64.AppImage"
+VERSION=4.5.8
+APPIMAGE="$DISTDIR/electrum-cat-$VERSION-x86_64.AppImage"
 
 rm -rf "$BUILDDIR"
 mkdir -p "$APPDIR" "$CACHEDIR" "$PIP_CACHE_DIR" "$DISTDIR" "$DLL_TARGET_DIR"
@@ -139,7 +139,7 @@ info "preparing electrum-locale."
     cd "$PROJECT_ROOT"
     git submodule update --init
 
-    LOCALE="$PROJECT_ROOT/electrum_grs/locale/"
+    LOCALE="$PROJECT_ROOT/electrum_cat/locale/"
     # we want the binary to have only compiled (.mo) locale files; not source (.po) files
     rm -rf "$LOCALE"
     "$CONTRIB/build_locale.sh" "$CONTRIB/deterministic-build/electrum-locale/locale/" "$LOCALE"
@@ -160,9 +160,9 @@ info "Installing build dependencies."
 "$python" -m pip install --no-build-isolation --no-dependencies --no-binary :all: --no-warn-script-location \
     --cache-dir "$PIP_CACHE_DIR" -r "$CONTRIB/deterministic-build/requirements-build-appimage.txt"
 
-info "installing electrum-grs and its dependencies."
+info "installing electrum-cat and its dependencies."
 export ELECTRUM_ECC_DONT_COMPILE=1
-"$python" -m pip install --no-build-isolation --no-dependencies --no-binary :all: --no-warn-script-location \
+"$python" -m pip install --no-build-isolation --no-dependencies --no-binary :all: --only-binary scrypt --no-warn-script-location \
     --cache-dir "$PIP_CACHE_DIR" -r "$CONTRIB/deterministic-build/requirements.txt"
 "$python" -m pip install --no-build-isolation --no-dependencies --no-binary :all: --only-binary PyQt6,PyQt6-Qt6,cryptography --no-warn-script-location \
     --cache-dir "$PIP_CACHE_DIR" -r "$CONTRIB/deterministic-build/requirements-binaries.txt"
@@ -177,8 +177,8 @@ export ELECTRUM_ECC_DONT_COMPILE=1
 
 
 info "desktop integration."
-cp "$PROJECT_ROOT/electrum-grs.desktop" "$APPDIR/electrum-grs.desktop"
-cp "$PROJECT_ROOT/electrum_grs/gui/icons/electrum-grs.png" "$APPDIR/electrum-grs.png"
+cp "$PROJECT_ROOT/electrum-cat.desktop" "$APPDIR/electrum-cat.desktop"
+cp "$PROJECT_ROOT/electrum_cat/gui/icons/electrum-cat.png" "$APPDIR/electrum-cat.png"
 
 
 # add launcher

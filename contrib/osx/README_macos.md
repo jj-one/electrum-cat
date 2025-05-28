@@ -1,4 +1,4 @@
-# Running Electrum-GRS from source on macOS (development version)
+# Running Electrum-CAT from source on macOS (development version)
 
 ## Prerequisites
 
@@ -10,28 +10,28 @@
 
 ### 1. Check out the code from GitHub:
 ```
-$ git clone https://github.com/Groestlcoin/electrum-grs.git
-$ cd electrum-grs
+$ git clone https://github.com/jj-one/electrum-cat.git
+$ cd electrum-cat
 $ git submodule update --init
 ```
 
 ### 2. Prepare for compiling libsecp256k1
 
-To be able to build the `electrum-ecc` package from source
+To be able to build the `electrum-cat` package from source
 (which is pulled in when installing Electrum in the next step),
 you need:
 ```
 $ brew install autoconf automake libtool coreutils
 ```
 
-### 3. Install Electrum-GRS
+### 3. Install Electrum-CAT
 
 Run install (this should install the dependencies):
 ```
 $ python3 -m pip install --user -e ".[gui,crypto]"
 ```
 
-### 4. Run electrum-grs:
+### 4. Run electrum-cat:
 ```
-$ ./run_electrum_grs
+$ ./run_electrum_cat
 ```

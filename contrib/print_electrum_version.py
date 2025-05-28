@@ -1,11 +1,11 @@
 #!/usr/bin/python3
-# For usage in shell, to get the version of electrum-grs, without needing electrum-grs installed.
+# For usage in shell, to get the version of electrum-cat, without needing electrum-cat installed.
 # usage: ./print_electrum_version.py [<attr_name>]
 #
 # For example:
 # $ VERSION=$("$CONTRIB"/print_electrum_version.py)
 # instead of
-# $ VERSION=$(python3 -c "import electrum; print(electrum_grs.version.ELECTRUM_VERSION)")
+# $ VERSION=$(python3 -c "import electrum; print(electrum_cat.version.ELECTRUM_VERSION)")
 
 import importlib.util
 import os
@@ -19,7 +19,7 @@ if __name__ == '__main__':
         attr_name = "ELECTRUM_VERSION"
 
     project_root = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-    version_file_path = os.path.join(project_root, "electrum_grs", "version.py")
+    version_file_path = os.path.join(project_root, "electrum_cat", "version.py")
 
     # load version.py; needlessly complicated alternative to "imp.load_source":
     version_spec = importlib.util.spec_from_file_location('version', version_file_path)

@@ -188,7 +188,7 @@ RUN cd /opt \
     && git clone https://github.com/spesmilo/buildozer \
     && cd buildozer \
     && git checkout "${BUILDOZER_CHECKOUT_COMMIT}^{commit}" \
-    # SETUPTOOLS_USE_DISTUTILS=stdlib needed to build buildozer for GRS
+    # SETUPTOOLS_USE_DISTUTILS=stdlib needed to build buildozer for CAT
     && SETUPTOOLS_USE_DISTUTILS=stdlib /opt/venv/bin/python3  -m pip install --no-build-isolation --no-dependencies -e . \
     && /opt/venv/bin/python3 -m pip install --no-build-isolation --no-dependencies -e .
 

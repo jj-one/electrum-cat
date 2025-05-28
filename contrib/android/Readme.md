@@ -1,9 +1,9 @@
 # Qml GUI
 
-The Qml GUI is used with Electrum-GRS on Android devices, since Electrum-GRS 4.4.
+The Qml GUI is used with Electrum-CAT on Android devices, since Electrum-CAT 4.4.
 To generate an APK file, follow these instructions.
 
-(note: older versions of Electrum-GRS for Android used the "kivy" GUI)
+(note: older versions of Electrum-CAT for Android used the "kivy" GUI)
 
 ## Android binary with Docker
 
@@ -66,18 +66,18 @@ You probably need to clear the cache: `rm -rf .buildozer/android/platform/build-
 ### How do I deploy on connected phone for quick testing?
 Assuming `adb` is installed:
 ```
-$ adb -d install -r dist/ElectrumGRS-*-arm64-v8a-debug.apk
-$ adb shell monkey -p org.groestlcoin.electrumgrs 1
+$ adb -d install -r dist/ElectrumCAT-*-arm64-v8a-debug.apk
+$ adb shell monkey -p org.catcoin.electrumcat 1
 ```
 
 
 ### How do I get an interactive shell inside docker?
 ```
 $ docker run -it --rm \
-    -v $PWD:/home/user/wspace/electrum-grs \
+    -v $PWD:/home/user/wspace/electrum-cat \
     -v $PWD/.buildozer/.gradle:/home/user/.gradle \
-    --workdir /home/user/wspace/electrum-grs \
-    electrum-grs-android-builder-img
+    --workdir /home/user/wspace/electrum-cat \
+    electrum-cat-android-builder-img
 ```
 
 
@@ -92,7 +92,7 @@ adb logcat | grep python
 ```
 Better `grep` but fragile because of `cut`:
 ```
-adb logcat | grep -F "`adb shell ps | grep org.groestlcoin.Electrumgrs | cut -c14-19`"
+adb logcat | grep -F "`adb shell ps | grep org.catcoin.Electrumcat | cut -c14-19`"
 ```
 
 
@@ -102,7 +102,7 @@ Install requirements:
 python3 -m pip install ".[qml_gui]"
 ```
 
-Run electrum-grs with the `-g` switch: `electrum_grs -g qml`
+Run electrum-cat with the `-g` switch: `electrum_cat -g qml`
 
 Notes:
 
@@ -137,18 +137,18 @@ of Android does not let you access the internal storage of an app without root.
 To pull a file:
 ```
 $ adb shell
-adb$ run-as org.groestlcoin.electrumgrs ls /data/data/org.groestlcoin.electrumgrs/files/data
+adb$ run-as org.catcoin.electrumcat ls /data/data/org.catcoin.electrumcat/files/data
 adb$ exit
-$ adb exec-out run-as org.groestlcoin.electrumgrs cat /data/data/org.groestlcoin.electrumgrs/files/data/wallets/my_wallet > my_wallet
+$ adb exec-out run-as org.catcoin.electrumcat cat /data/data/org.catcoin.electrumcat/files/data/wallets/my_wallet > my_wallet
 ```
 To push a file:
 ```
 $ adb push ~/wspace/tmp/my_wallet /data/local/tmp
 $ adb shell
 adb$ ls -la /data/local/tmp
-adb$ run-as org.groestlcoin.testnet.electrumgrs cp /data/local/tmp/my_wallet /data/data/org.groestlcoin.testnet.electrumgrs/files/data/testnet/wallets/
-adb$ run-as org.groestlcoin.testnet.electrumgrs chmod -R 700 /data/data/org.groestlcoin.testnet.electrumgrs/files/data/testnet/wallets
-adb$ run-as org.groestlcoin.testnet.electrumgrs chmod -R u-x,u+X /data/data/org.groestlcoin.testnet.electrumgrs/files/data/testnet/wallets
+adb$ run-as org.catcoin.testnet.electrumcat cp /data/local/tmp/my_wallet /data/data/org.catcoin.testnet.electrumcat/files/data/testnet/wallets/
+adb$ run-as org.catcoin.testnet.electrumcat chmod -R 700 /data/data/org.catcoin.testnet.electrumcat/files/data/testnet/wallets
+adb$ run-as org.catcoin.testnet.electrumcat chmod -R u-x,u+X /data/data/org.catcoin.testnet.electrumcat/files/data/testnet/wallets
 adb$ rm /data/local/tmp/my_wallet
 ```
 
@@ -164,19 +164,19 @@ Run `$ adb shell pm list users` to get a list of all existing users, and take no
 
 Instead of `/data/data/{app.path}`, private app data is stored at `/data/user/{userId}/{app.path}`.
 
-Further, instead of `adb$ run-as org.groestlcoin.testnet.electrumgrs`,
-you need `adb$ run-as org.groestlcoin.testnet.electrumgrs --user {userId}`.
+Further, instead of `adb$ run-as org.catcoin.testnet.electrumcat`,
+you need `adb$ run-as org.catcoin.testnet.electrumcat --user {userId}`.
 
 ### How to investigate diff between binaries if reproducibility fails?
 ```
 cd dist/
-unzip ElectrumGRS-*.apk1 -d apk1
+unzip ElectrumCAT-*.apk1 -d apk1
 mkdir apk1/assets/private_mp3/
 tar -xzvf apk1/assets/private.tar --directory apk1/assets/private_mp3/
 mkdir apk1/lib/_libpybundle/
 tar -xzvf apk1/lib/*/libpybundle.so --directory apk1/lib/_libpybundle/
 
-unzip ElectrumGRS-*.apk2 -d apk2
+unzip ElectrumCAT-*.apk2 -d apk2
 mkdir apk2/assets/private_mp3/
 tar -xzvf apk2/assets/private.tar --directory apk2/assets/private_mp3/
 mkdir apk2/lib/_libpybundle/
