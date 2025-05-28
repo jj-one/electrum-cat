@@ -10,7 +10,7 @@
 
 ### 1. Check out the code from GitHub:
 ```
-$ git clone https://github.com/jj-one/electrum-cat.git
+$ git clone https://github.com/catcoincore/electrum-cat.git
 $ cd electrum-cat
 $ git submodule update --init
 ```

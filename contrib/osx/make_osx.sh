@@ -6,7 +6,7 @@ set -e
 PYTHON_VERSION=3.11.9
 PY_VER_MAJOR="3.11"  # as it appears in fs paths
 PACKAGE=Electrum-CAT
-GIT_REPO=https://github.com/jj-one/electrum-cat
+GIT_REPO=https://github.com/catcoincore/electrum-cat
 
 export GCC_STRIP_BINARIES="1"
 export PYTHONDONTWRITEBYTECODE=1  # don't create __pycache__/ folders with .pyc files

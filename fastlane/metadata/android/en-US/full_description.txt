@@ -3,7 +3,7 @@ Electrum Catcoin wallet for Android.
 Secure, feature rich and trusted by the Bitcoin community since 2011.
 • Website: https://electrum-cat.org
 • Email: catcoin2013@proton.me
-• GitHub: https://github.com/jj-one/electrum-cat
+• GitHub: https://github.com/catcoincore/electrum-cat
 • Support: Please use GitHub or email to report bugs rather than the app rating system.
 
 Features:

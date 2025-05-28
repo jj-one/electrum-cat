@@ -7,7 +7,7 @@ Language: Python (>= 3.10)
 Homepage: https://electrum-cat.org/
 ```
 
-[![Build Status](https://api.cirrus-ci.com/github/jj-one/electrum-cat.svg?branch=master)](https://cirrus-ci.com/github/jj-one/electrum-cat)
+[![Build Status](https://api.cirrus-ci.com/github/catcoincore/electrum-cat.svg?branch=master)](https://cirrus-ci.com/github/catcoincore/electrum-cat)
 
 ## Getting started
 
@@ -103,7 +103,7 @@ and [for macOS](contrib/osx/README_macos.md))_
 
 Check out the code from GitHub:
 ```
-$ git clone https://github.com/jj-one/electrum-cat.git
+$ git clone https://github.com/catcoincore/electrum-cat.git
 $ cd electrum-cat
 $ git submodule update --init
 ```
@@ -153,7 +153,7 @@ Implementing new features, or improving/refactoring the codebase, is of course
 also welcome, but to avoid wasted effort, especially for larger changes,
 we encourage discussing these on the issue tracker or IRC first.
 
-Besides [GitHub](https://github.com/jj-one/electrum-cat),
+Besides [GitHub](https://github.com/catcoincore/electrum-cat),
 most communication about Electrum-CAT development happens on Discord, in the
 `#General` channel on Catcoin Team 3 (Unofficial) Discord server. The easiest way to participate 
 with the web client, [https://discord.gg/4HDPB5DE](https://discord.gg/4HDPB5DE).
