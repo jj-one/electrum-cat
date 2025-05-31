@@ -53,7 +53,7 @@ def get_peers():
     # 1. get connected interfaces
     server = config.get('server')
     if server is None:
-        print("You need to set a secure server, for example (for mainnet): 'electrum-cat setconfig server cat1.electrum-cat.org:8101:s'")
+        print("You need to set a secure server, for example (for mainnet): 'electrum-cat setconfig server pro1.electrum-cat.org:8101:s'")
         return []
     interfaces = get_interfaces([server])
     if not interfaces:

@@ -1,5 +1,10 @@
 {
-    "cat1.electrum-cat.org": {
+    "pro1.electrum-cat.org": {
+        "pruning": "-",
+        "s": "8103",
+        "version": "1.16.0"
+    },
+    "pro2.electrum-cat.org": {
         "pruning": "-",
         "s": "8103",
         "version": "1.16.0"
