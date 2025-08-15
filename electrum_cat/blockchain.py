@@ -701,57 +701,49 @@ class Blockchain(Logger):
         return self.get_target_4(last_height, headers)
 
     def get_target_lwma(self, last_height: int, headers: dict) -> int:
-        try:
-            last_timestamp = headers[last_height].get("timestamp")
-            last_bits = headers[last_height].get("bits")
-        except:
-            try:
-                last_timestamp = self.read_header(last_height).get("timestamp")
-                last_bits = self.read_header(last_height).get("bits")
-            except:
-                raise MissingHeader()
-        t = constants.net.POW_TARGET_SPACING
-        n = constants.net.LWMA_AVERAGING_WINDOW
-        k = n * (n + 1) * t // 2
+        T = constants.net.POW_TARGET_SPACING
+        N = constants.net.LWMA_AVERAGING_WINDOW
+        pow_limit = MAX_TARGET
         height = last_height
-        powLimit = MAX_TARGET
+    
+        if height < N:
+            return pow_limit
 
-        if height < n:
-            return powLimit
-
-        sumWeightedSolvetimes = 0
+        k = N * (N + 1) * T // 2
+        sum_weighted_solvetimes = 0
         j = 0
-        avgTarget = 0
+        avg_target = 0
+
         try:
-            ancestor_timestamp = headers[height - n].get("timestamp")
+            previous_timestamp = headers[height - N].get("timestamp")
         except:
             try:
-                ancestor_timestamp = self.read_header(height - n).get("timestamp")
+                previous_timestamp = self.read_header(height - N).get("timestamp")
             except:
                 raise MissingHeader()
-        
-        for i in range(height - n + 1, height, 1):
+
+        for i in range(height - N + 1, height + 1):
             try:
-                thisBlock = headers[i]
-                ancestor_i_timestamp = thisBlock.get("timestamp")
+                block = headers[i]
             except:
                 try:
-                    thisBlock = self.read_header(i)
-                    ancestor_i_timestamp = thisBlock.get("timestamp")
+                    block = self.read_header(i)
                 except:
-                    raise MissingHeader() 
-            thisTimestamp = ancestor_i_timestamp if ancestor_i_timestamp > ncestor_timestamp else ncestor_timestamp + 1
-            solvetime = min(6 * t, thisTimestamp - ancestor_timestamp)
-            ancestor_timestamp = thisTimestamp
-            j += 1
-            sumWeightedSolvetimes += solvetime * j
-            thisTarget = self.bits_to_target(thisBlock.get("bits"))
-            avgTarget += thisTarget // n // k
+                    raise MissingHeader()
 
-        nextTarget = avgTarget * sumWeightedSolvetimes
-        if nextTarget > powLimit:
-            return powLimit
-        return nextTarget
+            this_timestamp = block.get("timestamp") if block.get("timestamp") > previous_timestamp else previous_timestamp + 1
+            solvetime = min(6 * T, this_timestamp - previous_timestamp)
+            previous_timestamp = this_timestamp
+            j += 1
+            sum_weighted_solvetimes += solvetime * j
+            target = self.bits_to_target(block.get("bits"))
+            avg_target += target // N // k
+
+        next_target = avg_target * sum_weighted_solvetimes
+
+        if next_target > pow_limit:
+            next_target = pow_limit
+        return next_target
             
     def get_target(self, last_height: int, headers=None) -> int:
         # compute target from chunk x, used in chunk x+1
