@@ -1,21 +1,21 @@
 # Note: we deliberately use an old Debian stable as base image.
-# from https://docs.appimage.org/introduction/concepts.html :
-# "[AppImages] should be built on the oldest possible system, allowing them to run on newer system[s]"
+# "[AppImages] should be built on the oldest possible system, allowing them to run on newer systems"
 
 FROM debian:buster@sha256:233c3bbc892229c82da7231980d50adceba4db56a08c0b7053a4852782703459
 
 ENV LC_ALL=C.UTF-8 LANG=C.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive
 
-# need ca-certificates before using snapshot packages
-RUN apt update -qq > /dev/null && apt install -qq --yes --no-install-recommends \
-    ca-certificates
+# Pin to a fixed snapshot date for reproducible builds
+# Using December 1, 2024 (near end-of-life but still has latest patches)
+RUN echo "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20241201T000000Z buster main contrib non-free" > /etc/apt/sources.list \
+ && echo "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20241201T000000Z buster/updates main contrib non-free" >> /etc/apt/sources.list \
+ && echo "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20241201T000000Z buster-updates main contrib non-free" >> /etc/apt/sources.list \
+ && apt-get -o Acquire::Check-Valid-Until=false update \
+ && apt-get install -y --no-install-recommends ca-certificates
 
-# pin the distro packages
-# COPY apt.sources.list /etc/apt/sources.list
-# COPY apt.preferences /etc/apt/preferences.d/snapshot
-
-RUN apt-get update -q && \
+# Install all build dependencies
+RUN apt-get -o Acquire::Check-Valid-Until=false update && \
     apt-get install -qy --allow-downgrades \
         sudo \
         git \
@@ -58,7 +58,6 @@ RUN apt-get update -q && \
         libxcb-image0 \
         libxcb-keysyms1 \
         libxcb-util0 \
-        #libxcb-util1 \
         libxcb-render-util0 \
         libxcb-cursor0 \
         libx11-xcb1 \
@@ -68,22 +67,8 @@ RUN apt-get update -q && \
         libv4l-dev \
         libjpeg62-turbo-dev \
         libx11-dev \
-        && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get autoremove -y && \
-    apt-get clean
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get autoremove -y \
+    && apt-get clean
 
 RUN git config --global --add safe.directory '*'
-
-# create new user to avoid using root; but with sudo access and no password for convenience.
-#ARG UID=1000
-#ENV USER="user"
-#ENV HOME_DIR="/home/${USER}"
-#ENV WORK_DIR="${HOME_DIR}/wspace" \
-#    PATH="${HOME_DIR}/.local/bin:${PATH}"
-#RUN useradd --uid $UID --create-home --shell /bin/bash ${USER}
-#RUN usermod -append --groups sudo ${USER}
-#RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-#WORKDIR ${WORK_DIR}
-#RUN chown --recursive ${USER} ${WORK_DIR}
-#USER ${USER}
