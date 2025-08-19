@@ -11,15 +11,6 @@ task:
       - echo $CIRRUS_TASK_NAME
       - git ls-files -s contrib/deterministic-build/*.txt
       - git ls-files -s contrib/build-wine/
-  build2_cache:
-    folders:
-      - contrib/build-wine/.cache/win*/build
-    fingerprint_script:
-      - echo $CIRRUS_TASK_NAME
-      - cat contrib/make_libsecp256k1.sh | sha256sum
-      - cat contrib/make_libusb.sh | sha256sum
-      - cat contrib/make_zbar.sh | sha256sum
-      - git ls-files -s contrib/build-wine/
   build_script:
     - cd contrib/build-wine
     - ./make_win.sh
@@ -28,6 +19,7 @@ task:
   env:
     CIRRUS_WORKING_DIR: /opt/wine64/drive_c/electrum-cat
     CIRRUS_DOCKER_CONTEXT: contrib/build-wine
+    CIRRUS_DOCKER_TAG: "no-cache-${CIRRUS_BUILD_ID}"
 
 task:
   name: "build: Android (QML $APK_ARCH)"
@@ -98,18 +90,13 @@ task:
       - echo $CIRRUS_TASK_NAME
       - git ls-files -s contrib/deterministic-build/*.txt
       - git ls-files -s contrib/build-linux/appimage/
-  build2_cache:
-    folder: contrib/build-linux/appimage/.cache/appimage
-    fingerprint_script:
-      - echo $CIRRUS_TASK_NAME
-      - cat contrib/make_libsecp256k1.sh | sha256sum
-      - git ls-files -s contrib/build-linux/appimage/
   build_script:
     - ./contrib/build-linux/appimage/make_appimage.sh
   binaries_artifacts:
     path: "dist/*"
   env:
     CIRRUS_DOCKER_CONTEXT: contrib/build-linux/appimage
+    CIRRUS_DOCKER_TAG: "no-cache-${CIRRUS_BUILD_ID}"
 
 task:
   container:
