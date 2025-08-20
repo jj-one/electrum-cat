@@ -25,7 +25,7 @@ similar system.
     ```
     If you want reproducibility, try instead e.g.:
     ```
-    $ ELECBUILD_COMMIT=HEAD ./build.sh
+    $ ELECBUILD_COMMIT=HEAD ELECBUILD_NOCACHE=1 ./build.sh
     ```
 
 3. The generated binaries are in `./contrib/build-wine/dist`.

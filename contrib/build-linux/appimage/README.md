@@ -25,7 +25,7 @@ Help to adapt these scripts to build for (some flavor of) ARM would be welcome.
     ```
     If you want reproducibility, try instead e.g.:
     ```
-    $ ELECBUILD_COMMIT=HEAD ./build.sh
+    $ ELECBUILD_COMMIT=HEAD ELECBUILD_NOCACHE=1 ./build.sh
     ```
 
 3. The generated binary is in `./dist`.
