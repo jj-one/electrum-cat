@@ -13,7 +13,10 @@ To generate an APK file, follow these instructions.
 - _Minimum supported target system (i.e. what end-users need): Android 6.0 (API 23)_
 
 This assumes an Ubuntu (x86_64) host, but it should not be too hard to adapt to another
-similar system.
+similar system. 
+
+Note: ensure you have minimum of 70GB of free disk space before you 
+start building Android apk to avoid confusing build errors.
 
 1. Install Docker
 
