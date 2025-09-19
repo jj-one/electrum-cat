@@ -673,16 +673,42 @@ def xor_bytes(a: bytes, b: bytes) -> bytes:
 
 
 def user_dir():
+    #Keeps path to the userdata directory
+    path = None
     if "ELECTRUMDIR" in os.environ:
-        return os.environ["ELECTRUMDIR"]
+        path = os.environ["ELECTRUMDIR"]
     elif 'ANDROID_DATA' in os.environ:
-        return android_data_dir()
+        path = android_data_dir()
     elif os.name == 'posix':
-        return os.path.join(os.environ["HOME"], ".electrum-cat")
+        path = os.path.join(os.environ["HOME"], ".electrum-cat")
     elif "APPDATA" in os.environ:
-        return os.path.join(os.environ["APPDATA"], "Electrum-cat")
+        path = os.path.join(os.environ["APPDATA"], "Electrum-cat")
     elif "LOCALAPPDATA" in os.environ:
-        return os.path.join(os.environ["LOCALAPPDATA"], "Electrum-cat")
+        path = os.path.join(os.environ["LOCALAPPDATA"], "Electrum-cat")
+    """else:
+        #raise Exception("No home directory found in environment variables.")
+        return
+    """
+
+    if path is not None:
+        #if user dir starts with C:\Program Files or C:\Program Files (x86), change to C:\Users\Username\AppData\Roaming
+        if path.startswith('C:\\Program Files'):
+            if "APPDATA" in os.environ and not os.environ["APPDATA"].startswith('C:\\Program Files'):
+                path = os.path.join(os.environ["APPDATA"], "Electrum-cat")
+            elif "LOCALAPPDATA" in os.environ and not os.environ["LOCALAPPDATA"].startswith('C:\\Program Files'):
+                path = os.path.join(os.environ["LOCALAPPDATA"], "Electrum-cat")
+            else:
+                #raise Exception("No home directory found in environment variables.")
+                return
+        elif path.startswith('C:\\Program Files (x86)'):
+            if "APPDATA" in os.environ and not os.environ["APPDATA"].startswith('C:\\Program Files (x86)'):
+                path = os.path.join(os.environ["APPDATA"], "Electrum-cat")
+            elif "LOCALAPPDATA" in os.environ and not os.environ["LOCALAPPDATA"].startswith('C:\\Program Files (x86)'):
+                path = os.path.join(os.environ["LOCALAPPDATA"], "Electrum-cat")
+            else:
+                #raise Exception("No home directory found in environment variables.")
+                return
+        return path
     else:
         #raise Exception("No home directory found in environment variables.")
         return
