@@ -274,7 +274,7 @@ class SimpleConfig(Logger):
         # Read electrum_path from command line
         # Otherwise use the user's default data directory.
         path = self.get('electrum_path') or self.user_dir()
-        make_dir(path, allow_symlink=False) 
+        make_dir(path, allow_symlink=False)
         return path
 
     def electrum_path(self):
