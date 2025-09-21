@@ -692,18 +692,19 @@ def user_dir():
 
     if path is not None:
         #if user dir starts with C:\Program Files or C:\Program Files (x86), change to C:\Users\Username\AppData\Roaming
-        if path.startswith('C:\\Program Files'):
-            if "APPDATA" in os.environ and not os.environ["APPDATA"].startswith('C:\\Program Files'):
+        win_no_allow = ['C:\\Program Files', 'C:\\Program Files (x86)']
+        if path.startswith(win_no_allow[0]):
+            if "APPDATA" in os.environ and not os.environ["APPDATA"].startswith(win_no_allow[0]):
                 path = os.path.join(os.environ["APPDATA"], "Electrum-cat")
-            elif "LOCALAPPDATA" in os.environ and not os.environ["LOCALAPPDATA"].startswith('C:\\Program Files'):
+            elif "LOCALAPPDATA" in os.environ and not os.environ["LOCALAPPDATA"].startswith(win_no_allow[0]):
                 path = os.path.join(os.environ["LOCALAPPDATA"], "Electrum-cat")
             else:
                 #raise Exception("No home directory found in environment variables.")
                 return
-        elif path.startswith('C:\\Program Files (x86)'):
-            if "APPDATA" in os.environ and not os.environ["APPDATA"].startswith('C:\\Program Files (x86)'):
+        elif path.startswith(win_no_allow[1]):
+            if "APPDATA" in os.environ and not os.environ["APPDATA"].startswith(win_no_allow[1]):
                 path = os.path.join(os.environ["APPDATA"], "Electrum-cat")
-            elif "LOCALAPPDATA" in os.environ and not os.environ["LOCALAPPDATA"].startswith('C:\\Program Files (x86)'):
+            elif "LOCALAPPDATA" in os.environ and not os.environ["LOCALAPPDATA"].startswith(win_no_allow[1]):
                 path = os.path.join(os.environ["LOCALAPPDATA"], "Electrum-cat")
             else:
                 #raise Exception("No home directory found in environment variables.")

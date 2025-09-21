@@ -359,6 +359,19 @@ def main():
             # note: Re the portable .exe on Windows, when the user double-clicks it, CWD gets set
             #       to the parent dir, i.e. we will put the datadir next to the exe.
             datadir = os.path.join(os.path.realpath(cwd), 'electrum-cat_data')
+        
+        # datadir must not be C:\Program Files or similar on Windows
+        win_no_allow = ['C:\\Program Files', 'C:\\Program Files (x86)']
+        if datadir.startswith(win_no_allow[0]):
+            if "APPDATA" in os.environ and not os.environ["APPDATA"].startswith(win_no_allow[0]):
+                datadir = os.path.join(os.environ["APPDATA"], "electrum-cat_data")
+            elif "LOCALAPPDATA" in os.environ and not os.environ["LOCALAPPDATA"].startswith(win_no_allow[0]):
+                datadir = os.path.join(os.environ["LOCALAPPDATA"], "electrum-cat_data")
+        elif datadir.startswith(win_no_allow[1]):
+            if "APPDATA" in os.environ and not os.environ["APPDATA"].startswith(win_no_allow[1]):
+                datadir = os.path.join(os.environ["APPDATA"], "electrum-cat_data")
+            elif "LOCALAPPDATA" in os.environ and not os.environ["LOCALAPPDATA"].startswith(win_no_allow[1]):
+                datadir = os.path.join(os.environ["LOCALAPPDATA"], "electrum-cat_data")
         config_options['electrum_path'] = datadir
 
     if not config_options.get('verbosity'):
